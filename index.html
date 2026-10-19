@@ -91,7 +91,7 @@
             background: #0d0d0b;
             object-fit: contain;
         }
-        /* ===== NOTIFICATION BAR WIDGET ===== */
+        /* ===== ALWAYS-ON NOTIFICATION BAR WIDGET ===== */
         .app-notification-bar {
             position: absolute;
             top: 12px;
@@ -99,12 +99,12 @@
             transform: translateX(-50%) translateY(-120px);
             width: calc(100% - 32px);
             max-width: 420px;
-            background: rgba(22, 22, 18, 0.94);
-            border: 1px solid rgba(255, 204, 0, 0.4);
+            background: rgba(22, 22, 18, 0.96);
+            border: 1px solid rgba(255, 204, 0, 0.5);
             border-radius: 14px;
             padding: 12px 16px;
             z-index: 5000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255,204,0,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255,204,0,0.25);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             display: flex;
@@ -1484,20 +1484,20 @@
 <body>
 
     <div id="workspace">
-        <!-- Live System Notification Bar Simulator -->
-        <div class="app-notification-bar" id="appNotificationBar">
+        <!-- Always-On Persistent Notification Bar -->
+        <div class="app-notification-bar show" id="appNotificationBar">
             <div class="notif-header">
                 <div class="notif-app-info">
                     <img src="bee72342368/Gemini_Generated_Image_m9ale3m9ale3m9al.png" alt="Icon" style="width:14px;height:14px;">
-                    <span>Bee Project • Notification</span>
+                    <span>Bee Project • Active Session</span>
                 </div>
-                <span id="notifTime">Just now</span>
+                <span id="notifTime">Always On</span>
             </div>
             <div class="notif-body">
                 <img src="bee72342368/Gemini_Generated_Image_m9ale3m9ale3m9al.png" alt="Logo" class="notif-icon">
                 <div class="notif-content">
-                    <div class="notif-title" id="notifBarTitle">Layer Routing Active</div>
-                    <div class="notif-text" id="notifBarText">Inserted to Layer A3: —</div>
+                    <div class="notif-title" id="notifBarTitle">App Running</div>
+                    <div class="notif-text" id="notifBarText">Ready for data input (Layer A3)</div>
                 </div>
                 <button class="notif-close" id="notifBarCloseBtn" title="Dismiss">✕</button>
             </div>
@@ -1611,7 +1611,7 @@
                             <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
                         </button>
                         <button class="nudge-btn nudge-down" id="nudgeDownBtn" data-dir="down" title="Move Down (hold to keep moving)">
-                            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 z"/></svg>
+                            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
                         </button>
                     </div>
                     <div class="nudge-spacing-bar">
@@ -1813,22 +1813,16 @@
         const ctx = canvas.getContext('2d', { alpha: false });
         const container = document.getElementById('canvasContainer');
 
-        // ========== NOTIFICATION BAR SIMULATOR CONTROLLER ==========
-        let _notifTimer = null;
+        // ========== ALWAYS-ON NOTIFICATION BAR CONTROLLER ==========
         function showAppNotification(title, message) {
             const bar = document.getElementById('appNotificationBar');
             const titleEl = document.getElementById('notifBarTitle');
             const textEl = document.getElementById('notifBarText');
             if (!bar || !titleEl || !textEl) return;
 
-            titleEl.textContent = title || 'Layer Routed (A3)';
-            textEl.textContent = message || 'Value inserted successfully';
+            titleEl.textContent = title || 'Bee Project Active';
+            textEl.textContent = message || 'Ready for data entry (Layer A3)';
             bar.classList.add('show');
-
-            clearTimeout(_notifTimer);
-            _notifTimer = setTimeout(() => {
-                bar.classList.remove('show');
-            }, 4000);
         }
 
         document.getElementById('notifBarCloseBtn').addEventListener('click', () => {
@@ -1836,7 +1830,7 @@
             if (bar) bar.classList.remove('show');
         });
 
-        // Request Browser Notification Permission on load
+        // Request browser permission
         if ('Notification' in window && Notification.permission === 'default') {
             Notification.requestPermission().catch(() => {});
         }
@@ -3238,7 +3232,7 @@
             if (setInput(a3Layer, amount))    { 
                 changed = true; 
                 log.push(`A3=${amount}`); 
-                showAppNotification('Layer A3 Routing', `Inserted amount: ${amount}`);
+                showAppNotification('Layer A3 Assigned', `Inserted Amount/Number: ${amount}`);
             }
             else if (a3Layer)                 { log.push('A3=—'); }
 
@@ -3982,9 +3976,8 @@
                 const idx = project.layers.findIndex(l => l.id === selectedLayerId);
                 if (inputIndices.includes(idx)) {
                     layer.isInput = true;
-                    // Trigger Notification Bar if typing in Layer A3 (index 2)
                     if (idx === 2) {
-                        showAppNotification('Layer A3 Update', `Number inserted: ${newText}`);
+                        showAppNotification('Layer A3 Updated', `Inserted Number: ${newText}`);
                     }
                 }
 
