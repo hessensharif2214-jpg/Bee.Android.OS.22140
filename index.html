@@ -1,0 +1,3652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bee Project · Offline Font Sync</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0c0c0a">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;800;900&family=Almarai:wght@700;800&family=Baloo+Bhaijaan+2:wght@700;800&family=Cairo:wght@900&family=Changa:wght@800;900&family=El+Messiri:wght@700&family=IBM+Plex+Sans+Arabic:wght@700&family=Lalezar&family=Noto+Sans+Arabic:wght@800;900&family=Plus+Jakarta+Sans:wght@800&family=Readex+Pro:wght@700;800&family=Rubik:wght@800;900&family=Tajawal:wght@900&family=Vazirmatn:wght@900&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'GE Dinar One';
+            src: local('GE Dinar One Bold'), local('GEDinarOne-Bold'), url('GE-Dinar-One-Bold.ttf') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Al Majeed Quranic Font';
+            src: local('Al Majeed Quranic Font'), local('AlMajeedQuranicFont');
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Guesswhat Exceptional';
+            src: local('Guesswhat Exceptional'), local('GuesswhatExceptional');
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Aa Typo round Point';
+            src: local('Aa Typo round Point'), local('AaTyporoundPoint');
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Aa Typo squared Point';
+            src: local('Aa Typo squared Point'), local('AaTyposquaredPoint');
+            font-style: normal;
+        }
+        :root {
+            --bg-base: #0c0c0a;
+            --bg-surface: #161612;
+            --bg-control: #24241d;
+            --bg-control-hover: #333329;
+            --accent: #FFCC00;
+            --accent-glow: rgba(255, 204, 0, 0.25);
+            --text-main: #f5f5f0;
+            --text-muted: #9c9c8e;
+            --text-blue: #ffdb4d;
+            --border: rgba(255, 204, 0, 0.08);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+        }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: -webkit-fill-available;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        #workspace {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, #1c1c14 0%, #060605 100%);
+            padding: 16px;
+            overflow: auto;
+            position: relative;
+            min-height: 40vh;
+        }
+        .canvas-container {
+            position: relative;
+            border-radius: 8px;
+            overflow: visible;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            max-width: 100%;
+            max-height: 100%;
+            will-change: transform;
+        }
+        canvas {
+            display: block;
+            max-width: 100%;
+            max-height: 55vh;
+            background: #0d0d0b;
+            object-fit: contain;
+        }
+        #sidebar {
+            width: 100%;
+            height: 50vh;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+            border-left: none;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            box-shadow: 0 -8px 24px rgba(0,0,0,0.4);
+            z-index: 10;
+            position: relative;
+            -webkit-overflow-scrolling: touch;
+        }
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+        .app-logo {
+            display: block;
+            max-width: 44px;
+            height: auto;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+        }
+        .brand-text { flex-grow: 1; }
+        h2 {
+            margin: 0 0 2px 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .section-card {
+            background: rgba(255, 204, 0, 0.01);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        h3 {
+            margin: 0;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+        button, select, input[type="text"], input[type="number"], input[type="range"], textarea {
+            background: var(--bg-control);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            transition: background 0.15s ease, border-color 0.15s ease;
+            width: 100%;
+            box-sizing: border-box;
+            outline: none;
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+            font-family: inherit;
+        }
+        textarea { min-height: 70px; resize: vertical; }
+        input[type="text"] { dir: auto; -webkit-appearance: none; appearance: none; }
+        input[type="range"] { padding: 0; height: 12px; background: var(--bg-control); border: none; cursor: pointer; }
+        button:active, select:active { background: var(--bg-control-hover); transform: scale(0.98); }
+        input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        button.primary { background: var(--accent); border: none; font-weight: 600; color: #111; }
+        button.primary:active { background: #e6b800; }
+        button.secondary { background: rgba(255, 255, 255, 0.05); }
+        .row { display: flex; gap: 10px; }
+        .row > * { flex: 1; }
+        .file-btn { position: relative; overflow: hidden; display: inline-block; text-align: center; width: 100%; }
+        .file-btn input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%; }
+        #layersList { display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto; }
+        .layer-item {
+            background: var(--bg-control);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            min-height: 46px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .layer-item.active { background: rgba(255, 204, 0, 0.06); border-color: var(--accent); }
+        .layer-item.bg-hidden-only {
+            border-left: 3px solid #7f5aff;
+        }
+        .layer-ref {
+            background: rgba(255, 204, 0, 0.1);
+            color: var(--text-blue);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-family: monospace;
+            margin-right: 8px;
+        }
+        .layer-ref.hidden-only-tag {
+            background: rgba(127, 90, 255, 0.15);
+            color: #b9a1ff;
+        }
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            width: auto;
+            min-height: auto;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+        .delete-btn:active { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .text-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            white-space: nowrap;
+            padding: 0px 0px;
+            border: 1px dashed transparent;
+            border-radius: 0px;
+            transform-origin: top left;
+            touch-action: none;
+            will-change: transform;
+            transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease, color 0.2s ease;
+        }
+        .text-layer:active { cursor: grabbing; }
+        .text-layer.active { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+        .text-layer.hidden-only-hidden {
+            display: none !important;
+        }
+        .text-layer.a9-shine {
+            text-shadow: 0 0 10px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.5);
+        }
+        .text-layer.a9-shine.bg-hidden-appborder {
+            text-shadow: none !important;
+        }
+        .text-layer.bg-hidden-appborder {
+            border: 1.5px solid rgba(255, 204, 0, 0.55) !important;
+            border-radius: 10px !important;
+            padding: 6px 12px !important;
+            background-color: rgba(12, 12, 10, 0.55) !important;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 4px 14px rgba(0,0,0,0.5), 0 0 14px rgba(255,204,0,0.18) !important;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            color: #FFCC00 !important;
+        }
+        .text-layer.bg-hidden-appborder.active {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 4px 14px rgba(0,0,0,0.5), 0 0 18px rgba(255,204,0,0.45) !important;
+        }
+        .text-layer.bg-hidden-appborder.user-hidden-only {
+            border-color: rgba(127, 90, 255, 0.75) !important;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 4px 14px rgba(0,0,0,0.5), 0 0 14px rgba(127,90,255,0.35) !important;
+        }
+        .total-label-badge {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            font-weight: 900;
+            color: var(--accent);
+            background: rgba(12, 12, 10, 0.78);
+            border: 1.5px solid rgba(255, 204, 0, 0.65);
+            border-radius: 10px;
+            padding: 4px 12px;
+            font-size: 16px;
+            line-height: 1.2;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            direction: rtl;
+            text-shadow: 0 0 8px rgba(255,204,0,0.35);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.6), 0 0 14px rgba(255,204,0,0.22);
+            z-index: 40;
+            transform-origin: top left;
+            will-change: transform;
+            display: none;
+        }
+        .total-label-badge.visible {
+            display: block;
+        }
+        body.dragging-active .text-layer { cursor: grabbing !important; }
+        .hint { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            width: 100%;
+            height: 46px;
+            padding: 0;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: var(--radius-md); }
+        .nudge-pad {
+            background: #c2c2c2;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 0 0 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .nudge-dpad { position: relative; width: 160px; height: 140px; margin-bottom: 10px; }
+        .nudge-btn {
+            position: absolute;
+            background: #ffffff;
+            border: none;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            min-height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            transition: transform 0.1s, background-color 0.1s;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .nudge-btn:active, .nudge-btn.holding { background: #eeeeee; transform: scale(0.92); }
+        .nudge-btn svg { fill: #707070; width: 24px; height: 24px; pointer-events: none; }
+        .nudge-up    { top: 5px;   left: 58px;  clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        .nudge-left  { top: 48px;  left: 10px;  clip-path: polygon(100% 0, 0% 50%, 100% 100%); }
+        .nudge-right { top: 48px;  left: 106px; clip-path: polygon(0 0, 0% 100%, 100% 50%); }
+        .nudge-down  { top: 91px;  left: 58px;  clip-path: polygon(0 0, 100% 0, 50% 100%); }
+        .nudge-spacing-bar { width: 100%; background: #3a3a3a; display: flex; border-top: 1px solid rgba(0,0,0,0.2); }
+        .spacing-control-unit {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            gap: 4px;
+            border-right: 1px solid #4a4a4a;
+        }
+        .spacing-control-unit:last-child { border-right: none; }
+        .spacing-action-btn {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 32px;
+            height: 32px;
+            min-height: auto;
+            padding: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .spacing-action-btn:active { background: rgba(255,255,255,0.1); }
+        .spacing-label-icon {
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .select-all-btn {
+            background: var(--bg-control);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.15s;
+            min-height: 36px;
+            flex: 0 0 auto;
+            width: auto;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .select-all-btn:active { background: var(--bg-control-hover); transform: scale(0.96); }
+        @media (min-width: 768px) {
+            body { flex-direction: row; }
+            #sidebar { width: 360px; height: 100vh; border-top: none; border-right: 1px solid var(--border); border-radius: 0; }
+            canvas { max-height: 80vh; max-width: 75vw; }
+            #workspace { min-height: auto; padding: 40px; }
+        }
+        .apply-font-all {
+            background: rgba(255, 204, 0, 0.08);
+            border: 1px solid var(--accent);
+            color: var(--text-blue);
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            min-height: 36px;
+            transition: 0.15s;
+            width: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .apply-font-all:active { background: rgba(255, 204, 0, 0.15); transform: scale(0.96); }
+        .font-action-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .font-action-row .select-all-btn { flex: 0 1 auto; }
+        .font-action-row .apply-font-all { flex: 1 1 auto; }
+        .suggestion-wrap { position: relative; width: 100%; }
+        .suggestion-wrap input { width: 100%; }
+        .suggestion-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            max-height: 180px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            padding: 4px 0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+        }
+        .suggestion-dropdown.show { display: block; }
+        .suggestion-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.1s;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            dir: rtl;
+            text-align: right;
+        }
+        .suggestion-item:hover, .suggestion-item:active { background: var(--bg-control-hover); }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item .remove-mem {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .suggestion-item .remove-mem:hover { color: #ef4444; background: rgba(239, 68, 68, 0.15); }
+        .a9-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .a9-opt-btn {
+            background: var(--bg-control);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0 6px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            min-height: 28px;
+            height: 28px;
+            width: 100%;
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .a9-opt-btn:active { background: var(--bg-control-hover); transform: scale(0.90); }
+        .a9-menu-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            background: var(--bg-surface);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius-md);
+            display: none;
+            z-index: 105;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+            width: 220px;
+            overflow: hidden;
+        }
+        .a9-menu-dropdown.show { display: block; }
+        .a9-option-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255,204,0,0.1);
+            color: var(--text-main);
+            text-align: right;
+            direction: rtl;
+            transition: background 0.15s;
+        }
+        .a9-option-item:hover, .a9-option-item:active {
+            background: rgba(255, 204, 0, 0.15);
+            color: var(--accent);
+        }
+        .a9-option-item:last-child { border-bottom: none; }
+        .clipboard-panel {
+            background: linear-gradient(135deg, rgba(255,204,0,0.08), rgba(255,204,0,0.02));
+            border: 1px solid var(--accent);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .clipboard-panel h4 {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+        .clipboard-panel .clipboard-status {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            min-height: 14px;
+            transition: color 0.3s;
+        }
+        .clipboard-panel .clipboard-status.ok { color: #5cd65c; font-weight: 600; }
+        .clipboard-panel .clipboard-status.err { color: #ef4444; font-weight: 600; }
+        .clipboard-panel .btn-row {
+            display: flex;
+            gap: 8px;
+        }
+        .clipboard-panel .btn-row button {
+            flex: 1;
+            min-height: 40px;
+            padding: 8px 10px;
+            font-size: 0.85rem;
+        }
+        .clipboard-panel .paste-select-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+        .clipboard-panel .paste-select-row button.primary {
+            flex: 1;
+        }
+        .clipboard-panel .paste-select-row button.mini-select {
+            flex: 0 0 auto;
+            background: var(--bg-control);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.68rem;
+            padding: 6px 8px;
+            min-height: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            align-self: center;
+        }
+        .clipboard-panel .paste-select-row button.mini-select:active {
+            background: var(--bg-control-hover);
+            transform: scale(0.94);
+        }
+        .fast-scroll-btn {
+            position: fixed;
+            right: 16px;
+            z-index: 9999;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #111;
+            border: none;
+            box-shadow: 0 4px 16px rgba(255, 204, 0, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            transition: transform 0.2s, background 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            pointer-events: auto;
+            touch-action: none;
+        }
+        .fast-scroll-btn:active, .fast-scroll-btn.holding {
+            transform: scale(0.88);
+            background: #e6b800;
+        }
+        .fast-scroll-down { bottom: 70px; }
+        .fast-scroll-up { bottom: 130px; }
+        /* Jump to Saved A8 button — modern app-styled */
+        .jump-saved-btn {
+            position: fixed;
+            right: 16px;
+            bottom: 190px;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-control);
+            color: var(--accent);
+            border: 1.5px solid var(--accent);
+            box-shadow: 0 4px 14px rgba(255, 204, 0, 0.35), 0 0 10px rgba(255,204,0,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            pointer-events: auto;
+            line-height: 1;
+        }
+        .jump-saved-btn:active {
+            transform: scale(0.85);
+            background: var(--bg-control-hover);
+            box-shadow: 0 0 18px rgba(255, 204, 0, 0.6);
+        }
+        @media (min-width: 768px) {
+            .fast-scroll-btn { right: 370px; }
+            .fast-scroll-down { bottom: 30px; }
+            .fast-scroll-up { bottom: 90px; }
+            .jump-saved-btn { right: 374px; bottom: 150px; }
+        }
+        .bg-toggle-btn {
+            background: var(--bg-control);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            padding: 0 10px;
+            height: 34px;
+            min-height: 34px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+            transition: 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            flex: 0 0 auto;
+            width: auto;
+            line-height: 1;
+        }
+        .bg-toggle-btn:active {
+            background: var(--bg-control-hover);
+            transform: scale(0.94);
+        }
+        .bg-toggle-btn.hidden-state {
+            background: #3a1f1f;
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+        .flash-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.7);
+            background: #1a8a3d;
+            color: #ffffff;
+            padding: 20px 40px;
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            box-shadow: 0 12px 40px rgba(26, 138, 61, 0.6), 0 0 0 1px rgba(255,255,255,0.12) inset;
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            white-space: nowrap;
+        }
+        .flash-message.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        .flash-message .flash-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1;
+        }
+        .dl-count-toast {
+            position: fixed;
+            top: 216px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            background: #0b2a4a;
+            color: #ffffff;
+            padding: 14px 26px;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            box-shadow: 0 8px 28px rgba(11, 42, 74, 0.6), 0 0 0 1px rgba(255,204,0,0.35) inset;
+            z-index: 99998;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+        .dl-count-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .dl-count-toast .dl-count-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 8px;
+            border-radius: 14px;
+            background: var(--accent);
+            color: #111;
+            font-size: 15px;
+            font-weight: 900;
+        }
+        .mask-ruler {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: #000000;
+            cursor: ns-resize;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 0 0 2px rgba(255, 204, 0, 0.7), 0 2px 12px rgba(0,0,0,0.9);
+            transition: background 0.15s ease, box-shadow 0.15s ease;
+            transform-origin: center center;
+            border-radius: 4px;
+        }
+        .mask-ruler:active { background: #1a1a1a; }
+        .mask-ruler.mask-active {
+            background: #1a1a1a;
+            box-shadow: 0 0 0 2px rgba(255, 204, 0, 1), 0 0 20px rgba(255,204,0,0.5), 0 2px 12px rgba(0,0,0,0.9);
+        }
+        .mask-ruler::before {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; top: 0;
+            height: 3px;
+            background: repeating-linear-gradient(to right, var(--accent) 0px, var(--accent) 3px, transparent 3px, transparent 8px);
+            opacity: 0.95;
+            border-radius: 4px 4px 0 0;
+        }
+        .mask-ruler::after {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: 3px;
+            background: repeating-linear-gradient(to right, var(--accent) 0px, var(--accent) 3px, transparent 3px, transparent 8px);
+            opacity: 0.95;
+            border-radius: 0 0 4px 4px;
+        }
+        .mask-ruler-grip {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .mask-ruler-grip span {
+            display: block;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.95;
+        }
+        .mask-rotate-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.6);
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            color: #111;
+            border: 2px solid #111;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 60;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.8), 0 0 16px rgba(255,204,0,0.6);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            line-height: 1;
+            padding: 0;
+            min-height: auto;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .mask-ruler.mask-active .mask-rotate-center {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .mask-rotate-center:active {
+            background: #e6b800;
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+        .heart-btn {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.9), 0 0 12px rgba(255,204,0,0.45);
+            z-index: 10000;
+            transition: transform 0.15s, background 0.15s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            padding: 0;
+            min-height: auto;
+        }
+        .heart-btn:active {
+            transform: scale(0.85);
+            background: #2a2a2a;
+        }
+        .heart-btn.saved {
+            color: #ff4d6d;
+            border-color: #ff4d6d;
+            background: #2a0a0a;
+        }
+        @media (min-width: 768px) {
+            .heart-btn { right: 376px; }
+        }
+        .saved-a8-section {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .saved-a8-section.visible { display: flex; }
+        .saved-a8-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2px;
+        }
+        .saved-a8-header h3 {
+            margin: 0;
+            font-size: 0.7rem;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+        .saved-a8-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 140px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .saved-a8-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-control);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            gap: 6px;
+            transition: background 0.12s, box-shadow 0.4s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .saved-a8-item:active { background: var(--bg-control-hover); }
+        .saved-a8-item.highlight {
+            box-shadow: 0 0 0 2px var(--accent), 0 0 18px rgba(255,204,0,0.6);
+        }
+        .saved-a8-item .a8-value-col {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+            gap: 2px;
+        }
+        .saved-a8-item .a8-value {
+            font-weight: 600;
+            color: var(--text-blue);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+            cursor: pointer;
+            padding: 4px 2px;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+        .saved-a8-item .a8-value:active { background: rgba(255,204,0,0.1); }
+        .saved-a8-item .a3-detail {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.4px;
+            padding: 0 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            user-select: none;
+            -webkit-user-select: none;
+            pointer-events: none;
+            cursor: default;
+        }
+        .saved-a8-item .a8-actions {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .saved-a8-item .a8-actions button {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            min-height: auto;
+            width: auto;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.15s, color 0.15s;
+        }
+        .saved-a8-item .a8-actions button.copy-btn:active {
+            background: rgba(255,204,0,0.15);
+            color: var(--accent);
+        }
+        .saved-a8-item .a8-actions button.remove-btn:active {
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+        }
+        .empty-saved-msg {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 8px 0;
+            font-style: italic;
+        }
+
+        /* ===== BEEAPP TOGGLE ===== */
+        .beeapp-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .beeapp-btn {
+            background: rgba(255, 204, 0, 0.10);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.04em;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.18s, transform 0.12s;
+            min-height: 30px;
+            width: auto;
+            flex: 0 0 auto;
+        }
+        .beeapp-btn:active {
+            background: rgba(255, 204, 0, 0.22);
+            transform: scale(0.94);
+        }
+        .beeapp-btn .beeapp-chevron {
+            display: inline-block;
+            transition: transform 0.25s ease;
+            font-size: 0.75rem;
+            line-height: 1;
+        }
+        .beeapp-btn.collapsed .beeapp-chevron {
+            transform: rotate(-90deg);
+        }
+        .text-engine-contents {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.3s ease;
+            max-height: 600px;
+            opacity: 1;
+        }
+        .text-engine-contents.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="workspace">
+        <div class="canvas-container" id="canvasContainer">
+            <canvas id="imageCanvas"></canvas>
+        </div>
+    </div>
+
+    <button class="heart-btn" id="heartSaveA8Btn" title="Save current A8 value">♡</button>
+
+    <div id="sidebar">
+        <div class="brand-header">
+            <img src="bee72342368/Gemini_Generated_Image_m9ale3m9ale3m9al.png" alt="Bee Logo" class="app-logo">
+            <div class="brand-text">
+                <h2>Payment Method</h2>
+                <div class="hint">Safe payment server from e&</div>
+            </div>
+            <button class="bg-toggle-btn" id="bgToggleBtn" title="Hide/Show background image">BG</button>
+        </div>
+        
+        <div class="section-card">
+            <h3> </h3>
+            <div class="row">
+                <button id="saveProjectFile" class="secondary" style="font-size: 0.85rem;">Save Project</button>
+                <button id="importProjectFileBtn" class="secondary" style="font-size: 0.85rem;">Import Project</button>
+            </div>
+            <div class="hint" id="fileStatusHint">Working in local temporary memory mode.</div>
+        </div>
+
+        <div class="section-card">
+            <h3> </h3>
+            <div class="file-btn">
+                <button class="primary"> Upload file</button>
+                <input type="file" id="imageLoader" accept="image/*">
+            </div>
+        </div>
+
+        <div class="section-card" id="textEngineCard">
+            <div class="beeapp-toggle-row">
+                <h3 style="margin:0;">Text Engine</h3>
+                <button class="beeapp-btn" id="beeappToggleBtn" title="Collapse/expand Text Engine contents">
+                    <span>beeapp</span>
+                    <span class="beeapp-chevron">▾</span>
+                </button>
+            </div>
+            <div class="text-engine-contents" id="textEngineContents">
+                <div class="row" style="flex-wrap: wrap; gap: 8px;">
+                    <button class="secondary" id="addTextBtn" style="border: 1px dashed var(--accent); color: #ffeb99; flex: 1 1 auto;">+ Text Node</button>
+                    <button class="secondary" id="addTimeBtn" style="border: 1px dashed #ffdb4d; color: #ffeb99; flex: 1 1 auto;">System Time</button>
+                    <button class="secondary" id="addSumBtn" style="border: 1px dashed #4da6ff; color: #99ccff; flex: 1 1 100%; margin-top: 4px;">+ Sum Formula</button>
+                    <button class="secondary" id="addHiddenOnlyBtn" style="border: 1px dashed #7f5aff; color: #b9a1ff; flex: 1 1 100%; margin-top: 4px;">+ BG-Hidden Layer (only shows when BG is off)</button>
+                </div>
+                <div class="file-btn" style="margin-top: 4px;">
+                    <button class="secondary" style="font-size: 0.85rem; border: 1px dashed var(--text-muted);"> Upload Font File</button>
+                    <input type="file" id="fontLoader" accept="*/*">
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h3>PaymentMethod</h3>
+            <div class="clipboard-panel">
+                <h4> A8 (ID) + A3 (Amount) + A10 (Name )</h4>
+                <div class="paste-select-row">
+                    <button class="primary" id="autoFillClipboardBtn">Auto-Fill </button>
+                    <button class="mini-select" id="pasteSelectBtn" title="Insert clipboard text into paste area">Select</button>
+                </div>
+                <div class="btn-row">
+                    <button class="secondary" id="parseManualBtn">Parse Below</button>
+                </div>
+                <textarea id="manualPasteArea" placeholder="Or paste here manually:&#10;30210092502154&#10;1467.00&#10;الاسم:عبدالله مؤمن عبدالله شحاته شحاته"></textarea>
+                <div class="clipboard-status" id="clipboardStatus"> </div>
+            </div>
+        </div>
+
+        <div class="section-card saved-a8-section" id="savedA8Section">
+            <div class="saved-a8-header">
+                <h3>♥ Saved A8</h3>
+                <span class="hint" style="font-size:0.65rem;">tap A8 to copy</span>
+            </div>
+            <div class="saved-a8-list" id="savedA8List"></div>
+            <div class="empty-saved-msg" id="emptySavedMsg">No saved A8 yet. Use the heart on the canvas.</div>
+        </div>
+
+        <div id="inspector" class="section-card" style="display:none;">
+            <h3>Active Node Properties</h3>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                
+                <div class="nudge-pad">
+                    <div class="nudge-dpad">
+                        <button class="nudge-btn nudge-up" id="nudgeUpBtn" data-dir="up" title="Move Up (hold to keep moving)">
+                            <svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
+                        </button>
+                        <button class="nudge-btn nudge-left" id="nudgeLeftBtn" data-dir="left" title="Move Left (hold to keep moving)">
+                            <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
+                        </button>
+                        <button class="nudge-btn nudge-right" id="nudgeRightBtn" data-dir="right" title="Move Right (hold to keep moving)">
+                            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+                        </button>
+                        <button class="nudge-btn nudge-down" id="nudgeDownBtn" data-dir="down" title="Move Down (hold to keep moving)">
+                            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+                        </button>
+                    </div>
+                    <div class="nudge-spacing-bar">
+                        <div class="spacing-control-unit">
+                            <button class="spacing-action-btn" id="decLetterSpacing">-</button>
+                            <span class="spacing-label-icon">➔A➔</span>
+                            <button class="spacing-action-btn" id="incLetterSpacing">+</button>
+                        </div>
+                        <div class="spacing-control-unit">
+                            <button class="spacing-action-btn" id="decLineHeight">-</button>
+                            <span class="spacing-label-icon">⬇A⬆</span>
+                            <button class="spacing-action-btn" id="incLineHeight">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size:0.75rem; display:block; margin-bottom:4px;">Content Expression</label>
+                    <div style="display: flex; gap: 6px; align-items: flex-start; position: relative;">
+                        <div class="suggestion-wrap">
+                            <input type="text" id="layerText" autocomplete="off" placeholder="Enter Arabic name or expression..." style="flex:1;">
+                            <div id="suggestionDropdown" class="suggestion-dropdown"></div>
+                        </div>
+                        <div class="a9-container" style="flex: 0 0 auto;">
+                            <button id="selectAllTextBtn" class="select-all-btn">Select All</button>
+                            <button id="a9OptionsBtn" class="a9-opt-btn" title="A9 Options">⚙</button>
+                            <div id="a9MenuDropdown" class="a9-menu-dropdown">
+                                <div class="a9-option-item" data-value="بدايتي للتمويل متناهي الصغر">بدايتي للتمويل متناهي الصغر</div>
+                                <div class="a9-option-item" data-value="تمويلي للتمويل متناهي الصغر">تمويلي للتمويل متناهي الصغر</div>
+                                <div class="a9-option-item" data-value="سنده للتمويل متناهي الصغر">سنده للتمويل متناهي الصغر</div>
+                                <div class="a9-option-item" data-value="تنمية للتمويل متناهي الصغر">تنمية للتمويل متناهي الصغر</div>
+                            </div>
+                        </div>
+                        <button id="nextLayerBtn" class="select-all-btn" style="flex: 0 0 auto;">Next</button>
+                    </div>
+                    <div class="hint" style="margin-top: 5px;">
+                        Use text or expressions like `=TIME()`, `=DATE()`, or `=SUM(A1,A2)` — decimals allowed.
+                    </div>
+                </div>
+                
+                <div>
+                    <label style="font-size:0.75rem; display:block; margin-bottom:4px;">Creative Font Family</label>
+                    <div class="font-action-row">
+                        <select id="layerFont" style="flex:2;">
+                            <option value="'GE Dinar One', sans-serif" style="font-family: 'GE Dinar One', sans-serif; font-weight: bold;">GE Dinar One Bold</option>
+                            <option value="'Cairo', sans-serif" style="font-family: 'Cairo', sans-serif; font-weight: 900;">Cairo Black (900)</option>
+                            <option value="'Almarai', sans-serif" style="font-family: 'Almarai', sans-serif; font-weight: 800;">Almarai Extra Bold (800)</option>
+                            <option value="'Almarai', sans-serif" style="font-family: 'Almarai', sans-serif; font-weight: 700;">Almarai Bold (700)</option>
+                            <option value="'Readex Pro', sans-serif" style="font-family: 'Readex Pro', sans-serif; font-weight: 800;">Readex Pro Extra Bold (800)</option>
+                            <option value="'Readex Pro', sans-serif" style="font-family: 'Readex Pro', sans-serif; font-weight: 700;">Readex Pro Bold (700)</option>
+                            <option value="'IBM Plex Sans Arabic', sans-serif" style="font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 700;">IBM Plex Sans Arabic Bold (700)</option>
+                            <option value="'Rubik', sans-serif" style="font-family: 'Rubik', sans-serif; font-weight: 900;">Rubik Black (900)</option>
+                            <option value="'Rubik', sans-serif" style="font-family: 'Rubik', sans-serif; font-weight: 800;">Rubik Extra Bold (800)</option>
+                            <option value="'Alexandria', sans-serif" style="font-family: 'Alexandria', sans-serif; font-weight: 900;">Alexandria Black (900)</option>
+                            <option value="'Alexandria', sans-serif" style="font-family: 'Alexandria', sans-serif; font-weight: 800;">Alexandria Extra Bold (800)</option>
+                            <option value="'Baloo Bhaijaan 2', display" style="font-family: 'Baloo Bhaijaan 2', display; font-weight: 800;">Baloo Bhaijaan 2 Extra Bold (800)</option>
+                            <option value="'Plus Jakarta Sans', sans-serif" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;">Plus Jakarta Sans Arabic Extra Bold (800)</option>
+                            <option value="'Lalezar', display" style="font-family: 'Lalezar', display;">Lalezar (Ultra Bold Display)</option>
+                            <option value="'El Messiri', serif" style="font-family: 'El Messiri', serif; font-weight: 700;">El Messiri Extra Bold</option>
+                            <option value="'Changa', sans-serif" style="font-family: 'Changa', sans-serif; font-weight: 900;">Changa Black (900)</option>
+                            <option value="'Vazirmatn', sans-serif" style="font-family: 'Vazirmatn', sans-serif; font-weight: 900;">Vazirmatn Black (900)</option>
+                            <option value="'Tajawal', sans-serif" style="font-family: 'Tajawal', sans-serif; font-weight: 900;">Tajawal Black (900)</option>
+                            <option value="'Noto Sans Arabic', sans-serif" style="font-family: 'Noto Sans Arabic', sans-serif; font-weight: 900;">Noto Sans Arabic Black (900)</option>
+                            <option value="'Al Majeed Quranic Font', serif" style="font-family: 'Al Majeed Quranic Font', serif;">Al Majeed Quranic Font</option>
+                            <option value="'Guesswhat Exceptional', sans-serif" style="font-family: 'Guesswhat Exceptional', sans-serif;">Guesswhat Exceptional</option>
+                            <option value="'Aa Typo round Point', sans-serif" style="font-family: 'Aa Typo round Point', sans-serif;">Aa Typo round Point</option>
+                            <option value="'Aa Typo squared Point', sans-serif" style="font-family: 'Aa Typo squared Point', sans-serif;">Aa Typo squared Point</option>
+                            <option value="Inter, system-ui, sans-serif" style="font-family: sans-serif;">Inter (Modern Minimalist)</option>
+                            <option value="'Helvetica Neue', Helvetica, Arial, sans-serif" style="font-family: sans-serif;">Helvetica Pro (Clean Swiss)</option>
+                            <option value="Cairo, 'Segoe UI', Tahoma, sans-serif" style="font-family: sans-serif; font-weight: normal;">Cairo (Modern Sans-Serif)</option>
+                            <option value="Cairo, 'Segoe UI', Tahoma, sans-serif" style="font-family: sans-serif; font-weight: 500;">Cairo Medium</option>
+                            <option value="Cairo, 'Segoe UI', Tahoma, sans-serif" style="font-family: sans-serif; font-weight: bold;">Cairo Bold</option>
+                            <option value="Tajawal, 'Segoe UI', Arial, sans-serif" style="font-family: sans-serif; font-weight: normal;">Tajawal (Geometric)</option>
+                            <option value="Tajawal, 'Segoe UI', Arial, sans-serif" style="font-family: sans-serif; font-weight: 500;">Tajawal Medium</option>
+                            <option value="Tajawal, 'Segoe UI', Arial, sans-serif" style="font-family: sans-serif; font-weight: bold;">Tajawal Bold</option>
+                            <option value="Amiri, 'Times New Roman', serif" style="font-family: serif; font-weight: normal;">Amiri (Classic Naskh)</option>
+                            <option value="Amiri, 'Times New Roman', serif" style="font-family: serif; font-weight: bold;">Amiri Bold</option>
+                            <option value="Almarai, 'Helvetica Neue', Arial, sans-serif" style="font-family: sans-serif; font-weight: normal;">Almarai (Corporate)</option>
+                            <option value="Almarai, 'Helvetica Neue', Arial, sans-serif" style="font-family: sans-serif; font-weight: bold;">Almarai Bold</option>
+                            <option value="'Dubai', 'Segoe UI', Tahoma, sans-serif" style="font-family: sans-serif; font-weight: normal;">Dubai Font Regular</option>
+                            <option value="'Dubai', 'Segoe UI', Tahoma, sans-serif; font-weight: 500;">Dubai Font Medium</option>
+                            <option value="'Dubai', 'Segoe UI', Tahoma, sans-serif; font-weight: bold;">Dubai Font Bold</option>
+                            <option value="'El Messiri', 'Traditional Arabic', serif" style="font-family: serif; font-weight: bold;">El Messiri Bold</option>
+                            <option value="'Simplified Arabic', Tahoma, sans-serif" style="font-family: sans-serif; font-weight: bold;">Simplified Arabic Bold</option>
+                            <option value="'Traditional Arabic', Times, serif" style="font-family: serif; font-weight: bold;">Traditional Arabic Bold</option>
+                            <option value="Didot, 'Bodoni MT', 'Times New Roman', serif" style="font-family: serif;">Didot (High-Fashion Elegant)</option>
+                            <option value="Georgia, serif" style="font-family: Georgia, serif;">Georgia Editorial (Classic Serif)</option>
+                            <option value="'Impact', 'Arial Black', sans-serif" style="font-family: Impact, sans-serif;">Impact (Bold Streetwear)</option>
+                            <option value="'Trebuchet MS', sans-serif" style="font-family: 'Trebuchet MS', sans-serif;">Futura-Style Geometric</option>
+                            <option value="'Courier New', Courier, monospace" style="font-family: monospace;">Cyberpunk Tech (Typewriter)</option>
+                            <option value="Consolas, 'Lucida Console', monospace" style="font-family: monospace;">Dev Console (Clean Code)</option>
+                        </select>
+                        <button id="applyFontToAllBtn" class="apply-font-all" title="Apply selected font to all layers">↻ Apply to All</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size:0.75rem; display:block; margin-bottom:4px;">Size (px)</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="range" id="layerSizeSlider" min="10" max="250" value="40" style="flex: 1;">
+                        <input type="number" id="layerSize" value="40" style="width: 75px;">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    <div style="flex: 1.5;">
+                        <label style="font-size:0.75rem; display:block; margin-bottom:4px;">Font Color</label>
+                        <input type="color" id="layerColor" value="#000000">
+                    </div>
+                    <div style="flex: 1.5;">
+                        <label style="font-size:0.75rem; display:block; margin-bottom:4px;">Bg Color</label>
+                        <input type="color" id="layerBgColor" value="#000000">
+                    </div>
+                </div>
+                
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" id="useBoldText" style="width:20px; height:20px; margin:0; cursor:pointer;">
+                        <label for="useBoldText" style="font-size:0.85rem; cursor:pointer; user-select:none; font-weight:bold; color:var(--text-blue);">Bold Text</label>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" id="useBgColor" style="width:20px; height:20px; margin:0; cursor:pointer;">
+                        <label for="useBgColor" style="font-size:0.85rem; cursor:pointer; user-select:none;">Enable text background</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h3>Calculated Matrix Layers</h3>
+            <div id="layersList"></div>
+        </div>
+
+        <div class="section-card" style="margin-top:auto; padding-bottom: 24px;">
+            <h3>Master Render Export</h3>
+            <div class="row">
+                <button id="exportPng" class="secondary">PNG</button>
+                <button id="exportJpg" class="primary">JPEG Master</button>
+            </div>
+            <button id="shareImageBtn" class="secondary" style="margin-top: 8px;">Share Image</button>
+            <button id="printBluetoothBtn" class="primary" style="margin-top: 8px; background:#0a84ff; color:#fff;">🖨 Print via Bluetooth</button>
+            <div class="hint" id="btStatus" style="margin-top:6px; min-height:14px;"></div>
+        </div>
+    </div>
+
+    <button class="fast-scroll-btn fast-scroll-up" id="fastScrollUpBtn" title="Scroll Up Fast (hold to keep scrolling)">▲</button>
+    <button class="fast-scroll-btn fast-scroll-down" id="fastScrollDownBtn" title="Scroll Down Fast (hold to keep scrolling)">▼</button>
+    <!-- New: small jump button to the Saved A8 area -->
+    <button class="jump-saved-btn" id="jumpToSavedBtn" title="Jump to Saved A8">♥</button>
+
+    <div class="flash-message" id="flashMessage">
+        <span class="flash-check">✓</span>
+        <span id="flashMessageText">Completed Operation</span>
+    </div>
+
+    <div class="dl-count-toast" id="dlCountToast">
+        <span>Downloads for this A8:</span>
+        <span class="dl-count-badge" id="dlCountValue">1</span>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false });
+        const container = document.getElementById('canvasContainer');
+
+        let _cachedScale = 1;
+        let _lastCanvasWidth = 0;
+        function getScale() {
+            const w = canvas.clientWidth;
+            if (w !== _lastCanvasWidth) {
+                _lastCanvasWidth = w;
+                _cachedScale = w / canvas.width;
+            }
+            return _cachedScale;
+        }
+
+        let _audioCtx = null;
+        function playNotificationSound() {
+            try {
+                if (!_audioCtx) {
+                    const AC = window.AudioContext || window.webkitAudioContext;
+                    if (!AC) return;
+                    _audioCtx = new AC();
+                }
+                if (_audioCtx.state === 'suspended') _audioCtx.resume();
+                const now = _audioCtx.currentTime;
+                const notes = [
+                    { freq: 880.00,  start: 0.00, dur: 0.35 },
+                    { freq: 1108.73, start: 0.35, dur: 0.35 },
+                    { freq: 1318.51, start: 0.70, dur: 0.60 }
+                ];
+                notes.forEach(n => {
+                    const osc = _audioCtx.createOscillator();
+                    const gain = _audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = n.freq;
+                    const t0 = now + n.start;
+                    const t1 = t0 + n.dur;
+                    gain.gain.setValueAtTime(0, t0);
+                    gain.gain.linearRampToValueAtTime(0.22, t0 + 0.03);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, t1);
+                    osc.connect(gain);
+                    gain.connect(_audioCtx.destination);
+                    osc.start(t0);
+                    osc.stop(t1 + 0.03);
+                });
+            } catch (e) {
+                console.warn('Notification sound failed:', e);
+            }
+        }
+
+        // ========== STRONGER VIBRATION ON DOWNLOAD ==========
+        function vibrateOnDownload() {
+            try {
+                if (navigator && typeof navigator.vibrate === 'function') {
+                    // Stronger pattern: two strong bursts followed by a long pulse
+                    navigator.vibrate([100, 60, 150, 60, 250]);
+                }
+            } catch(e) { /* vibration unsupported — silently ignore */ }
+        }
+
+        // Vibration helper for destructive actions / confirmations
+        function vibrateStrong() {
+            try {
+                if (navigator && typeof navigator.vibrate === 'function') {
+                    navigator.vibrate([80, 40, 80]);
+                }
+            } catch(e) {}
+        }
+
+        const DL_COUNT_STORAGE_KEY = 'bee72342368/dl_count_per_a8';
+
+        function loadDownloadCounts() {
+            try {
+                const raw = localStorage.getItem(DL_COUNT_STORAGE_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch(e) { return {}; }
+        }
+
+        function saveDownloadCounts(obj) {
+            try { localStorage.setItem(DL_COUNT_STORAGE_KEY, JSON.stringify(obj)); } catch(e) {}
+        }
+
+        function getCurrentA8Value() {
+            const a8Layer = project.layers[7];
+            if (!a8Layer) return null;
+            const raw = (parseFormula(a8Layer.text) || '').toString().trim();
+            if (!raw) return null;
+            return raw;
+        }
+
+        function getCurrentA3Value() {
+            const a3Layer = project.layers[2];
+            if (!a3Layer) return null;
+            const raw = (parseFormula(a3Layer.text) || '').toString().trim();
+            if (!raw) return null;
+            return raw;
+        }
+
+        function bumpDownloadCountForA8() {
+            const a8Val = getCurrentA8Value();
+            if (!a8Val) return null;
+            const counts = loadDownloadCounts();
+            const prev = parseInt(counts[a8Val] || '0', 10) || 0;
+            const next = prev + 1;
+            counts[a8Val] = next;
+            saveDownloadCounts(counts);
+            return { a8: a8Val, count: next };
+        }
+
+        let _dlToastTimer = null;
+        function showDownloadCountToast(count) {
+            const el = document.getElementById('dlCountToast');
+            const val = document.getElementById('dlCountValue');
+            if (!el || !val) return;
+            val.textContent = String(count);
+            el.classList.add('show');
+            clearTimeout(_dlToastTimer);
+            _dlToastTimer = setTimeout(() => {
+                el.classList.remove('show');
+            }, 2500);
+        }
+
+        const SAVED_A8_STORAGE_KEY = 'bee72342368/saved_a8_values';
+
+        function loadSavedA8Values() {
+            try {
+                const raw = localStorage.getItem(SAVED_A8_STORAGE_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch(e) { return []; }
+        }
+
+        function saveSavedA8Values(arr) {
+            try { localStorage.setItem(SAVED_A8_STORAGE_KEY, JSON.stringify(arr)); } catch(e) {}
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderSavedA8List() {
+            const listEl = document.getElementById('savedA8List');
+            const emptyMsg = document.getElementById('emptySavedMsg');
+            const section = document.getElementById('savedA8Section');
+            if (!listEl) return;
+
+            const saved = loadSavedA8Values();
+            if (saved.length === 0) {
+                listEl.innerHTML = '';
+                if (emptyMsg) emptyMsg.style.display = 'block';
+                if (section) section.classList.add('visible');
+                return;
+            }
+            if (emptyMsg) emptyMsg.style.display = 'none';
+            if (section) section.classList.add('visible');
+
+            listEl.innerHTML = '';
+            saved.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'saved-a8-item';
+                itemEl.dataset.index = index;
+
+                const a3Text = (item.a3 !== undefined && item.a3 !== null && String(item.a3).trim() !== '')
+                    ? String(item.a3)
+                    : '—';
+
+                itemEl.innerHTML = `
+                    <div class="a8-value-col">
+                        <span class="a8-value" title="Tap to copy">${escapeHtml(item.value)}</span>
+                        <span class="a3-detail" title="A3 detail (read-only)">A3: ${escapeHtml(a3Text)}</span>
+                    </div>
+                    <div class="a8-actions">
+                        <button class="copy-btn" title="Copy A8 value">📋</button>
+                        <button class="remove-btn" title="Remove">✕</button>
+                    </div>
+                `;
+                itemEl.querySelector('.a8-value').addEventListener('click', () => {
+                    copyA8ToClipboard(item.value);
+                });
+                itemEl.querySelector('.copy-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    copyA8ToClipboard(item.value);
+                });
+                itemEl.querySelector('.remove-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // ===== CONFIRMATION BEFORE REMOVING SAVED A8 =====
+                    const confirmed = window.confirm('Delete this saved A8 entry?\n\n' + item.value + (a3Text !== '—' ? '\nA3: ' + a3Text : ''));
+                    if (!confirmed) return;
+                    vibrateStrong();
+                    const current = loadSavedA8Values();
+                    current.splice(index, 1);
+                    saveSavedA8Values(current);
+                    renderSavedA8List();
+                });
+                listEl.appendChild(itemEl);
+            });
+        }
+
+        function copyA8ToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showFlashMessage('A8 copied');
+                }).catch(() => {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    ta.remove();
+                    showFlashMessage('A8 copied');
+                });
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                showFlashMessage('A8 copied');
+            }
+        }
+
+        function addSavedA8Value(value, a3Value) {
+            if (!value || typeof value !== 'string') return;
+            const clean = value.trim();
+            if (!clean) return;
+            const cleanA3 = (a3Value !== undefined && a3Value !== null) ? String(a3Value).trim() : '';
+            const saved = loadSavedA8Values();
+            if (saved.some(item => item.value === clean)) {
+                showFlashMessage('Already saved');
+                return;
+            }
+            saved.unshift({ value: clean, a3: cleanA3 });
+            saveSavedA8Values(saved);
+            renderSavedA8List();
+            showFlashMessage('A8 saved');
+        }
+
+        const A9_TARGET_VALUE_1 = 'بدايتي للتمويل متناهي الصغر';
+        const A9_TARGET_VALUE_2 = 'تمويلي للتمويل متناهي الصغر';
+
+        function applyA4Rule() {
+            const a9Layer = project.layers[8];
+            const a3Layer = project.layers[2];
+            const a4Layer = project.layers[3];
+
+            if (!a9Layer || !a3Layer || !a4Layer) return false;
+
+            const a9Text = (parseFormula(a9Layer.text) || '').toString().trim();
+            const a3Raw = (parseFormula(a3Layer.text) || '').toString();
+            const a3Match = a3Raw.match(/[-+]?[0-9]*\.?[0-9]+/);
+            if (!a3Match) return false;
+            const a3Num = parseFloat(a3Match[0]);
+            if (isNaN(a3Num)) return false;
+
+            let a4Value = null;
+
+            if (a9Text === A9_TARGET_VALUE_1) {
+                if (a3Num < 1000) a4Value = '9';
+                else if (a3Num < 2000) a4Value = '13';
+                else if (a3Num < 5000) a4Value = '22';
+                else if (a3Num < 10000) a4Value = '26';
+            } else if (a9Text === A9_TARGET_VALUE_2) {
+                if (a3Num < 1000) a4Value = '13';
+                else if (a3Num < 2000) a4Value = '20';
+                else if (a3Num < 5000) a4Value = '26';
+                else if (a3Num < 10000) a4Value = '32';
+            } else {
+                return false;
+            }
+
+            if (a4Value === null) return false;
+            if (a4Layer.text === a4Value) return false;
+
+            a4Layer.text = a4Value;
+            a4Layer.isInput = true;
+            const a4El = document.getElementById(a4Layer.id);
+            if (a4El) {
+                a4El.innerText = a4Value;
+                a4El.style.transition = 'box-shadow 0.3s';
+                a4El.style.boxShadow = '0 0 18px rgba(255,204,0,0.9)';
+                setTimeout(() => { a4El.style.boxShadow = ''; }, 900);
+            }
+            if (selectedLayerId === a4Layer.id) {
+                const inp = document.getElementById('layerText');
+                if (inp) inp.value = a4Value;
+            }
+            return true;
+        }
+
+        function applyA9Shine() {
+            const a9Layer = project.layers[8];
+            if (!a9Layer) return;
+            const a9El = document.getElementById(a9Layer.id);
+            if (!a9El) return;
+            if (backgroundVisible) {
+                a9El.classList.add('a9-shine');
+            } else {
+                a9El.classList.remove('a9-shine');
+            }
+        }
+
+        let maskRulerY = null;
+        let maskRulerAngle = 0;
+        let maskActive = false;
+
+        function ensureMaskRulerExists() {
+            let ruler = document.getElementById('maskRuler');
+            if (ruler) return ruler;
+            ruler = document.createElement('div');
+            ruler.id = 'maskRuler';
+            ruler.className = 'mask-ruler';
+            ruler.innerHTML = '<div class="mask-ruler-grip"><span></span><span></span><span></span></div>';
+
+            const rotateCenter = document.createElement('button');
+            rotateCenter.className = 'mask-rotate-center';
+            rotateCenter.innerHTML = '↻';
+            rotateCenter.title = 'Rotate 180°';
+            rotateCenter.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+            rotateCenter.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
+            rotateCenter.addEventListener('click', (e) => {
+                e.stopPropagation();
+                rotateMask(180);
+            });
+            ruler.appendChild(rotateCenter);
+
+            container.appendChild(ruler);
+            attachMaskRulerDrag(ruler);
+
+            if (maskRulerY == null) {
+                maskRulerY = Math.round(canvas.height / 2);
+            }
+            positionMaskRuler();
+            renderCanvas();
+            return ruler;
+        }
+
+        function rotateMask(delta) {
+            maskRulerAngle = (maskRulerAngle + delta) % 360;
+            positionMaskRuler();
+            renderCanvas();
+            applyA9Shine();
+            saveProject();
+        }
+
+        function setMaskActive(active) {
+            maskActive = active;
+            const ruler = document.getElementById('maskRuler');
+            if (ruler) {
+                if (active) ruler.classList.add('mask-active');
+                else ruler.classList.remove('mask-active');
+            }
+        }
+
+        function attachMaskRulerDrag(ruler) {
+            let dragging = false;
+            let startClientY = 0;
+            let startCanvasY = 0;
+            let pendingY = null;
+            let moved = false;
+
+            const onDown = (clientY) => {
+                dragging = true;
+                moved = false;
+                startClientY = clientY;
+                startCanvasY = (maskRulerY == null) ? 0 : maskRulerY;
+                setMaskActive(true);
+            };
+            const onMove = (clientY) => {
+                if (!dragging) return;
+                const scale = getScale();
+                if (!scale) return;
+                const deltaCanvas = (clientY - startClientY) / scale;
+                if (Math.abs(deltaCanvas) > 0.5) moved = true;
+                let newY = startCanvasY + deltaCanvas;
+                if (newY < 0) newY = 0;
+                if (newY > canvas.height - 2) newY = canvas.height - 2;
+                maskRulerY = newY;
+                pendingY = newY;
+                if (!rafPending) {
+                    rafPending = true;
+                    requestAnimationFrame(() => {
+                        positionMaskRuler();
+                        if (pendingY !== null) {
+                            renderCanvas();
+                            applyA9Shine();
+                            pendingY = null;
+                        }
+                        rafPending = false;
+                    });
+                }
+            };
+            const onUp = () => {
+                if (dragging) {
+                    dragging = false;
+                    saveProject();
+                }
+            };
+
+            ruler.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('mask-rotate-center')) return;
+                e.preventDefault();
+                onDown(e.clientY);
+            });
+            ruler.addEventListener('touchstart', (e) => {
+                if (e.target.classList.contains('mask-rotate-center')) return;
+                if (e.touches.length === 1) { e.preventDefault(); onDown(e.touches[0].clientY); }
+            }, { passive: false });
+
+            window.addEventListener('mousemove', (e) => onMove(e.clientY));
+            window.addEventListener('touchmove', (e) => {
+                if (dragging && e.touches.length === 1) { e.preventDefault(); onMove(e.touches[0].clientY); }
+            }, { passive: false });
+
+            window.addEventListener('mouseup', onUp);
+            window.addEventListener('touchend', onUp);
+            window.addEventListener('touchcancel', onUp);
+
+            const outsideHandler = (e) => {
+                const r = document.getElementById('maskRuler');
+                if (!r) return;
+                if (!r.contains(e.target)) {
+                    setMaskActive(false);
+                }
+            };
+            document.addEventListener('mousedown', outsideHandler);
+            document.addEventListener('touchstart', outsideHandler, { passive: true });
+        }
+
+        function positionMaskRuler() {
+            const ruler = document.getElementById('maskRuler');
+            if (!ruler) return;
+            if (maskRulerY == null) {
+                ruler.style.display = 'none';
+                return;
+            }
+            const scale = getScale();
+            ruler.style.display = 'flex';
+            ruler.style.top = (maskRulerY * scale) + 'px';
+            ruler.style.left = '50%';
+            ruler.style.transform = `translateX(-50%) rotate(${maskRulerAngle}deg)`;
+        }
+
+        let _flashTimer = null;
+        function showFlashMessage(msg) {
+            const el = document.getElementById('flashMessage');
+            const txt = document.getElementById('flashMessageText');
+            if (!el || !txt) return;
+            txt.textContent = msg || 'Completed Operation';
+            el.classList.add('show');
+            clearTimeout(_flashTimer);
+            _flashTimer = setTimeout(() => {
+                el.classList.remove('show');
+            }, 2200);
+        }
+
+        let backgroundVisible = true;
+
+        const APP_BORDER_INDICES = [2, 3, 4, 7, 8, 9];
+        const A5_INDEX = 4;
+
+        let totalLabelEl = null;
+
+        function ensureTotalLabelExists() {
+            if (totalLabelEl) return totalLabelEl;
+            totalLabelEl = document.createElement('div');
+            totalLabelEl.className = 'total-label-badge';
+            totalLabelEl.textContent = 'إجمالى';
+            container.appendChild(totalLabelEl);
+            return totalLabelEl;
+        }
+
+        function applyAppBorderAndShine() {
+            const allEls = document.querySelectorAll('.text-layer');
+            allEls.forEach(el => {
+                el.classList.remove('bg-hidden-appborder');
+                el.classList.remove('user-hidden-only');
+                el.classList.remove('hidden-only-hidden');
+            });
+
+            if (!backgroundVisible) {
+                APP_BORDER_INDICES.forEach(idx => {
+                    const layer = project.layers[idx];
+                    if (!layer) return;
+                    const el = document.getElementById(layer.id);
+                    if (el) el.classList.add('bg-hidden-appborder');
+                });
+                project.layers.forEach(layer => {
+                    if (layer.hiddenOnly) {
+                        const el = document.getElementById(layer.id);
+                        if (el) {
+                            el.classList.add('bg-hidden-appborder');
+                            el.classList.add('user-hidden-only');
+                        }
+                    }
+                });
+            } else {
+                project.layers.forEach(layer => {
+                    if (layer.hiddenOnly) {
+                        const el = document.getElementById(layer.id);
+                        if (el) el.classList.add('hidden-only-hidden');
+                    }
+                });
+            }
+
+            applyA9Shine();
+
+            if (!backgroundVisible && project.layers[A5_INDEX]) {
+                const label = ensureTotalLabelExists();
+                label.classList.add('visible');
+                positionTotalLabel();
+            } else if (totalLabelEl) {
+                totalLabelEl.classList.remove('visible');
+            }
+        }
+
+        function positionTotalLabel() {
+            if (!totalLabelEl) return;
+            const a5Layer = project.layers[A5_INDEX];
+            if (!a5Layer) { totalLabelEl.classList.remove('visible'); return; }
+            if (!backgroundVisible) { totalLabelEl.classList.remove('visible'); return; }
+            totalLabelEl.classList.remove('visible');
+        }
+
+        function updateTotalLabel() {
+            if (!totalLabelEl) {
+                if (backgroundVisible) return;
+                ensureTotalLabelExists();
+            }
+            const a5Layer = project.layers[A5_INDEX];
+            if (!backgroundVisible && a5Layer) {
+                totalLabelEl.classList.add('visible');
+                const a5El = document.getElementById(a5Layer.id);
+                if (a5El) {
+                    const scale = getScale();
+                    const a5Rect = a5El.getBoundingClientRect();
+                    const containerRect = container.getBoundingClientRect();
+                    const offsetX = (a5Rect.right - containerRect.left) / scale + 8;
+                    const offsetY = (a5Rect.top - containerRect.top) / scale;
+                    totalLabelEl.style.transform = `translate3d(${offsetX * scale}px, ${offsetY * scale}px, 0)`;
+                }
+            } else {
+                totalLabelEl.classList.remove('visible');
+            }
+        }
+
+        function updateBgToggleButtonUI() {
+            if (backgroundVisible) {
+                bgToggleBtn.classList.remove('hidden-state');
+                bgToggleBtn.textContent = 'BG';
+                bgToggleBtn.title = 'Hide background image';
+            } else {
+                bgToggleBtn.classList.add('hidden-state');
+                bgToggleBtn.textContent = 'BG';
+                bgToggleBtn.title = 'Show background image';
+            }
+        }
+
+        function saveBgVisibility() {
+            try {
+                localStorage.setItem('bee72342368/bg_visible', backgroundVisible ? '1' : '0');
+            } catch(e) { /* ignore */ }
+        }
+
+        function loadBgVisibility() {
+            try {
+                const stored = localStorage.getItem('bee72342368/bg_visible');
+                if (stored === '0') backgroundVisible = false;
+                else if (stored === '1') backgroundVisible = true;
+                else backgroundVisible = true;
+            } catch(e) {
+                backgroundVisible = true;
+            }
+        }
+
+        const sidebar = document.getElementById('sidebar');
+
+        // ========== BEEAPP TOGGLE (Text Engine collapse/expand) ==========
+        (function initBeeappToggle() {
+            const btn = document.getElementById('beeappToggleBtn');
+            const contents = document.getElementById('textEngineContents');
+            if (!btn || !contents) return;
+            const STORAGE_KEY = 'bee72342368/text_engine_collapsed';
+            let collapsed = false;
+            try { collapsed = localStorage.getItem(STORAGE_KEY) === '1'; } catch(e) {}
+            const applyState = () => {
+                if (collapsed) {
+                    contents.classList.add('collapsed');
+                    btn.classList.add('collapsed');
+                } else {
+                    contents.classList.remove('collapsed');
+                    btn.classList.remove('collapsed');
+                }
+            };
+            applyState();
+            btn.addEventListener('click', () => {
+                collapsed = !collapsed;
+                applyState();
+                try { localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0'); } catch(e) {}
+            });
+        })();
+
+        // ========== JUMP TO SAVED A8 ==========
+        document.getElementById('jumpToSavedBtn').addEventListener('click', () => {
+            const section = document.getElementById('savedA8Section');
+            if (!section) return;
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Highlight the section card briefly for feedback
+            section.style.transition = 'box-shadow 0.35s ease';
+            section.style.boxShadow = '0 0 0 2px var(--accent), 0 0 22px rgba(255,204,0,0.5)';
+            setTimeout(() => { section.style.boxShadow = ''; }, 1200);
+            // Small haptic tap if supported
+            try { if (navigator.vibrate) navigator.vibrate(25); } catch(e) {}
+        });
+
+        // ========== FAST SCROLL — PRESS-AND-HOLD ==========
+        const SCROLL_STEP = 400;
+        const SCROLL_INITIAL_DELAY = 300;
+        const SCROLL_REPEAT_INTERVAL = 90;
+
+        const scrollHoldState = {
+            timer: null,
+            interval: null,
+            btn: null,
+            direction: 0,
+            active: false
+        };
+
+        function doScrollStep(direction) {
+            const delta = SCROLL_STEP * direction;
+            sidebar.scrollBy({ top: delta, behavior: 'auto' });
+        }
+
+        function stopScrollHold() {
+            if (scrollHoldState.timer) { clearTimeout(scrollHoldState.timer); scrollHoldState.timer = null; }
+            if (scrollHoldState.interval) { clearInterval(scrollHoldState.interval); scrollHoldState.interval = null; }
+            if (scrollHoldState.btn) scrollHoldState.btn.classList.remove('holding');
+            scrollHoldState.btn = null;
+            scrollHoldState.direction = 0;
+            scrollHoldState.active = false;
+        }
+
+        function beginScrollHold(btn, direction) {
+            stopScrollHold();
+            scrollHoldState.btn = btn;
+            scrollHoldState.direction = direction;
+            scrollHoldState.active = true;
+            btn.classList.add('holding');
+
+            doScrollStep(direction);
+
+            scrollHoldState.timer = setTimeout(() => {
+                if (!scrollHoldState.active) return;
+                scrollHoldState.interval = setInterval(() => {
+                    if (!scrollHoldState.active) return;
+                    doScrollStep(direction);
+                }, SCROLL_REPEAT_INTERVAL);
+            }, SCROLL_INITIAL_DELAY);
+        }
+
+        (function attachFastScrollHold() {
+            const upBtn = document.getElementById('fastScrollUpBtn');
+            const downBtn = document.getElementById('fastScrollDownBtn');
+
+            const bind = (btn, direction) => {
+                if (!btn) return;
+                btn.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    beginScrollHold(btn, direction);
+                });
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    beginScrollHold(btn, direction);
+                }, { passive: false });
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                btn.addEventListener('contextmenu', (e) => e.preventDefault());
+            };
+
+            bind(upBtn, -1);
+            bind(downBtn, 1);
+
+            window.addEventListener('mouseup', stopScrollHold);
+            window.addEventListener('touchend', stopScrollHold);
+            window.addEventListener('touchcancel', stopScrollHold);
+            window.addEventListener('blur', stopScrollHold);
+        })();
+
+        const bgToggleBtn = document.getElementById('bgToggleBtn');
+        bgToggleBtn.addEventListener('click', () => {
+            backgroundVisible = !backgroundVisible;
+
+            project.layers.forEach(layer => {
+                if (!backgroundVisible) {
+                    if (typeof layer.hiddenX !== 'number' || typeof layer.hiddenY !== 'number') {
+                        layer.hiddenX = layer.x;
+                        layer.hiddenY = layer.y;
+                    }
+                }
+                const el = document.getElementById(layer.id);
+                if (el) {
+                    positionElement(el, backgroundVisible ? layer.x : layer.hiddenX,
+                                          backgroundVisible ? layer.y : layer.hiddenY);
+                }
+            });
+
+            updateBgToggleButtonUI();
+            saveBgVisibility();
+            applyAppBorderAndShine();
+            updateTotalLabel();
+            renderCanvas();
+            saveProject();
+        });
+
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        const touchSpeedMultiplier = isAndroid ? 1.8 : 1.2; 
+
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+        let rafPending = false;
+        let saveTimeout = null;
+        
+        let project = {
+            bgImage: null,
+            layers: [],
+            maskRulerY: null,
+            maskRulerAngle: 0
+        };
+        
+        let selectedLayerId = null;
+        let isDragging = false;
+        let dragTarget = null;
+        let startX, startY;
+        let baseImgObj = new Image();
+        
+        let projectFileHandle = null;
+        let lastUploadedFontName = null;
+
+        const defaultArabicNames = [
+            "أحمد", "محمد", "محمود", "مصطفى", "علي", "حسين", "حسن", "عمر", 
+            "إبراهيم", "يوسف", "خالد", "عبدالله", "عبد الرحمن", "طارق", "سعيد",
+            "فاطمة", "مريم", "زينب", "آية", "نور", "سارة", "هدى", "منى", "أميرة"
+        ];
+
+        let textMemory = [];
+        let numberNamePairs = {};
+
+        function loadNumberNamePairs() {
+            try {
+                const stored = localStorage.getItem('bee72342368/number_name_pairs_bee');
+                numberNamePairs = stored ? JSON.parse(stored) : {};
+            } catch(e) { numberNamePairs = {}; }
+        }
+
+        function saveNumberNamePairs() {
+            try { localStorage.setItem('bee72342368/number_name_pairs_bee', JSON.stringify(numberNamePairs)); } catch(e) {}
+        }
+
+        function saveCurrentPair() {
+            const a8Layer = project.layers[7];
+            const a10Layer = project.layers[9];
+            if (!a8Layer || !a10Layer) return;
+            const numStr = parseFormula(a8Layer.text).toString().trim();
+            const nameStr = parseFormula(a10Layer.text).toString().trim();
+            if (numStr && /^\d+$/.test(numStr) && nameStr && !nameStr.startsWith('=') && nameStr !== '[Syntax Error]') {
+                numberNamePairs[numStr] = nameStr;
+                saveNumberNamePairs();
+            }
+        }
+
+        function lookupAndFillName(inputValue) {
+            const cleaned = inputValue.trim();
+            if (!cleaned || !/^\d+$/.test(cleaned)) return;
+            const matchedName = numberNamePairs[cleaned];
+            if (matchedName) {
+                const a10Layer = project.layers[9];
+                if (a10Layer) {
+                    a10Layer.text = matchedName;
+                    const a10El = document.getElementById(a10Layer.id);
+                    if (a10El) a10El.innerText = matchedName;
+                    if (selectedLayerId === a10Layer.id) {
+                        document.getElementById('layerText').value = matchedName;
+                    }
+                    updateAllFormulas();
+                    updateLayersList();
+                    saveProject();
+                    const a10El2 = document.getElementById(a10Layer.id);
+                    if (a10El2) {
+                        a10El2.style.transition = 'box-shadow 0.3s';
+                        a10El2.style.boxShadow = '0 0 15px rgba(255,204,0,0.8)';
+                        setTimeout(() => { a10El2.style.boxShadow = ''; }, 800);
+                    }
+                }
+            }
+        }
+
+        function normalizeArabic(str) {
+            return str.replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/[\u064B-\u0652]/g, '').trim().toLowerCase();
+        }
+
+        function loadTextMemory() {
+            try {
+                const mem = localStorage.getItem('bee72342368/text_memory_bee');
+                if (mem) textMemory = JSON.parse(mem);
+                else { textMemory = [...defaultArabicNames]; saveTextMemory(); }
+            } catch(e) { textMemory = [...defaultArabicNames]; }
+        }
+
+        function saveTextMemory() {
+            try { localStorage.setItem('bee72342368/text_memory_bee', JSON.stringify(textMemory)); } catch(e) {}
+        }
+
+        function addNameToMemory(name) {
+            if (!name || name.startsWith('=')) return;
+            const cleaned = name.trim();
+            if (cleaned.length < 2) return;
+            const normCleaned = normalizeArabic(cleaned);
+            const exists = textMemory.some(item => normalizeArabic(item) === normCleaned);
+            if (!exists) { textMemory.unshift(cleaned); saveTextMemory(); }
+        }
+
+        function removeNameFromMemory(name, e) {
+            if (e) e.stopPropagation();
+            textMemory = textMemory.filter(item => item !== name);
+            saveTextMemory();
+            updateSuggestions(textInput.value);
+        }
+
+        loadTextMemory();
+        loadNumberNamePairs();
+
+        const textInput = document.getElementById('layerText');
+        const suggestionDropdown = document.getElementById('suggestionDropdown');
+
+        function updateSuggestions(query) {
+            const rawQ = query.trim();
+            const normQ = normalizeArabic(rawQ);
+            if (!normQ) { suggestionDropdown.classList.remove('show'); return; }
+            const matches = textMemory.filter(name => normalizeArabic(name).includes(normQ)).slice(0, 8);
+            if (matches.length === 0) { suggestionDropdown.classList.remove('show'); return; }
+            suggestionDropdown.innerHTML = '';
+            matches.forEach(text => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                const span = document.createElement('span');
+                span.textContent = text;
+                const removeBtn = document.createElement('span');
+                removeBtn.className = 'remove-mem';
+                removeBtn.innerHTML = '✕';
+                removeBtn.onclick = (e) => removeNameFromMemory(text, e);
+                div.appendChild(span);
+                div.appendChild(removeBtn);
+                div.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    textInput.value = text;
+                    suggestionDropdown.classList.remove('show');
+                    updateActiveLayerProps();
+                });
+                suggestionDropdown.appendChild(div);
+            });
+            suggestionDropdown.classList.add('show');
+        }
+
+        textInput.addEventListener('input', () => updateSuggestions(textInput.value));
+        textInput.addEventListener('blur', () => setTimeout(() => suggestionDropdown.classList.remove('show'), 200));
+        textInput.addEventListener('focus', () => { if (textInput.value.trim()) updateSuggestions(textInput.value); });
+
+        function setClipboardStatus(msg, type) {
+            const el = document.getElementById('clipboardStatus');
+            if (!el) return;
+            el.textContent = msg;
+            el.className = 'clipboard-status' + (type ? ' ' + type : '');
+            if (type === 'ok') {
+                clearTimeout(window._clipStatusTimer);
+                window._clipStatusTimer = setTimeout(() => {
+                    el.textContent = 'Ready. Copy your data and press Auto-Fill.';
+                    el.className = 'clipboard-status';
+                }, 6000);
+            }
+        }
+
+        function firstWords(text, n) {
+            if (!text) return '';
+            const words = text.split(/\s+/).filter(w => w.length > 0);
+            return words.slice(0, n).join(' ');
+        }
+
+        function parseClipboardSmart(text) {
+            if (!text || typeof text !== 'string') return { id: null, amount: null, name: null };
+
+            let normalized = text
+                .replace(/\r\n?/g, '\n')
+                .replace(/[\u0660-\u0669]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x0660 + 48))
+                .replace(/[\u06F0-\u06F9]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x06F0 + 48))
+                .replace(/[\u066B]/g, '.')
+                .replace(/[\u066C]/g, ',');
+
+            const lines = normalized.split('\n').map(l => l.trim()).filter(Boolean);
+
+            let id = null;
+            let amount = null;
+            let name = null;
+
+            const nameLabelPatterns = [
+                /(?:الاسم|الاسم\s*الكامل|اسم\s*العميل|اسم|Name)\s*[:：\-]\s*(.+)/i,
+                /(?:اسم)\s+(.+)/i
+            ];
+            for (const pat of nameLabelPatterns) {
+                const m = normalized.match(pat);
+                if (m && m[1]) {
+                    const candidate = m[1].split(/\n/)[0].trim();
+                    const words = candidate.split(/\s+/).filter(Boolean);
+                    const arabicWords = words.filter(w => /[\u0600-\u06FF]/.test(w));
+                    if (arabicWords.length > 0) {
+                        name = arabicWords.slice(0, 3).join(' ');
+                        break;
+                    }
+                }
+            }
+
+            const idCandidates = (normalized.match(/\d{8,19}/g) || []);
+            if (idCandidates.length > 0) {
+                id = idCandidates.reduce((a, b) => (b.length > a.length ? b : a));
+            }
+
+            let textForAmount = normalized;
+            if (id) textForAmount = textForAmount.replace(new RegExp(id, 'g'), ' ');
+
+            const amountRegex = /(?:^|[\s,،;:\n])(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)(?=$|[\s,،;:\n])/g;
+            const amountCandidates = [];
+            let am;
+            while ((am = amountRegex.exec(textForAmount)) !== null) {
+                const raw = am[1].replace(/,/g, '');
+                const num = parseFloat(raw);
+                if (isNaN(num)) continue;
+                if (num < 0.01 || num > 100000000) continue;
+                amountCandidates.push({ raw, num, hasDecimal: raw.includes('.') });
+            }
+
+            if (amountCandidates.length > 0) {
+                const withDecimal = amountCandidates.filter(c => c.hasDecimal);
+                const pool = withDecimal.length > 0 ? withDecimal : amountCandidates;
+                pool.sort((a, b) => b.num - a.num);
+                amount = String(Math.floor(pool[0].num));
+            }
+
+            if (!name) {
+                for (const line of lines) {
+                    if (/^\d+([.,]\d+)?$/.test(line)) continue;
+                    if (/^\d{8,}$/.test(line)) continue;
+                    if (/[:：]/.test(line) && !/[\u0600-\u06FF]/.test(line.replace(/[:：].*/, ''))) continue;
+                    if (/[\u0600-\u06FF]/.test(line) && !/^\d/.test(line)) {
+                        const words = line.split(/\s+/).filter(w => /[\u0600-\u06FF]/.test(w));
+                        if (words.length > 0) {
+                            name = words.slice(0, 3).join(' ');
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (name) name = firstWords(name, 3);
+
+            return { id, amount, name };
+        }
+
+        function applyClipboardData(text) {
+            const parsed = parseClipboardSmart(text);
+            const { id, amount, name } = parsed;
+
+            if (!id && !amount && !name) {
+                setClipboardStatus('⚠ No usable data found. Check your clipboard content.', 'err');
+                return false;
+            }
+
+            const a8Layer  = project.layers[7];
+            const a3Layer  = project.layers[2];
+            const a10Layer = project.layers[9];
+
+            const log = [];
+            let changed = false;
+
+            const setInput = (layer, value) => {
+                if (!layer || value == null || value === '') return false;
+                const str = String(value);
+                layer.text = str;
+                layer.isInput = true;
+                delete layer.formula;
+                delete layer.isFormula;
+                const el = document.getElementById(layer.id);
+                if (el) {
+                    el.innerText = str;
+                    el.style.transition = 'box-shadow 0.3s';
+                    el.style.boxShadow = '0 0 18px rgba(255,204,0,0.9)';
+                    setTimeout(() => { el.style.boxShadow = ''; }, 900);
+                }
+                if (selectedLayerId === layer.id) {
+                    const inp = document.getElementById('layerText');
+                    if (inp) inp.value = str;
+                }
+                return true;
+            };
+
+            if (setInput(a8Layer, id))        { changed = true; log.push(`A8=${id}`); }
+            else if (a8Layer)                 { log.push('A8=—'); }
+
+            if (setInput(a3Layer, amount))    { changed = true; log.push(`A3=${amount}`); }
+            else if (a3Layer)                 { log.push('A3=—'); }
+
+            if (setInput(a10Layer, name))     { changed = true; log.push(`A10=${name}`); addNameToMemory(name); }
+            else if (a10Layer)                { log.push('A10=—'); }
+
+            if (!changed) {
+                setClipboardStatus('⚠ Nothing applied. ' + log.join(' | '), 'err');
+                return false;
+            }
+
+            updateAllFormulas();
+            applyA4Rule();
+
+            const reassert = () => {
+                if (a8Layer  && id)     { const el = document.getElementById(a8Layer.id);  if (el) el.innerText = String(id); }
+                if (a3Layer  && amount) { const el = document.getElementById(a3Layer.id);  if (el) el.innerText = String(amount); }
+                if (a10Layer && name)   { const el = document.getElementById(a10Layer.id); if (el) el.innerText = name; }
+            };
+            reassert();
+            setTimeout(reassert, 1600);
+
+            updateLayersList();
+            saveProject();
+            setClipboardStatus('✓ ' + log.join(' | '), 'ok');
+            return true;
+        }
+
+        function pasteAndAutoFill() {
+            setClipboardStatus('Reading clipboard...', '');
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                navigator.clipboard.readText()
+                    .then(text => {
+                        if (!text || !text.trim()) {
+                            setClipboardStatus('⚠ Clipboard empty. Paste manually below.', 'err');
+                            return;
+                        }
+                        applyClipboardData(text);
+                    })
+                    .catch(err => {
+                        console.warn('Clipboard API failed:', err);
+                        setClipboardStatus('⚠ Clipboard blocked. Paste manually below and press "Parse Below".', 'err');
+                    });
+            } else {
+                setClipboardStatus('⚠ Clipboard not supported. Paste manually below.', 'err');
+            }
+        }
+
+        function pasteSelectIntoTextarea() {
+            const ta = document.getElementById('manualPasteArea');
+            if (!ta) return;
+
+            const selectAllInBox = (msg, type) => {
+                if (!ta.value || !ta.value.trim()) {
+                    setClipboardStatus('⚠ Paste area is empty.', 'err');
+                    ta.focus();
+                    return;
+                }
+                ta.focus();
+                ta.setSelectionRange(0, ta.value.length);
+                ta.scrollTop = ta.scrollHeight;
+                setClipboardStatus(msg || '✓ Selected all text in paste area.', type || 'ok');
+            };
+
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                navigator.clipboard.readText()
+                    .then(text => {
+                        if (!text || !text.trim()) {
+                            selectAllInBox('⚠ Clipboard empty — selected existing text in box.', 'err');
+                            return;
+                        }
+                        ta.value = text;
+                        ta.focus();
+                        ta.setSelectionRange(0, ta.value.length);
+                        ta.scrollTop = ta.scrollHeight;
+                        setClipboardStatus('✓ Clipboard inserted & selected.', 'ok');
+                        autoParsePasteArea();
+                    })
+                    .catch(err => {
+                        console.warn('Clipboard read failed:', err);
+                        selectAllInBox('⚠ Clipboard blocked — selected existing text in box.', 'err');
+                    });
+            } else {
+                selectAllInBox('⚠ Clipboard not supported — selected existing text in box.', 'err');
+            }
+        }
+
+        let _autoParseTimer = null;
+        function autoParsePasteArea() {
+            clearTimeout(_autoParseTimer);
+            _autoParseTimer = setTimeout(() => {
+                const val = document.getElementById('manualPasteArea').value;
+                if (!val || !val.trim()) return;
+                applyClipboardData(val);
+            }, 250);
+        }
+
+        (function attachAutoParse() {
+            const ta = document.getElementById('manualPasteArea');
+            if (!ta) return;
+            ta.addEventListener('input', autoParsePasteArea);
+            ta.addEventListener('paste', () => {
+                setTimeout(autoParsePasteArea, 10);
+            });
+            ta.addEventListener('change', autoParsePasteArea);
+        })();
+
+        document.getElementById('autoFillClipboardBtn').addEventListener('click', pasteAndAutoFill);
+        document.getElementById('pasteSelectBtn').addEventListener('click', pasteSelectIntoTextarea);
+        document.getElementById('parseManualBtn').addEventListener('click', () => {
+            const val = document.getElementById('manualPasteArea').value;
+            if (!val || !val.trim()) {
+                setClipboardStatus('⚠ Paste area is empty.', 'err');
+                return;
+            }
+            applyClipboardData(val);
+        });
+
+        const A6_CYCLE_VALUES = [
+            '246146247246226',
+            '206257152650001',
+            '237668465800000',
+            '225445644400226',
+            '2132590052507544',
+            '24316001552774277'
+        ];
+
+        const A7_CYCLE_VALUES = [
+            '2562547672573572600007647',
+            '267574267627862660007287',
+            '255627627772782890000022',
+            '276772876700000627277272',
+            '287730000377837773836660'
+        ];
+
+        let a6CycleIndex = 0;
+        let a7CycleIndex = 0;
+
+        function cycleA6Values() {
+            if (!project.layers || project.layers.length < 6) return;
+            const a6Layer = project.layers[5];
+            if (!a6Layer) return;
+            if (a6Layer.hiddenOnly) return;
+            if (selectedLayerId === a6Layer.id) {
+                a6CycleIndex = (a6CycleIndex + 1) % A6_CYCLE_VALUES.length;
+                return;
+            }
+            const newA6 = A6_CYCLE_VALUES[a6CycleIndex];
+            a6Layer.text = newA6;
+            a6Layer.isInput = true;
+            const a6El = document.getElementById(a6Layer.id);
+            if (a6El) a6El.innerText = newA6;
+            a6CycleIndex = (a6CycleIndex + 1) % A6_CYCLE_VALUES.length;
+            saveProject();
+        }
+
+        function cycleA7Values() {
+            if (!project.layers || project.layers.length < 7) return;
+            const a7Layer = project.layers[6];
+            if (!a7Layer) return;
+            if (a7Layer.hiddenOnly) return;
+            if (selectedLayerId === a7Layer.id) {
+                a7CycleIndex = (a7CycleIndex + 1) % A7_CYCLE_VALUES.length;
+                return;
+            }
+            const newA7 = A7_CYCLE_VALUES[a7CycleIndex];
+            a7Layer.text = newA7;
+            a7Layer.isInput = true;
+            const a7El = document.getElementById(a7Layer.id);
+            if (a7El) a7El.innerText = newA7;
+            a7CycleIndex = (a7CycleIndex + 1) % A7_CYCLE_VALUES.length;
+            saveProject();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadBgVisibility();
+            updateBgToggleButtonUI();
+
+            const saved = localStorage.getItem('bee72342368/formula_photo_studio_v4');
+            if (saved) loadProjectFromData(saved);
+            else renderCanvas();
+            
+            ensureMaskRulerExists();
+            ensureTotalLabelExists();
+            applyAppBorderAndShine();
+            updateTotalLabel();
+            applyA9Shine();
+
+            renderSavedA8List();
+
+            setInterval(cycleA6Values, 1000);
+            setInterval(cycleA7Values, 3000);
+
+            setInterval(() => {
+                if (document.hidden) return; 
+                
+                [5, 6].forEach(idx => {
+                    const layer = project.layers[idx];
+                    if (!layer) return;
+                    if (layer.hiddenOnly) return;
+                    if (layer.isInput) return;
+                    if (layer.text && layer.text.startsWith('=')) return;
+                    if (layer.text && /^=/.test(layer.text.trim())) return;
+                    
+                    const str = layer.text;
+                    const hasNumbers = /\d+/.test(str);
+                    if (hasNumbers) {
+                        layer.text = str.replace(/\d+/g, m => Math.round(parseInt(m, 10) + 30));
+                    } else {
+                        const parsed = parseFloat(str);
+                        if (!isNaN(parsed)) layer.text = Math.round(parsed + 30).toString();
+                    }
+                });
+                updateAllFormulas();
+                const activeIdx = project.layers.findIndex(l => l.id === selectedLayerId);
+                if ((activeIdx === 5 || activeIdx === 6) && document.getElementById('layerText')) {
+                    document.getElementById('layerText').value = project.layers[activeIdx].text;
+                }
+            }, 1000);
+        });
+
+        function saveProject() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                try {
+                    project.maskRulerY = maskRulerY;
+                    project.maskRulerAngle = maskRulerAngle;
+                    localStorage.setItem('bee72342368/formula_photo_studio_v4', JSON.stringify(project));
+                }
+                catch(e) { console.error("Local storage sync error:", e); }
+            }, 300);
+        }
+
+        function loadProjectFromData(jsonString) {
+            try {
+                project = JSON.parse(jsonString);
+                maskRulerY = (project.maskRulerY !== undefined && project.maskRulerY !== null) ? project.maskRulerY : null;
+                maskRulerAngle = (project.maskRulerAngle !== undefined && project.maskRulerAngle !== null) ? project.maskRulerAngle : 0;
+                project.layers.forEach(layer => {
+                    if (typeof layer.hiddenX !== 'number') layer.hiddenX = layer.x;
+                    if (typeof layer.hiddenY !== 'number') layer.hiddenY = layer.y;
+                    if (typeof layer.hiddenOnly !== 'boolean') layer.hiddenOnly = false;
+                });
+                document.getElementById('inspector').style.display = 'none';
+                selectedLayerId = null;
+                if (project.bgImage) {
+                    baseImgObj.src = project.bgImage;
+                    baseImgObj.onload = () => { renderCanvas(); rebuildHTMLLayers(); updateAllFormulas(); ensureMaskRulerExists(); ensureTotalLabelExists(); applyAppBorderAndShine(); updateTotalLabel(); applyA9Shine(); };
+                } else {
+                    renderCanvas(); rebuildHTMLLayers(); updateAllFormulas(); ensureMaskRulerExists(); ensureTotalLabelExists(); applyAppBorderAndShine(); updateTotalLabel(); applyA9Shine();
+                }
+                project.layers.forEach(l => { if (l.text && !l.text.startsWith('=')) addNameToMemory(l.text); });
+            } catch(e) { alert("Error reading project architecture."); console.error(e); }
+        }
+
+        document.getElementById('saveProjectFile').addEventListener('click', async () => {
+            project.maskRulerY = maskRulerY;
+            project.maskRulerAngle = maskRulerAngle;
+            if (window.showOpenFilePicker && projectFileHandle) {
+                try {
+                    const options = { mode: 'readwrite' };
+                    if (await projectFileHandle.queryPermission(options) !== 'granted') {
+                        if (await projectFileHandle.requestPermission(options) !== 'granted') throw new Error("Write access rejected.");
+                    }
+                    const writable = await projectFileHandle.createWritable();
+                    await writable.write(JSON.stringify(project, null, 2));
+                    await writable.close();
+                    const statusHint = document.getElementById('fileStatusHint');
+                    statusHint.innerText = `Saved directly into: ${projectFileHandle.name}`;
+                    statusHint.style.color = 'var(--text-blue)';
+                    return;
+                } catch (err) { console.warn("Direct file write aborted.", err); }
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(project));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `bee72342368/studio_project_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        });
+
+        document.getElementById('importProjectFileBtn').addEventListener('click', async () => {
+            if (window.showOpenFilePicker) {
+                try {
+                    const [handle] = await window.showOpenFilePicker({
+                        types: [{ description: 'Studio Project File (.json)', accept: { 'application/json': ['.json'] } }],
+                        multiple: false
+                    });
+                    projectFileHandle = handle;
+                    const file = await handle.getFile();
+                    const text = await file.text();
+                    loadProjectFromData(text);
+                    saveProject();
+                    const statusHint = document.getElementById('fileStatusHint');
+                    statusHint.innerText = `Linked file: ${handle.name}`;
+                    statusHint.style.color = '#5cd65c';
+                    return;
+                } catch (err) { console.warn("Modern File Picker cancelled.", err); }
+            }
+            const inputFallback = document.createElement('input');
+            inputFallback.type = 'file';
+            inputFallback.accept = '.json';
+            inputFallback.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    loadProjectFromData(event.target.result);
+                    saveProject();
+                    document.getElementById('fileStatusHint').innerText = "Imported standard data file matrix.";
+                };
+                reader.readAsText(file);
+            };
+            inputFallback.click();
+        });
+
+        document.getElementById('imageLoader').addEventListener('change', (e) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                project.bgImage = event.target.result;
+                baseImgObj.src = event.target.result;
+                baseImgObj.onload = () => {
+                    if (maskRulerY != null && maskRulerY > baseImgObj.height) maskRulerY = baseImgObj.height / 2;
+                    renderCanvas(); rebuildHTMLLayers(); updateAllFormulas(); ensureMaskRulerExists(); applyAppBorderAndShine(); updateTotalLabel(); applyA9Shine(); saveProject();
+                };
+            };
+            if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+        });
+
+        document.getElementById('fontLoader').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const fontName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+            lastUploadedFontName = fontName;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const fontDataUrl = event.target.result;
+                const customFont = new FontFace(fontName, `url(${fontDataUrl})`);
+                customFont.load().then((loadedFont) => {
+                    document.fonts.add(loadedFont);
+                    const selectEl = document.getElementById('layerFont');
+                    const opt = document.createElement('option');
+                    opt.value = `"${fontName}", sans-serif`;
+                    opt.style.fontFamily = `"${fontName}"`;
+                    opt.innerText = `${fontName} (Uploaded)`;
+                    selectEl.appendChild(opt);
+                    if (selectedLayerId) { selectEl.value = opt.value; triggerInspectorInput(); }
+                    updateAllFormulas();
+                }).catch(err => { alert("Unable to parse font structure."); console.error(err); });
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function renderCanvas() {
+            if (backgroundVisible && project.bgImage && baseImgObj.width) {
+                canvas.width = baseImgObj.width;
+                canvas.height = baseImgObj.height;
+                ctx.drawImage(baseImgObj, 0, 0);
+            } else if (backgroundVisible && !project.bgImage) {
+                canvas.width = 1080;
+                canvas.height = 1080;
+                ctx.fillStyle = "#11110e";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = "rgba(255,204,0,0.02)";
+                ctx.lineWidth = 2;
+                for(let x=0; x<canvas.width; x+=80) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+                for(let y=0; y<canvas.height; y+=80) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+                ctx.fillStyle = "#FFCC00";
+                ctx.font = "bold 28px -apple-system, sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("Formula Graphic Core Active", canvas.width/2, canvas.height/2 - 20);
+                ctx.fillStyle = "#616155";
+                ctx.font = "18px -apple-system, sans-serif";
+                ctx.fillText("Upload background image to start structural configuration", canvas.width/2, canvas.height/2 + 20);
+            } else {
+                const w = (baseImgObj.width || 1080);
+                const h = (baseImgObj.height || 1080);
+                canvas.width = w;
+                canvas.height = h;
+                ctx.fillStyle = "#000000";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            if (maskRulerY != null && maskRulerY < canvas.height) {
+                ctx.save();
+                ctx.translate(0, maskRulerY);
+                ctx.rotate(maskRulerAngle * Math.PI / 180);
+                const diagonal = Math.hypot(canvas.width, canvas.height);
+                ctx.fillStyle = "#000000";
+                ctx.fillRect(-diagonal, 0, diagonal * 2, diagonal);
+                ctx.restore();
+            }
+        }
+
+        function formatSumResult(value) {
+            if (Math.floor(value) === value) return value.toString();
+            return parseFloat(value.toFixed(2)).toString();
+        }
+
+        function parseFormula(text) {
+            if (!text || !text.startsWith('=')) return text;
+            let formula = text.slice(1).toUpperCase().trim();
+            if (formula === 'TIME()') {
+                const now = new Date();
+                return now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+            if (formula === 'DATE()') {
+                const now = new Date();
+                return `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}`;
+            }
+            if (formula.startsWith('SUM(') && formula.endsWith(')')) {
+                const inside = formula.slice(4, -1).replace(/\s+/g, '');
+                if (!inside) return "0";
+                const targets = inside.split(',');
+                let totalSum = 0;
+                targets.forEach(target => {
+                    if (target.startsWith('A')) {
+                        const targetIdx = parseInt(target.substring(1)) - 1;
+                        if (targetIdx >= 0 && targetIdx < project.layers.length) {
+                            const rawVal = parseFormula(project.layers[targetIdx].text);
+                            const matches = rawVal.match(/[-+]?[0-9]*\.?[0-9]+/g);
+                            if (matches) matches.forEach(num => totalSum += parseFloat(num));
+                        }
+                    } else {
+                        const parsedFloat = parseFloat(target);
+                        if (!isNaN(parsedFloat)) totalSum += parsedFloat;
+                    }
+                });
+                return formatSumResult(totalSum);
+            }
+            return "[Syntax Error]";
+        }
+
+        document.getElementById('addTextBtn').addEventListener('click', () => addNewLayer('أدخل الاسم', false));
+        document.getElementById('addTimeBtn').addEventListener('click', () => addNewLayer('=TIME()', false));
+        document.getElementById('addSumBtn').addEventListener('click', () => addNewLayer('=SUM(A1)', false));
+        document.getElementById('addHiddenOnlyBtn').addEventListener('click', () => addNewLayer('إجمالى', true));
+
+        function addNewLayer(initialText, hiddenOnly) {
+            const selectEl = document.getElementById('layerFont');
+            const newLayer = {
+                id: 'layer_' + Date.now(),
+                text: initialText, 
+                x: canvas.width / 4,
+                y: canvas.height / 3,
+                hiddenX: canvas.width / 4,
+                hiddenY: canvas.height / 3,
+                size: 50,
+                color: '#FFCC00',
+                bgColor: '#000000',
+                useBg: false,
+                isBold: false,
+                font: selectEl.value,
+                letterSpacing: 0, 
+                lineHeight: 1.2,
+                hiddenOnly: !!hiddenOnly
+            };
+            project.layers.push(newLayer);
+            createHTMLLayer(newLayer);
+            selectLayer(newLayer.id);
+            addNameToMemory(initialText);
+            saveProject();
+            applyAppBorderAndShine();
+            updateTotalLabel();
+        }
+
+        function createHTMLLayer(layer) {
+            const el = document.createElement('div');
+            el.id = layer.id;
+            el.className = 'text-layer';
+            el.style.color = layer.color;
+            el.style.fontSize = getScaledSize(layer.size) + 'px';
+            el.style.fontFamily = layer.font;
+            el.style.backgroundColor = (layer.useBg) ? layer.bgColor : 'transparent';
+            el.style.letterSpacing = getScaledSize(layer.letterSpacing || 0) + 'px';
+            el.style.lineHeight = (layer.lineHeight || 1.2);
+            if (layer.isBold) el.style.fontWeight = 'bold';
+            el.innerText = parseFormula(layer.text);
+            positionElement(el, backgroundVisible ? layer.x : layer.hiddenX,
+                                  backgroundVisible ? layer.y : layer.hiddenY);
+            if (layer === project.layers[8] && backgroundVisible) {
+                el.classList.add('a9-shine');
+            }
+
+            const startDrag = (clientX, clientY) => {
+                isDragging = true;
+                dragTarget = layer;
+                document.body.classList.add('dragging-active');
+                selectLayer(layer.id);
+                const rect = canvas.getBoundingClientRect();
+                const scale = getScale();
+                const baseX = backgroundVisible ? layer.x : layer.hiddenX;
+                const baseY = backgroundVisible ? layer.y : layer.hiddenY;
+                startX = (clientX - rect.left) / scale - baseX;
+                startY = (clientY - rect.top) / scale - baseY;
+                lastTouchX = clientX;
+                lastTouchY = clientY;
+            };
+
+            el.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+            el.addEventListener('touchstart', (e) => {
+                if(e.touches.length === 1) startDrag(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+
+            container.appendChild(el);
+            updateLayersList();
+            applyAppBorderAndShine();
+            updateTotalLabel();
+        }
+
+        function positionElement(el, x, y) {
+            const scale = getScale();
+            el.style.transform = `translate3d(${x * scale}px, ${y * scale}px, 0)`;
+        }
+
+        function getScaledSize(size) {
+            return size * getScale();
+        }
+
+        function rebuildHTMLLayers() {
+            document.querySelectorAll('.text-layer').forEach(el => el.remove());
+            project.layers.forEach(layer => createHTMLLayer(layer));
+            applyA9Shine();
+            applyAppBorderAndShine();
+            updateTotalLabel();
+        }
+
+        function updateAllFormulas() {
+            project.layers.forEach(layer => {
+                const el = document.getElementById(layer.id);
+                if (el) el.innerText = parseFormula(layer.text);
+            });
+            updateTotalLabel();
+        }
+
+        const handleMove = (clientX, clientY, isTouch = false) => {
+            if (!isDragging || !dragTarget) return;
+            const rect = canvas.getBoundingClientRect();
+            const scale = getScale();
+            const writeToHidden = !backgroundVisible;
+            if (isTouch) {
+                const deltaX = ((clientX - lastTouchX) / scale) * touchSpeedMultiplier;
+                const deltaY = ((clientY - lastTouchY) / scale) * touchSpeedMultiplier;
+                if (writeToHidden) {
+                    dragTarget.hiddenX += deltaX;
+                    dragTarget.hiddenY += deltaY;
+                } else {
+                    dragTarget.x += deltaX;
+                    dragTarget.y += deltaY;
+                }
+                lastTouchX = clientX;
+                lastTouchY = clientY;
+            } else {
+                if (writeToHidden) {
+                    dragTarget.hiddenX = (clientX - rect.left) / scale - startX;
+                    dragTarget.hiddenY = (clientY - rect.top) / scale - startY;
+                } else {
+                    dragTarget.x = (clientX - rect.left) / scale - startX;
+                    dragTarget.y = (clientY - rect.top) / scale - startY;
+                }
+            }
+            if (!rafPending) {
+                rafPending = true;
+                requestAnimationFrame(() => {
+                    const el = document.getElementById(dragTarget.id);
+                    if(el) {
+                        const px = backgroundVisible ? dragTarget.x : dragTarget.hiddenX;
+                        const py = backgroundVisible ? dragTarget.y : dragTarget.hiddenY;
+                        positionElement(el, px, py);
+                    }
+                    applyA9Shine();
+                    updateTotalLabel();
+                    rafPending = false;
+                });
+            }
+        };
+
+        window.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY, false));
+        window.addEventListener('touchmove', (e) => {
+            if(isDragging && e.touches.length === 1) handleMove(e.touches[0].clientX, e.touches[0].clientY, true);
+        }, { passive: true });
+
+        const endDrag = () => {
+            if(isDragging) {
+                isDragging = false;
+                document.body.classList.remove('dragging-active');
+                saveProject();
+                updateTotalLabel();
+            }
+        };
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('touchend', endDrag);
+
+        let _resizeRafPending = false;
+        window.addEventListener('resize', () => {
+            if (_resizeRafPending) return;
+            _resizeRafPending = true;
+            requestAnimationFrame(() => {
+                _lastCanvasWidth = 0;
+                project.layers.forEach(layer => {
+                    const el = document.getElementById(layer.id);
+                    if(el) {
+                        positionElement(el,
+                            backgroundVisible ? layer.x : layer.hiddenX,
+                            backgroundVisible ? layer.y : layer.hiddenY);
+                        el.style.fontSize = getScaledSize(layer.size) + 'px';
+                        el.style.letterSpacing = getScaledSize(layer.letterSpacing || 0) + 'px';
+                    }
+                });
+                positionMaskRuler();
+                applyA9Shine();
+                updateTotalLabel();
+                _resizeRafPending = false;
+            });
+        });
+
+        function selectLayer(id) {
+            selectedLayerId = id;
+            document.querySelectorAll('.text-layer').forEach(el => el.classList.remove('active'));
+            const el = document.getElementById(id);
+            if(el) el.classList.add('active');
+            const layer = project.layers.find(l => l.id === id);
+            if (layer) {
+                const textInput = document.getElementById('layerText');
+                document.getElementById('inspector').style.display = 'block';
+                textInput.value = layer.text;
+                textInput.style.fontFamily = layer.font;
+                textInput.style.fontWeight = layer.isBold ? 'bold' : 'normal';
+                document.getElementById('layerSize').value = layer.size;
+                document.getElementById('layerSizeSlider').value = layer.size;
+                document.getElementById('layerColor').value = layer.color;
+                document.getElementById('layerBgColor').value = layer.bgColor || '#000000';
+                document.getElementById('useBgColor').checked = !!layer.useBg;
+                document.getElementById('useBoldText').checked = !!layer.isBold;
+                document.getElementById('layerFont').value = layer.font;
+                if(layer.letterSpacing === undefined) layer.letterSpacing = 0;
+                if(layer.lineHeight === undefined) layer.lineHeight = 1.2;
+                setTimeout(() => {
+                    textInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    textInput.focus();
+                    textInput.select();
+                }, 50);
+            }
+            updateLayersList();
+            updateTotalLabel();
+        }
+
+        document.getElementById('layerSizeSlider').addEventListener('input', (e) => {
+            document.getElementById('layerSize').value = e.target.value;
+            triggerInspectorInput();
+        });
+
+        document.getElementById('layerSize').addEventListener('input', (e) => {
+            document.getElementById('layerSizeSlider').value = e.target.value;
+            triggerInspectorInput();
+        });
+
+        function triggerInspectorInput() {
+            document.getElementById('layerText').dispatchEvent(new Event('input'));
+        }
+
+        const updateActiveLayerProps = () => {
+            if (!selectedLayerId) return;
+            const layer = project.layers.find(l => l.id === selectedLayerId);
+            const el = document.getElementById(selectedLayerId);
+            const textInput = document.getElementById('layerText');
+            if (layer && el) {
+                const newText = textInput.value;
+                const oldText = layer.text;
+
+                const inputIndices = [2, 7, 9];
+                const idx = project.layers.findIndex(l => l.id === selectedLayerId);
+                if (inputIndices.includes(idx)) {
+                    layer.isInput = true;
+                }
+
+                layer.text = newText;
+                layer.size = parseInt(document.getElementById('layerSize').value) || 20;
+                layer.color = document.getElementById('layerColor').value;
+                layer.bgColor = document.getElementById('layerBgColor').value;
+                layer.useBg = document.getElementById('useBgColor').checked;
+                layer.isBold = document.getElementById('useBoldText').checked;
+                layer.font = document.getElementById('layerFont').value;
+                addNameToMemory(newText);
+                textInput.style.fontFamily = layer.font;
+                textInput.style.fontWeight = layer.isBold ? 'bold' : 'normal';
+                el.style.color = layer.color;
+                el.style.fontSize = getScaledSize(layer.size) + 'px';
+                el.style.fontFamily = layer.font;
+                el.style.backgroundColor = layer.useBg ? layer.bgColor : 'transparent';
+                el.style.fontWeight = layer.isBold ? 'bold' : 'normal';
+                el.style.letterSpacing = getScaledSize(layer.letterSpacing || 0) + 'px';
+                updateAllFormulas(); 
+                saveProject();
+                const activeIdx = project.layers.findIndex(l => l.id === selectedLayerId);
+                if (activeIdx === 7 && oldText !== newText) {
+                    clearTimeout(window._a8LookupTimeout);
+                    window._a8LookupTimeout = setTimeout(() => lookupAndFillName(newText), 600);
+                }
+                if (activeIdx === 2 || activeIdx === 8) {
+                    applyA4Rule();
+                    applyA9Shine();
+                    updateLayersList();
+                }
+                if (activeIdx === A5_INDEX) {
+                    updateTotalLabel();
+                }
+            }
+        };
+
+        ['layerText', 'layerSize', 'layerColor', 'layerBgColor', 'useBgColor', 'useBoldText', 'layerFont'].forEach(inputId => {
+            const targetEl = document.getElementById(inputId);
+            targetEl.addEventListener('input', updateActiveLayerProps);
+            targetEl.addEventListener('change', updateActiveLayerProps);
+        });
+
+        // ========== NUDGE + PRESS-AND-HOLD ==========
+        const NUDGE_DIRS = {
+            up:    { dx: 0,  dy: -1 },
+            down:  { dx: 0,  dy:  1 },
+            left:  { dx: -1, dy:  0 },
+            right: { dx: 1,  dy:  0 }
+        };
+
+        const NUDGE_INITIAL_DELAY = 320;
+        const NUDGE_REPEAT_INTERVAL = 55;
+
+        const nudgeHoldState = {
+            timer: null,
+            interval: null,
+            btn: null,
+            dir: null,
+            active: false
+        };
+
+        function doNudgeStep(dir) {
+            const d = NUDGE_DIRS[dir];
+            if (!d) return;
+            nudgeActiveLayer(d.dx, d.dy);
+        }
+
+        function stopNudgeHold() {
+            if (nudgeHoldState.timer) { clearTimeout(nudgeHoldState.timer); nudgeHoldState.timer = null; }
+            if (nudgeHoldState.interval) { clearInterval(nudgeHoldState.interval); nudgeHoldState.interval = null; }
+            if (nudgeHoldState.btn) {
+                nudgeHoldState.btn.classList.remove('holding');
+            }
+            nudgeHoldState.btn = null;
+            nudgeHoldState.dir = null;
+            nudgeHoldState.active = false;
+        }
+
+        function beginNudgeHold(btn, dir) {
+            stopNudgeHold();
+            if (!selectedLayerId) return;
+            nudgeHoldState.btn = btn;
+            nudgeHoldState.dir = dir;
+            nudgeHoldState.active = true;
+            btn.classList.add('holding');
+
+            doNudgeStep(dir);
+
+            nudgeHoldState.timer = setTimeout(() => {
+                if (!nudgeHoldState.active) return;
+                nudgeHoldState.interval = setInterval(() => {
+                    if (!nudgeHoldState.active) return;
+                    doNudgeStep(dir);
+                }, NUDGE_REPEAT_INTERVAL);
+            }, NUDGE_INITIAL_DELAY);
+        }
+
+        document.querySelectorAll('.nudge-btn').forEach(btn => {
+            const dir = btn.getAttribute('data-dir');
+            if (!dir) return;
+
+            btn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                beginNudgeHold(btn, dir);
+            });
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                beginNudgeHold(btn, dir);
+            }, { passive: false });
+
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
+            btn.addEventListener('contextmenu', (e) => e.preventDefault());
+        });
+
+        window.addEventListener('mouseup', stopNudgeHold);
+        window.addEventListener('touchend', stopNudgeHold);
+        window.addEventListener('touchcancel', stopNudgeHold);
+        window.addEventListener('blur', stopNudgeHold);
+
+        function nudgeActiveLayer(dx, dy) {
+            if (!selectedLayerId) return;
+            const layer = project.layers.find(l => l.id === selectedLayerId);
+            const el = document.getElementById(selectedLayerId);
+            if(layer && el) {
+                const stepMultiplier = isAndroid ? 5 : 1;
+                if (backgroundVisible) {
+                    layer.x += dx * stepMultiplier;
+                    layer.y += dy * stepMultiplier;
+                    positionElement(el, layer.x, layer.y);
+                } else {
+                    layer.hiddenX += dx * stepMultiplier;
+                    layer.hiddenY += dy * stepMultiplier;
+                    positionElement(el, layer.hiddenX, layer.hiddenY);
+                }
+                if (selectedLayerId === project.layers[8]?.id) applyA9Shine();
+                saveProject();
+                updateTotalLabel();
+            }
+        }
+
+        document.getElementById('incLetterSpacing').addEventListener('click', () => {
+            if (!selectedLayerId) return;
+            const layer = project.layers.find(l => l.id === selectedLayerId);
+            const el = document.getElementById(selectedLayerId);
+            if(layer && el) { layer.letterSpacing = (layer.letterSpacing || 0) + 1; el.style.letterSpacing = getScaledSize(layer.letterSpacing) + 'px'; saveProject(); updateTotalLabel(); }
+        });
+        document.getElementById('decLetterSpacing').addEventListener('click', () => {
+            if (!selectedLayerId) return;
+            const layer = project.layers.find(l => l.id === selectedLayerId);
+            const el = document.getElementById(selectedLayerId);
+            if(layer && el) { layer.letterSpacing = (layer.letterSpacing || 0) - 1; el.style.letterSpacing = getScaledSize(layer.letterSpacing) + 'px'; saveProject(); updateTotalLabel(); }
+        });
+        document.getElementById('incLineHeight').addEventListener('click', () => {
+            if (!selectedLayerId) return;
+            const layer = project.layers.find(l => l.id === selectedLayerId);
+            const el = document.getElementById(selectedLayerId);
+            if(layer && el) { layer.lineHeight = parseFloat(((layer.lineHeight || 1.2) + 0.05).toFixed(2)); el.style.lineHeight = layer.lineHeight; saveProject(); }
+        });
+        document.getElementById('decLineHeight').addEventListener('click', () => {
+            if (!selectedLayerId) return;
+            const layer = project.layers.find(l => l.id === selectedLayerId);
+            const el = document.getElementById(selectedLayerId);
+            if(layer && el) { layer.lineHeight = parseFloat(((layer.lineHeight || 1.2) - 0.05).toFixed(2)); el.style.lineHeight = layer.lineHeight; saveProject(); }
+        });
+
+        function deleteLayer(id, e) {
+            e.stopPropagation();
+            // ===== CONFIRMATION BEFORE DELETING LAYER =====
+            const layer = project.layers.find(l => l.id === id);
+            const label = layer ? (layer.text.length > 30 ? layer.text.slice(0, 30) + '…' : layer.text) : 'this layer';
+            const confirmed = window.confirm('Delete layer "' + label + '"?\nThis cannot be undone.');
+            if (!confirmed) return;
+            vibrateStrong();
+            project.layers = project.layers.filter(l => l.id !== id);
+            const el = document.getElementById(id);
+            if(el) el.remove();
+            if(selectedLayerId === id) {
+                document.getElementById('inspector').style.display = 'none';
+                selectedLayerId = null;
+            }
+            updateAllFormulas();
+            updateLayersList();
+            saveProject();
+            applyAppBorderAndShine();
+            updateTotalLabel();
+        }
+
+        function updateLayersList() {
+            const container = document.getElementById('layersList');
+            container.innerHTML = '';
+            project.layers.forEach((layer, idx) => {
+                const item = document.createElement('div');
+                item.className = `layer-item ${layer.id === selectedLayerId ? 'active' : ''}${layer.hiddenOnly ? ' bg-hidden-only' : ''}`;
+                item.onclick = () => selectLayer(layer.id);
+                const displayTitle = layer.text.length > 12 ? layer.text.slice(0, 12) + '...' : layer.text;
+                const tagClass = layer.hiddenOnly ? 'layer-ref hidden-only-tag' : 'layer-ref';
+                const tagLabel = layer.hiddenOnly ? 'HID' : 'A' + (idx + 1);
+                item.innerHTML = `
+                    <div>
+                        <span class="${tagClass}">${tagLabel}</span>
+                        <span style="font-family: ${layer.font}; ${layer.isBold ? 'font-weight: bold;' : ''}">${displayTitle.startsWith('=') ? 'ƒ' : displayTitle}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteLayer('${layer.id}', event)">✕</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function flattenAndDownload(format) {
+            saveCurrentPair();
+
+            if (project.bgImage && baseImgObj.width) {
+                canvas.width = baseImgObj.width;
+                canvas.height = baseImgObj.height;
+                ctx.drawImage(baseImgObj, 0, 0);
+            } else {
+                canvas.width = 1080;
+                canvas.height = 1080;
+                ctx.fillStyle = "#11110e";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            project.layers.forEach(layer => {
+                if (layer.hiddenOnly) return;
+                const finalStr = parseFormula(layer.text).toString();
+                const px = layer.x;
+                const py = layer.y;
+                ctx.font = `${layer.isBold ? 'bold' : 'normal'} ${layer.size}px ${layer.font}`;
+                ctx.textBaseline = "top";
+                ctx.textAlign = "left";
+                const textMetrics = ctx.measureText(finalStr);
+                const textWidth = textMetrics.width;
+                if(layer.useBg) { ctx.fillStyle = layer.bgColor; ctx.fillRect(px, py, textWidth, layer.size); }
+                ctx.fillStyle = layer.color;
+                if(layer.letterSpacing && layer.letterSpacing !== 0) {
+                    let currentX = px;
+                    for(let i=0; i<finalStr.length; i++) {
+                        const char = finalStr[i];
+                        ctx.fillText(char, currentX, py);
+                        currentX += ctx.measureText(char).width + layer.letterSpacing;
+                    }
+                } else {
+                    ctx.fillText(finalStr, px, py);
+                }
+            });
+            const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
+            const link = document.createElement('a');
+            link.download = `bee72342368/studio_render_${Date.now()}.${format}`;
+            link.href = canvas.toDataURL(mime, 0.95);
+            link.click();
+            renderCanvas();
+            positionMaskRuler();
+            applyAppBorderAndShine();
+            updateTotalLabel();
+            applyA9Shine();
+            showFlashMessage('Completed Operation');
+            playNotificationSound();
+            vibrateOnDownload();
+
+            const result = bumpDownloadCountForA8();
+            if (result) showDownloadCountToast(result.count);
+        }
+
+        async function shareImage() {
+            saveCurrentPair();
+
+            if (project.bgImage && baseImgObj.width) {
+                canvas.width = baseImgObj.width;
+                canvas.height = baseImgObj.height;
+                ctx.drawImage(baseImgObj, 0, 0);
+            } else {
+                canvas.width = 1080;
+                canvas.height = 1080;
+                ctx.fillStyle = "#11110e";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            project.layers.forEach(layer => {
+                if (layer.hiddenOnly) return;
+                const finalStr = parseFormula(layer.text).toString();
+                const px = layer.x;
+                const py = layer.y;
+                ctx.font = `${layer.isBold ? 'bold' : 'normal'} ${layer.size}px ${layer.font}`;
+                ctx.textBaseline = "top";
+                ctx.textAlign = "left";
+                const textMetrics = ctx.measureText(finalStr);
+                const textWidth = textMetrics.width;
+                if(layer.useBg) { ctx.fillStyle = layer.bgColor; ctx.fillRect(px, py, textWidth, layer.size); }
+                ctx.fillStyle = layer.color;
+                if(layer.letterSpacing && layer.letterSpacing !== 0) {
+                    let currentX = px;
+                    for(let i=0; i<finalStr.length; i++) {
+                        const char = finalStr[i];
+                        ctx.fillText(char, currentX, py);
+                        currentX += ctx.measureText(char).width + layer.letterSpacing;
+                    }
+                } else {
+                    ctx.fillText(finalStr, px, py);
+                }
+            });
+            canvas.toBlob(async (blob) => {
+                renderCanvas();
+                positionMaskRuler();
+                applyAppBorderAndShine();
+                updateTotalLabel();
+                applyA9Shine();
+                if (!blob) return;
+                const file = new File([blob], `studio_render_${Date.now()}.png`, { type: 'image/png' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({ files: [file], title: 'Shared Image', text: 'Check out this image generated with Bee Project.' });
+                        showFlashMessage('Completed Operation');
+                        playNotificationSound();
+                        vibrateOnDownload();
+                        const result = bumpDownloadCountForA8();
+                        if (result) showDownloadCountToast(result.count);
+                    } catch (err) { if (err.name !== 'AbortError') console.error('Sharing failed:', err); }
+                } else {
+                    const link = document.createElement('a');
+                    link.download = file.name;
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                    showFlashMessage('Completed Operation');
+                    playNotificationSound();
+                    vibrateOnDownload();
+                    const result = bumpDownloadCountForA8();
+                    if (result) showDownloadCountToast(result.count);
+                }
+            }, 'image/png', 0.95);
+        }
+
+        document.getElementById('exportPng').addEventListener('click', () => flattenAndDownload('png'));
+        document.getElementById('exportJpg').addEventListener('click', () => flattenAndDownload('jpg'));
+        document.getElementById('shareImageBtn').addEventListener('click', shareImage);
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('bee72342368/sw.js').catch(err => console.log(err));
+            });
+        }
+
+        const handleSelectAll = function(e) {
+            if (e) e.preventDefault();
+            const textInput = document.getElementById('layerText');
+            textInput.focus();
+            setTimeout(() => { textInput.setSelectionRange(0, textInput.value.length); }, 50);
+            if (lastUploadedFontName) {
+                const fontSelect = document.getElementById('layerFont');
+                const options = fontSelect.options;
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].text.includes(lastUploadedFontName)) {
+                        fontSelect.selectedIndex = i;
+                        fontSelect.dispatchEvent(new Event('change'));
+                        break;
+                    }
+                }
+            }
+        };
+
+        const selectAllBtn = document.getElementById('selectAllTextBtn');
+        selectAllBtn.addEventListener('click', handleSelectAll);
+        selectAllBtn.addEventListener('touchend', handleSelectAll);
+
+        const handleNextLayer = function(e) {
+            if (e) e.preventDefault();
+            if (!project.layers || project.layers.length === 0) return;
+            let sequence = [10, 8, 3, 4];
+            if (project.layers.length < 8) sequence = [10, 3, 4];
+            const current1BasedIndex = project.layers.findIndex(l => l.id === selectedLayerId) + 1;
+            let nextSeqIdx = 0;
+            const foundIdx = sequence.indexOf(current1BasedIndex);
+            if (foundIdx !== -1) nextSeqIdx = (foundIdx + 1) % sequence.length;
+            for (let i = 0; i < sequence.length; i++) {
+                const target1BasedIndex = sequence[(nextSeqIdx + i) % sequence.length];
+                const target0BasedIndex = target1BasedIndex - 1;
+                if (target0BasedIndex >= 0 && target0BasedIndex < project.layers.length) {
+                    selectLayer(project.layers[target0BasedIndex].id);
+                    break;
+                }
+            }
+        };
+
+        const nextBtn = document.getElementById('nextLayerBtn');
+        nextBtn.addEventListener('click', handleNextLayer);
+        nextBtn.addEventListener('touchend', handleNextLayer);
+
+        document.getElementById('applyFontToAllBtn').addEventListener('click', function() {
+            const fontSelect = document.getElementById('layerFont');
+            const selectedFont = fontSelect.value;
+            if (!selectedFont) return;
+            project.layers.forEach(layer => {
+                layer.font = selectedFont;
+                const el = document.getElementById(layer.id);
+                if (el) el.style.fontFamily = selectedFont;
+            });
+            if (selectedLayerId) {
+                const layer = project.layers.find(l => l.id === selectedLayerId);
+                if (layer) {
+                    layer.font = selectedFont;
+                    const el = document.getElementById(selectedLayerId);
+                    if (el) el.style.fontFamily = selectedFont;
+                    document.getElementById('layerText').style.fontFamily = selectedFont;
+                }
+            }
+            saveProject();
+            updateLayersList();
+            const btn = this;
+            const origText = btn.innerText;
+            btn.innerText = '✓ Applied!';
+            setTimeout(() => { btn.innerText = origText; }, 1200);
+        });
+
+        const a9OptBtn = document.getElementById('a9OptionsBtn');
+        const a9MenuDropdown = document.getElementById('a9MenuDropdown');
+        a9OptBtn.addEventListener('click', (e) => { e.stopPropagation(); a9MenuDropdown.classList.toggle('show'); });
+        document.querySelectorAll('.a9-option-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const selectedVal = e.target.getAttribute('data-value');
+                a9MenuDropdown.classList.remove('show');
+                const a9Layer = project.layers[8];
+                if (a9Layer) {
+                    a9Layer.text = selectedVal;
+                    const a9El = document.getElementById(a9Layer.id);
+                    if (a9El) a9El.innerText = selectedVal;
+                    if (selectedLayerId === a9Layer.id) document.getElementById('layerText').value = selectedVal;
+                    updateAllFormulas();
+                    updateLayersList();
+                    saveProject();
+                    applyA4Rule();
+                    applyA9Shine();
+                    if (a9El) {
+                        a9El.style.transition = 'box-shadow 0.3s';
+                        a9El.style.boxShadow = '0 0 15px rgba(255,204,0,0.8)';
+                        setTimeout(() => { a9El.style.boxShadow = ''; }, 800);
+                    }
+                }
+            });
+        });
+        window.addEventListener('click', () => { if (a9MenuDropdown.classList.contains('show')) a9MenuDropdown.classList.remove('show'); });
+        window.deleteLayer = deleteLayer;
+
+        // ========== HEART BUTTON ==========
+        document.getElementById('heartSaveA8Btn').addEventListener('click', () => {
+            const a8 = getCurrentA8Value();
+            if (!a8) {
+                showFlashMessage('No A8 value to save');
+                return;
+            }
+            const a3 = getCurrentA3Value();
+            addSavedA8Value(a8, a3);
+            const btn = document.getElementById('heartSaveA8Btn');
+            btn.classList.add('saved');
+            setTimeout(() => btn.classList.remove('saved'), 800);
+        });
+
+        // =========================================================
+        // ============= BLE THERMAL PRINTER (Web Bluetooth) ========
+        // =========================================================
+        (function initBluetoothPrinter() {
+            const PRINT_WIDTH = 384; // 58mm @ 203dpi
+            const CHUNK_SIZE  = 120;
+            const CHUNK_DELAY = 12;
+
+            const btBtn    = document.getElementById('printBluetoothBtn');
+            const btStatus = document.getElementById('btStatus');
+
+            function setStatus(msg, color) {
+                if (!btStatus) return;
+                btStatus.textContent = msg || '';
+                btStatus.style.color = color || 'var(--text-muted)';
+            }
+
+            function canvasToPrinterBitmap(sourceCanvas) {
+                const srcW = sourceCanvas.width;
+                const srcH = sourceCanvas.height;
+                const outW = PRINT_WIDTH;
+                const outH = Math.max(1, Math.round(srcH * (outW / srcW)));
+
+                const tmp = document.createElement('canvas');
+                tmp.width = outW;
+                tmp.height = outH;
+                const tctx = tmp.getContext('2d');
+                tctx.fillStyle = '#ffffff';
+                tctx.fillRect(0, 0, outW, outH);
+                tctx.drawImage(sourceCanvas, 0, 0, outW, outH);
+
+                const imgData = tctx.getImageData(0, 0, outW, outH);
+                const d = imgData.data;
+
+                const gray = new Float32Array(outW * outH);
+                for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+                    const a = d[i + 3] / 255;
+                    const r = d[i]     * a + 255 * (1 - a);
+                    const g = d[i + 1] * a + 255 * (1 - a);
+                    const b = d[i + 2] * a + 255 * (1 - a);
+                    gray[p] = 0.299 * r + 0.587 * g + 0.114 * b;
+                }
+
+                const bits = new Uint8Array(outW * outH);
+                for (let y = 0; y < outH; y++) {
+                    for (let x = 0; x < outW; x++) {
+                        const idx = y * outW + x;
+                        const oldVal = gray[idx];
+                        const newVal = oldVal < 128 ? 0 : 255;
+                        const err = oldVal - newVal;
+                        bits[idx] = newVal === 0 ? 1 : 0;
+
+                        if (x + 1 < outW)              gray[idx + 1]         += err * 7 / 16;
+                        if (y + 1 < outH) {
+                            if (x > 0)                 gray[idx + outW - 1]  += err * 3 / 16;
+                            gray[idx + outW]                                  += err * 5 / 16;
+                            if (x + 1 < outW)          gray[idx + outW + 1]  += err * 1 / 16;
+                        }
+                    }
+                }
+
+                const bytesPerRow = (outW + 7) >> 3;
+                const raster = new Uint8Array(bytesPerRow * outH);
+                for (let y = 0; y < outH; y++) {
+                    for (let x = 0; x < outW; x++) {
+                        if (bits[y * outW + x]) {
+                            raster[y * bytesPerRow + (x >> 3)] |= (0x80 >> (x & 7));
+                        }
+                    }
+                }
+
+                return { width: outW, height: outH, bytesPerRow, raster };
+            }
+
+            async function writeChunks(characteristic, data) {
+                for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+                    const slice = data.slice(i, i + CHUNK_SIZE);
+                    await characteristic.writeValue(slice);
+                    await new Promise(r => setTimeout(r, CHUNK_DELAY));
+                }
+            }
+
+            function buildPrintJob(bmp) {
+                const parts = [];
+                parts.push(new Uint8Array([0x10, 0xFF, 0xF1, 0x03]));
+                parts.push(new Uint8Array([0x10, 0xFF, 0xF1, 0x02, 0x40]));
+
+                const w = bmp.width;
+                const h = bmp.height;
+                const header = new Uint8Array([
+                    0x1D, 0x76, 0x30, 0x00,
+                    w & 0xFF, (w >> 8) & 0xFF,
+                    h & 0xFF, (h >> 8) & 0xFF
+                ]);
+                parts.push(header);
+
+                const rowPrefix = new Uint8Array([0x00]);
+                for (let y = 0; y < h; y++) {
+                    parts.push(rowPrefix);
+                    parts.push(bmp.raster.slice(y * bmp.bytesPerRow, (y + 1) * bmp.bytesPerRow));
+                }
+
+                parts.push(new Uint8Array([0x1B, 0x4A, 0x50]));
+                return parts;
+            }
+
+            btBtn.addEventListener('click', async () => {
+                if (!navigator.bluetooth) {
+                    setStatus('⚠ Web Bluetooth not supported on this browser.', '#ef4444');
+                    return;
+                }
+
+                btBtn.disabled = true;
+                const originalLabel = btBtn.textContent;
+                btBtn.textContent = '⏳ Connecting…';
+                setStatus('Requesting device…');
+
+                let device;
+                try {
+                    device = await navigator.bluetooth.requestDevice({
+                        acceptAllDevices: true,
+                        optionalServices: ['ff00', 'ae30', 'ff00']
+                    });
+                } catch (err) {
+                    setStatus('✕ Pairing cancelled.', '#ef4444');
+                    btBtn.disabled = false;
+                    btBtn.textContent = originalLabel;
+                    return;
+                }
+
+                setStatus('Connecting to ' + (device.name || 'printer') + '…');
+
+                try {
+                    const server = await device.gatt.connect();
+
+                    const serviceCandidates = ['ff00', 'ae30', 'ff00'];
+                    let service = null;
+                    for (const uuid of serviceCandidates) {
+                        try {
+                            service = await server.getPrimaryService(uuid);
+                            if (service) break;
+                        } catch (_) {}
+                    }
+                    if (!service) {
+                        throw new Error('Printer service not found. Try a different device.');
+                    }
+
+                    const charCandidates = ['ff02', 'ae01', 'ff01'];
+                    let characteristic = null;
+                    for (const uuid of charCandidates) {
+                        try {
+                            characteristic = await service.getCharacteristic(uuid);
+                            if (characteristic) break;
+                        } catch (_) {}
+                    }
+                    if (!characteristic) {
+                        throw new Error('Write characteristic not found.');
+                    }
+
+                    setStatus('Connected. Rendering…');
+
+                    const bmp = canvasToPrinterBitmap(canvas);
+
+                    setStatus('Sending to printer (' + bmp.width + '×' + bmp.height + ')…');
+
+                    const job = buildPrintJob(bmp);
+                    for (let i = 0; i < job.length; i++) {
+                        await writeChunks(characteristic, job[i]);
+                    }
+
+                    setStatus('✓ Print job sent!', '#5cd65c');
+                    setTimeout(() => setStatus(''), 4000);
+
+                    setTimeout(() => {
+                        try { server.disconnect(); } catch (_) {}
+                    }, 3000);
+
+                } catch (err) {
+                    console.error('BLE print error:', err);
+                    setStatus('✕ ' + (err.message || 'Print failed.'), '#ef4444');
+                } finally {
+                    btBtn.disabled = false;
+                    btBtn.textContent = originalLabel;
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
