@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bee Project · Offline Font Sync</title>
+    <title>Bee Project · Multi-Select Move</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0c0c0a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,6 +49,8 @@
             --border: rgba(255, 204, 0, 0.08);
             --radius-lg: 16px;
             --radius-md: 12px;
+            --multi-select: #4da6ff;
+            --multi-select-glow: rgba(77, 166, 255, 0.4);
         }
         body {
             margin: 0;
@@ -69,6 +71,7 @@
             justify-content: center;
             background: radial-gradient(circle, #1c1c14 0%, #060605 100%);
             padding: 16px;
+            padding-top: 56px;
             overflow: auto;
             position: relative;
             min-height: 40vh;
@@ -78,16 +81,149 @@
             border-radius: 8px;
             overflow: visible;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            max-width: 100%;
-            max-height: 100%;
             will-change: transform;
+            transform-origin: center center;
         }
         canvas {
             display: block;
-            max-width: 100%;
-            max-height: 55vh;
+            width: 100%;
+            height: auto;
             background: #0d0d0b;
             object-fit: contain;
+        }
+        /* ===== NOTIFICATION BAR WIDGET ===== */
+        .app-notification-bar {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            width: calc(100% - 32px);
+            max-width: 420px;
+            background: rgba(22, 22, 18, 0.94);
+            border: 1px solid rgba(255, 204, 0, 0.4);
+            border-radius: 14px;
+            padding: 12px 16px;
+            z-index: 5000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255,204,0,0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .app-notification-bar.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .notif-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255,204,0,0.1);
+            padding-bottom: 6px;
+        }
+        .notif-app-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .notif-body {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .notif-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            object-fit: contain;
+            background: #111;
+            border: 1px solid var(--border);
+            padding: 2px;
+        }
+        .notif-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .notif-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+        .notif-text {
+            font-size: 0.78rem;
+            color: var(--text-blue);
+            font-family: monospace;
+        }
+        .notif-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .notif-close:active { color: #ef4444; }
+
+        /* ===== PREVIEW SIZE CONTROLS ===== */
+        .preview-controls {
+            position: absolute;
+            top: 72px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(12,12,10,0.82);
+            border: 1px solid rgba(255,204,0,0.35);
+            border-radius: 10px;
+            padding: 6px 10px;
+            z-index: 200;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+        }
+        .preview-controls button {
+            width: 32px;
+            height: 32px;
+            min-height: 32px;
+            padding: 0;
+            border-radius: 8px;
+            background: var(--bg-control);
+            border: 1px solid var(--border);
+            color: var(--accent);
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .preview-controls button:active {
+            background: var(--bg-control-hover);
+            transform: scale(0.92);
+        }
+        .preview-controls .zoom-label {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: monospace;
+            min-width: 42px;
+            text-align: center;
+            letter-spacing: 0.03em;
+            user-select: none;
+            -webkit-user-select: none;
         }
         #sidebar {
             width: 100%;
@@ -163,7 +299,7 @@
             font-family: inherit;
         }
         textarea { min-height: 70px; resize: vertical; }
-        input[type="text"] { dir: auto; -webkit-appearance: none; appearance: none; }
+        input[type="text"] { direction: auto; -webkit-appearance: none; appearance: none; }
         input[type="range"] { padding: 0; height: 12px; background: var(--bg-control); border: none; cursor: pointer; }
         button:active, select:active { background: var(--bg-control-hover); transform: scale(0.98); }
         input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
@@ -190,8 +326,14 @@
             cursor: pointer;
             min-height: 46px;
             -webkit-tap-highlight-color: transparent;
+            transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
         }
         .layer-item.active { background: rgba(255, 204, 0, 0.06); border-color: var(--accent); }
+        .layer-item.multi-selected { 
+            background: rgba(77, 166, 255, 0.08); 
+            border-color: var(--multi-select); 
+            box-shadow: 0 0 0 1px var(--multi-select-glow);
+        }
         .layer-item.bg-hidden-only {
             border-left: 3px solid #7f5aff;
         }
@@ -236,6 +378,10 @@
         }
         .text-layer:active { cursor: grabbing; }
         .text-layer.active { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+        .text-layer.multi-selected {
+            border-color: var(--multi-select) !important;
+            box-shadow: 0 0 12px var(--multi-select-glow) !important;
+        }
         .text-layer.hidden-only-hidden {
             display: none !important;
         }
@@ -398,8 +544,7 @@
         @media (min-width: 768px) {
             body { flex-direction: row; }
             #sidebar { width: 360px; height: 100vh; border-top: none; border-right: 1px solid var(--border); border-radius: 0; }
-            canvas { max-height: 80vh; max-width: 75vw; }
-            #workspace { min-height: auto; padding: 40px; }
+            #workspace { min-height: auto; padding: 56px 40px 40px 40px; }
         }
         .apply-font-all {
             background: rgba(255, 204, 0, 0.08);
@@ -450,7 +595,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            dir: rtl;
+            direction: rtl;
             text-align: right;
         }
         .suggestion-item:hover, .suggestion-item:active { background: var(--bg-control-hover); }
@@ -608,7 +753,6 @@
         }
         .fast-scroll-down { bottom: 70px; }
         .fast-scroll-up { bottom: 130px; }
-        /* Jump to Saved A8 button — modern app-styled */
         .jump-saved-btn {
             position: fixed;
             right: 16px;
@@ -996,8 +1140,6 @@
             padding: 8px 0;
             font-style: italic;
         }
-
-        /* ===== BEEAPP TOGGLE ===== */
         .beeapp-toggle-row {
             display: flex;
             align-items: center;
@@ -1051,11 +1193,322 @@
             margin: 0;
             pointer-events: none;
         }
+
+        /* ===== COLLAPSIBLE SECTION TOGGLE ===== */
+        .collapsible-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .collapsible-section-header h3 {
+            margin: 0;
+            flex: 1;
+        }
+        .section-toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.03em;
+            -webkit-tap-highlight-color: transparent;
+            transition: color 0.15s, background 0.15s;
+            min-height: auto;
+            width: auto;
+            white-space: nowrap;
+        }
+        .section-toggle-btn:hover, .section-toggle-btn:active {
+            color: var(--accent);
+            background: rgba(255,204,0,0.08);
+        }
+        .collapsible-section-contents {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.3s ease;
+            max-height: 1200px;
+            opacity: 1;
+        }
+        .collapsible-section-contents.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            pointer-events: none;
+        }
+
+        /* ===== UNDO BUTTON ===== */
+        .undo-btn {
+            background: rgba(255, 120, 120, 0.08);
+            border: 1px solid rgba(255, 120, 120, 0.45);
+            color: #ffb3b3;
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            min-height: 36px;
+            width: 100%;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.15s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .undo-btn:active {
+            background: rgba(255, 120, 120, 0.18);
+            transform: scale(0.97);
+        }
+        .undo-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ===== MULTI-SELECT MODE STYLES ===== */
+        .multi-select-mode-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--multi-select);
+            background: rgba(77, 166, 255, 0.1);
+            border: 1px solid rgba(77, 166, 255, 0.4);
+            border-radius: 6px;
+            padding: 2px 8px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-left: 6px;
+        }
+        .multi-select-mode-indicator.active {
+            animation: pulse-multi 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-multi {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .multi-toggle-btn {
+            background: var(--bg-control);
+            border: 1.5px solid var(--multi-select);
+            color: var(--multi-select);
+            border-radius: 8px;
+            padding: 0 10px;
+            height: 34px;
+            min-height: 34px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            flex: 0 0 auto;
+            width: auto;
+            line-height: 1;
+            letter-spacing: 0.03em;
+        }
+        .multi-toggle-btn:active {
+            transform: scale(0.94);
+        }
+        .multi-toggle-btn.active {
+            background: rgba(77, 166, 255, 0.18);
+            border-color: var(--multi-select);
+            color: #fff;
+            box-shadow: 0 0 12px var(--multi-select-glow);
+        }
+        .multi-select-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding: 8px 0 0 0;
+            border-top: 1px solid rgba(77, 166, 255, 0.15);
+            margin-top: 4px;
+        }
+        .multi-select-actions button {
+            flex: 1 1 auto;
+            min-height: 32px;
+            height: 32px;
+            padding: 0 10px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid rgba(77, 166, 255, 0.35);
+            background: rgba(77, 166, 255, 0.06);
+            color: var(--multi-select);
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+            white-space: nowrap;
+        }
+        .multi-select-actions button:active {
+            background: rgba(77, 166, 255, 0.18);
+            transform: scale(0.95);
+        }
+        .multi-select-actions button.clear-all {
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+        .multi-select-actions button.clear-all:active {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        /* ===== ON-CANVAS MULTI-MOVE DPAD ===== */
+        .multi-move-dpad {
+            position: absolute;
+            z-index: 300;
+            display: none;
+            pointer-events: auto;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transform-origin: center center;
+            will-change: transform, left, top;
+        }
+        .multi-move-dpad.visible {
+            display: block;
+        }
+        .multi-move-dpad .dpad-inner {
+            position: relative;
+            width: 132px;
+            height: 132px;
+        }
+        .multi-move-dpad .dpad-btn {
+            position: absolute;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(12, 12, 10, 0.85);
+            border: 1.5px solid var(--multi-select);
+            color: var(--multi-select);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 10px var(--multi-select-glow);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            transition: background 0.12s, transform 0.12s;
+            padding: 0;
+            min-height: auto;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .multi-move-dpad .dpad-btn:active,
+        .multi-move-dpad .dpad-btn.holding {
+            background: rgba(77, 166, 255, 0.25);
+            transform: scale(0.9);
+        }
+        .multi-move-dpad .dpad-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            pointer-events: none;
+        }
+        .multi-move-dpad .dpad-up    { top: 0;    left: 45px; }
+        .multi-move-dpad .dpad-down  { bottom: 0; left: 45px; }
+        .multi-move-dpad .dpad-left  { top: 45px; left: 0; }
+        .multi-move-dpad .dpad-right { top: 45px; right: 0; }
+        .multi-move-dpad .dpad-center {
+            position: absolute;
+            top: 45px; left: 45px;
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            background: rgba(77, 166, 255, 0.15);
+            border: 1.5px solid var(--multi-select);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900;
+            color: var(--multi-select);
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            box-shadow: 0 0 12px var(--multi-select-glow) inset;
+        }
+        .multi-move-dpad .dpad-badge {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--multi-select);
+            color: #111;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 1px 8px;
+            border-radius: 8px;
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            pointer-events: none;
+        }
+        .multi-move-dpad .dpad-close {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 1.5px solid var(--multi-select);
+            color: var(--multi-select);
+            font-size: 12px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.7);
+            padding: 0;
+            min-height: auto;
+            -webkit-tap-highlight-color: transparent;
+            line-height: 1;
+        }
+        .multi-move-dpad .dpad-close:active {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: #ef4444;
+            color: #ef4444;
+            transform: scale(0.9);
+        }
     </style>
 </head>
 <body>
 
     <div id="workspace">
+        <!-- Live System Notification Bar Simulator -->
+        <div class="app-notification-bar" id="appNotificationBar">
+            <div class="notif-header">
+                <div class="notif-app-info">
+                    <img src="bee72342368/Gemini_Generated_Image_m9ale3m9ale3m9al.png" alt="Icon" style="width:14px;height:14px;">
+                    <span>Bee Project • Notification</span>
+                </div>
+                <span id="notifTime">Just now</span>
+            </div>
+            <div class="notif-body">
+                <img src="bee72342368/Gemini_Generated_Image_m9ale3m9ale3m9al.png" alt="Logo" class="notif-icon">
+                <div class="notif-content">
+                    <div class="notif-title" id="notifBarTitle">Layer Routing Active</div>
+                    <div class="notif-text" id="notifBarText">Inserted to Layer A3: —</div>
+                </div>
+                <button class="notif-close" id="notifBarCloseBtn" title="Dismiss">✕</button>
+            </div>
+        </div>
+
+        <div class="preview-controls">
+            <button id="previewZoomOut" title="Zoom out preview">−</button>
+            <span class="zoom-label" id="previewZoomLabel">100%</span>
+            <button id="previewZoomIn" title="Zoom in preview">+</button>
+            <button id="previewZoomReset" title="Reset to fit" style="font-size:12px;">⟲</button>
+        </div>
         <div class="canvas-container" id="canvasContainer">
             <canvas id="imageCanvas"></canvas>
         </div>
@@ -1072,7 +1525,7 @@
             </div>
             <button class="bg-toggle-btn" id="bgToggleBtn" title="Hide/Show background image">BG</button>
         </div>
-        
+
         <div class="section-card">
             <h3> </h3>
             <div class="row">
@@ -1112,19 +1565,24 @@
             </div>
         </div>
 
-        <div class="section-card">
-            <h3>PaymentMethod</h3>
-            <div class="clipboard-panel">
-                <h4> A8 (ID) + A3 (Amount) + A10 (Name )</h4>
-                <div class="paste-select-row">
-                    <button class="primary" id="autoFillClipboardBtn">Auto-Fill </button>
-                    <button class="mini-select" id="pasteSelectBtn" title="Insert clipboard text into paste area">Select</button>
+        <div class="section-card" id="paymentMethodCard">
+            <div class="collapsible-section-header">
+                <h3>PaymentMethod</h3>
+                <button class="section-toggle-btn" id="paymentMethodToggleBtn" title="Hide/Show PaymentMethod contents">(hide)</button>
+            </div>
+            <div class="collapsible-section-contents" id="paymentMethodContents">
+                <div class="clipboard-panel">
+                    <h4> A8 (ID) + A3 (Amount) + A10 (Name )</h4>
+                    <div class="paste-select-row">
+                        <button class="primary" id="autoFillClipboardBtn">Auto-Fill </button>
+                        <button class="mini-select" id="pasteSelectBtn" title="Insert clipboard text into paste area">Select</button>
+                    </div>
+                    <div class="btn-row">
+                        <button class="secondary" id="parseManualBtn">Parse Below</button>
+                    </div>
+                    <textarea id="manualPasteArea" placeholder="Or paste here manually:&#10;30210092502154&#10;1467.00&#10;الاسم:عبدالله مؤمن عبدالله شحاته شحاته"></textarea>
+                    <div class="clipboard-status" id="clipboardStatus"> </div>
                 </div>
-                <div class="btn-row">
-                    <button class="secondary" id="parseManualBtn">Parse Below</button>
-                </div>
-                <textarea id="manualPasteArea" placeholder="Or paste here manually:&#10;30210092502154&#10;1467.00&#10;الاسم:عبدالله مؤمن عبدالله شحاته شحاته"></textarea>
-                <div class="clipboard-status" id="clipboardStatus"> </div>
             </div>
         </div>
 
@@ -1153,7 +1611,7 @@
                             <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
                         </button>
                         <button class="nudge-btn nudge-down" id="nudgeDownBtn" data-dir="down" title="Move Down (hold to keep moving)">
-                            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+                            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 z"/></svg>
                         </button>
                     </div>
                     <div class="nudge-spacing-bar">
@@ -1189,6 +1647,7 @@
                         </div>
                         <button id="nextLayerBtn" class="select-all-btn" style="flex: 0 0 auto;">Next</button>
                     </div>
+                    <button id="undoBtn" class="undo-btn" title="Undo last change">↶ Undo Last Change</button>
                     <div class="hint" style="margin-top: 5px;">
                         Use text or expressions like `=TIME()`, `=DATE()`, or `=SUM(A1,A2)` — decimals allowed.
                     </div>
@@ -1270,21 +1729,38 @@
                 </div>
                 
                 <div style="display:flex; flex-direction:column; gap:8px;">
-                    <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                         <input type="checkbox" id="useBoldText" style="width:20px; height:20px; margin:0; cursor:pointer;">
                         <label for="useBoldText" style="font-size:0.85rem; cursor:pointer; user-select:none; font-weight:bold; color:var(--text-blue);">Bold Text</label>
                     </div>
-                    <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                         <input type="checkbox" id="useBgColor" style="width:20px; height:20px; margin:0; cursor:pointer;">
                         <label for="useBgColor" style="font-size:0.85rem; cursor:pointer; user-select:none;">Enable text background</label>
+                        <button id="multiSelectToggleBtn" class="multi-toggle-btn" title="Toggle multi-select mode">
+                            <span>☰</span> MULTI
+                        </button>
+                        <span class="multi-select-mode-indicator" id="multiSelectIndicator" style="display:none;">
+                            <span>◉</span> MULTI ON
+                        </span>
                     </div>
+                </div>
+
+                <!-- Multi-select actions panel -->
+                <div class="multi-select-actions" id="multiSelectActionsPanel" style="display:none;">
+                    <button id="multiSelectAllBtn" title="Select all layers">Select All Layers</button>
+                    <button id="multiSelectClearBtn" class="clear-all" title="Clear all multi-selections">Clear Selection</button>
                 </div>
             </div>
         </div>
 
-        <div class="section-card">
-            <h3>Calculated Matrix Layers</h3>
-            <div id="layersList"></div>
+        <div class="section-card" id="calculatedMatrixCard">
+            <div class="collapsible-section-header">
+                <h3>Calculated Matrix Layers</h3>
+                <button class="section-toggle-btn" id="calculatedMatrixToggleBtn" title="Hide/Show Calculated Matrix contents">(hide)</button>
+            </div>
+            <div class="collapsible-section-contents" id="calculatedMatrixContents">
+                <div id="layersList"></div>
+            </div>
         </div>
 
         <div class="section-card" style="margin-top:auto; padding-bottom: 24px;">
@@ -1294,14 +1770,11 @@
                 <button id="exportJpg" class="primary">JPEG Master</button>
             </div>
             <button id="shareImageBtn" class="secondary" style="margin-top: 8px;">Share Image</button>
-            <button id="printBluetoothBtn" class="primary" style="margin-top: 8px; background:#0a84ff; color:#fff;">🖨 Print via Bluetooth</button>
-            <div class="hint" id="btStatus" style="margin-top:6px; min-height:14px;"></div>
         </div>
     </div>
 
     <button class="fast-scroll-btn fast-scroll-up" id="fastScrollUpBtn" title="Scroll Up Fast (hold to keep scrolling)">▲</button>
     <button class="fast-scroll-btn fast-scroll-down" id="fastScrollDownBtn" title="Scroll Down Fast (hold to keep scrolling)">▼</button>
-    <!-- New: small jump button to the Saved A8 area -->
     <button class="jump-saved-btn" id="jumpToSavedBtn" title="Jump to Saved A8">♥</button>
 
     <div class="flash-message" id="flashMessage">
@@ -1314,20 +1787,430 @@
         <span class="dl-count-badge" id="dlCountValue">1</span>
     </div>
 
+    <!-- ON-CANVAS MULTI-MOVE DPAD -->
+    <div class="multi-move-dpad" id="multiMoveDpad">
+        <div class="dpad-inner">
+            <div class="dpad-badge">MOVE ALL</div>
+            <button class="dpad-btn dpad-up" id="dpadUp" title="Move all selected up">
+                <svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
+            </button>
+            <button class="dpad-btn dpad-down" id="dpadDown" title="Move all selected down">
+                <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+            </button>
+            <button class="dpad-btn dpad-left" id="dpadLeft" title="Move all selected left">
+                <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
+            </button>
+            <button class="dpad-btn dpad-right" id="dpadRight" title="Move all selected right">
+                <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+            </button>
+            <div class="dpad-center" id="dpadCount">0</div>
+            <button class="dpad-close" id="dpadClose" title="Hide move pad">✕</button>
+        </div>
+    </div>
+
     <script>
         const canvas = document.getElementById('imageCanvas');
         const ctx = canvas.getContext('2d', { alpha: false });
         const container = document.getElementById('canvasContainer');
 
-        let _cachedScale = 1;
-        let _lastCanvasWidth = 0;
-        function getScale() {
-            const w = canvas.clientWidth;
-            if (w !== _lastCanvasWidth) {
-                _lastCanvasWidth = w;
-                _cachedScale = w / canvas.width;
+        // ========== NOTIFICATION BAR SIMULATOR CONTROLLER ==========
+        let _notifTimer = null;
+        function showAppNotification(title, message) {
+            const bar = document.getElementById('appNotificationBar');
+            const titleEl = document.getElementById('notifBarTitle');
+            const textEl = document.getElementById('notifBarText');
+            if (!bar || !titleEl || !textEl) return;
+
+            titleEl.textContent = title || 'Layer Routed (A3)';
+            textEl.textContent = message || 'Value inserted successfully';
+            bar.classList.add('show');
+
+            clearTimeout(_notifTimer);
+            _notifTimer = setTimeout(() => {
+                bar.classList.remove('show');
+            }, 4000);
+        }
+
+        document.getElementById('notifBarCloseBtn').addEventListener('click', () => {
+            const bar = document.getElementById('appNotificationBar');
+            if (bar) bar.classList.remove('show');
+        });
+
+        // Request Browser Notification Permission on load
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission().catch(() => {});
+        }
+
+        // ========== UNDO STATE ==========
+        const undoStack = [];
+        const UNDO_MAX = 50;
+        let undoApplying = false;
+        let undoLastPushTime = 0;
+        const UNDO_DEBOUNCE_MS = 350;
+
+        function pushUndoSnapshot(force) {
+            if (undoApplying) return;
+            const now = Date.now();
+            if (!force && now - undoLastPushTime < UNDO_DEBOUNCE_MS) return;
+            undoLastPushTime = now;
+            try {
+                const snapshot = JSON.stringify({
+                    layers: project.layers,
+                    maskRulerY: maskRulerY,
+                    maskRulerAngle: maskRulerAngle
+                });
+                undoStack.push(snapshot);
+                if (undoStack.length > UNDO_MAX) undoStack.shift();
+                updateUndoButtonState();
+            } catch(e) { console.warn('Undo snapshot failed', e); }
+        }
+
+        function updateUndoButtonState() {
+            const btn = document.getElementById('undoBtn');
+            if (!btn) return;
+            if (undoStack.length === 0) {
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+            } else {
+                btn.disabled = false;
+                btn.style.opacity = '1';
             }
-            return _cachedScale;
+        }
+
+        function undoLastChange() {
+            if (undoStack.length === 0) {
+                showFlashMessage('Nothing to undo');
+                return;
+            }
+            const snapshot = undoStack.pop();
+            undoApplying = true;
+            try {
+                const data = JSON.parse(snapshot);
+                project.layers = data.layers;
+                if (data.maskRulerY !== undefined && data.maskRulerY !== null) {
+                    maskRulerY = data.maskRulerY;
+                }
+                if (data.maskRulerAngle !== undefined && data.maskRulerAngle !== null) {
+                    maskRulerAngle = data.maskRulerAngle;
+                }
+                project.layers.forEach(layer => {
+                    if (typeof layer.hiddenX !== 'number') layer.hiddenX = layer.x;
+                    if (typeof layer.hiddenY !== 'number') layer.hiddenY = layer.y;
+                    if (typeof layer.hiddenOnly !== 'boolean') layer.hiddenOnly = false;
+                });
+                document.querySelectorAll('.text-layer').forEach(el => el.remove());
+                applyPreviewZoom();
+                project.layers.forEach(layer => createHTMLLayer(layer));
+                if (selectedLayerId && !project.layers.some(l => l.id === selectedLayerId)) {
+                    selectedLayerId = null;
+                    document.getElementById('inspector').style.display = 'none';
+                }
+                if (selectedLayerId) {
+                    const layer = project.layers.find(l => l.id === selectedLayerId);
+                    if (layer) {
+                        document.getElementById('layerText').value = layer.text;
+                        document.getElementById('layerSize').value = layer.size;
+                        document.getElementById('layerSizeSlider').value = layer.size;
+                        document.getElementById('layerColor').value = layer.color;
+                        document.getElementById('layerBgColor').value = layer.bgColor || '#000000';
+                        document.getElementById('useBgColor').checked = !!layer.useBg;
+                        document.getElementById('useBoldText').checked = !!layer.isBold;
+                        document.getElementById('layerFont').value = layer.font;
+                    }
+                }
+                updateAllFormulas();
+                updateLayersList();
+                applyAppBorderAndShine();
+                updateTotalLabel();
+                applyA9Shine();
+                positionMaskRuler();
+                renderCanvas();
+                saveProject();
+                showFlashMessage('Undone');
+            } catch(e) {
+                console.error('Undo failed', e);
+                showFlashMessage('Undo failed');
+            } finally {
+                undoApplying = false;
+                updateUndoButtonState();
+            }
+        }
+
+        // ========== MULTI-SELECT STATE ==========
+        let multiSelectMode = false;
+        let multiSelectedIds = new Set();
+        let dpadHiddenByUser = false;
+
+        function toggleMultiSelectMode() {
+            multiSelectMode = !multiSelectMode;
+            const btn = document.getElementById('multiSelectToggleBtn');
+            const indicator = document.getElementById('multiSelectIndicator');
+            const actionsPanel = document.getElementById('multiSelectActionsPanel');
+
+            if (multiSelectMode) {
+                btn.classList.add('active');
+                indicator.style.display = 'inline-flex';
+                indicator.classList.add('active');
+                actionsPanel.style.display = 'flex';
+                if (selectedLayerId) {
+                    multiSelectedIds.add(selectedLayerId);
+                    updateMultiSelectVisuals();
+                }
+            } else {
+                btn.classList.remove('active');
+                indicator.style.display = 'none';
+                indicator.classList.remove('active');
+                actionsPanel.style.display = 'none';
+                multiSelectedIds.clear();
+                dpadHiddenByUser = false;
+                updateMultiSelectVisuals();
+            }
+            updateDpadVisibility();
+        }
+
+        function updateMultiSelectVisuals() {
+            document.querySelectorAll('.text-layer').forEach(el => {
+                if (multiSelectedIds.has(el.id)) {
+                    el.classList.add('multi-selected');
+                } else {
+                    el.classList.remove('multi-selected');
+                }
+            });
+            document.querySelectorAll('.layer-item').forEach(item => {
+                const id = item.dataset.layerId;
+                if (id && multiSelectedIds.has(id)) {
+                    item.classList.add('multi-selected');
+                } else {
+                    item.classList.remove('multi-selected');
+                }
+            });
+            updateDpadVisibility();
+        }
+
+        function toggleMultiSelectLayer(id) {
+            if (!multiSelectMode) return;
+            if (multiSelectedIds.has(id)) {
+                multiSelectedIds.delete(id);
+            } else {
+                multiSelectedIds.add(id);
+            }
+            if (multiSelectedIds.size < 2) dpadHiddenByUser = false;
+            updateMultiSelectVisuals();
+            updateLayersList();
+        }
+
+        function selectAllLayersForMulti() {
+            multiSelectedIds.clear();
+            project.layers.forEach(layer => {
+                multiSelectedIds.add(layer.id);
+            });
+            dpadHiddenByUser = false;
+            updateMultiSelectVisuals();
+            updateLayersList();
+        }
+
+        function clearMultiSelect() {
+            multiSelectedIds.clear();
+            dpadHiddenByUser = false;
+            updateMultiSelectVisuals();
+            updateLayersList();
+        }
+
+        // ========== ON-CANVAS MULTI-MOVE DPAD ==========
+        function updateDpadVisibility() {
+            const dpad = document.getElementById('multiMoveDpad');
+            if (!dpad) return;
+            const shouldShow = multiSelectMode && multiSelectedIds.size >= 2 && !dpadHiddenByUser;
+            if (shouldShow) {
+                dpad.classList.add('visible');
+                positionMultiMoveDpad();
+                const countEl = document.getElementById('dpadCount');
+                if (countEl) countEl.textContent = multiSelectedIds.size;
+            } else {
+                dpad.classList.remove('visible');
+            }
+        }
+
+        function positionMultiMoveDpad() {
+            const dpad = document.getElementById('multiMoveDpad');
+            if (!dpad || !dpad.classList.contains('visible')) return;
+
+            let sumX = 0, sumY = 0, count = 0;
+            multiSelectedIds.forEach(id => {
+                const layer = project.layers.find(l => l.id === id);
+                if (!layer) return;
+                const px = backgroundVisible ? layer.x : layer.hiddenX;
+                const py = backgroundVisible ? layer.y : layer.hiddenY;
+                sumX += px;
+                sumY += py;
+                count++;
+            });
+            if (count === 0) return;
+            const avgX = sumX / count;
+            const avgY = sumY / count;
+
+            const scale = getScale();
+            const dpadSize = 132;
+            const dpadW = dpadSize * scale;
+            const dpadH = dpadSize * scale;
+
+            let leftPx = avgX * scale - dpadW / 2;
+            let topPx = avgY * scale - dpadH - (20 * scale);
+
+            const containerW = canvas.clientWidth || 0;
+            const containerH = canvas.clientHeight || 0;
+            if (containerW > 0) {
+                leftPx = Math.max(4, Math.min(leftPx, containerW - dpadW - 4));
+            }
+            if (containerH > 0) {
+                if (topPx < 4) topPx = avgY * scale + (30 * scale);
+                if (topPx + dpadH > containerH) topPx = Math.max(4, containerH - dpadH - 4);
+            }
+
+            dpad.style.left = leftPx + 'px';
+            dpad.style.top = topPx + 'px';
+        }
+
+        function moveSelectedBy(dx, dy) {
+            if (!multiSelectMode || multiSelectedIds.size === 0) return;
+            const stepMultiplier = isAndroid ? 5 : 1;
+            multiSelectedIds.forEach(id => {
+                const layer = project.layers.find(l => l.id === id);
+                if (!layer) return;
+                if (backgroundVisible) {
+                    layer.x += dx * stepMultiplier;
+                    layer.y += dy * stepMultiplier;
+                } else {
+                    layer.hiddenX += dx * stepMultiplier;
+                    layer.hiddenY += dy * stepMultiplier;
+                }
+                const el = document.getElementById(id);
+                if (el) {
+                    positionElement(el, backgroundVisible ? layer.x : layer.hiddenX,
+                                          backgroundVisible ? layer.y : layer.hiddenY);
+                }
+            });
+            saveProject();
+            updateTotalLabel();
+            positionMultiMoveDpad();
+        }
+
+        const DPAD_NUDGE_INITIAL_DELAY = 320;
+        const DPAD_NUDGE_REPEAT_INTERVAL = 55;
+        const dpadHoldState = { timer: null, interval: null, btn: null, dir: null, active: false };
+
+        const DPAD_DIRS = {
+            up:    { dx: 0,  dy: -1 },
+            down:  { dx: 0,  dy:  1 },
+            left:  { dx: -1, dy:  0 },
+            right: { dx: 1,  dy:  0 }
+        };
+
+        function stopDpadHold() {
+            if (dpadHoldState.timer) { clearTimeout(dpadHoldState.timer); dpadHoldState.timer = null; }
+            if (dpadHoldState.interval) { clearInterval(dpadHoldState.interval); dpadHoldState.interval = null; }
+            if (dpadHoldState.btn) dpadHoldState.btn.classList.remove('holding');
+            dpadHoldState.btn = null;
+            dpadHoldState.dir = null;
+            dpadHoldState.active = false;
+        }
+
+        function beginDpadHold(btn, dir) {
+            stopDpadHold();
+            const d = DPAD_DIRS[dir];
+            if (!d) return;
+            dpadHoldState.btn = btn;
+            dpadHoldState.dir = dir;
+            dpadHoldState.active = true;
+            btn.classList.add('holding');
+            moveSelectedBy(d.dx, d.dy);
+            dpadHoldState.timer = setTimeout(() => {
+                if (!dpadHoldState.active) return;
+                dpadHoldState.interval = setInterval(() => {
+                    if (!dpadHoldState.active) return;
+                    moveSelectedBy(d.dx, d.dy);
+                }, DPAD_NUDGE_REPEAT_INTERVAL);
+            }, DPAD_NUDGE_INITIAL_DELAY);
+        }
+
+        function attachDpadButton(btnId, dir) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            btn.addEventListener('mousedown', (e) => { e.preventDefault(); beginDpadHold(btn, dir); });
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); beginDpadHold(btn, dir); }, { passive: false });
+            btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
+            btn.addEventListener('contextmenu', (e) => e.preventDefault());
+        }
+
+        // ========== PREVIEW ZOOM STATE ==========
+        let previewZoom = 1.0;
+        let _fitScale = 1;
+        let _renderScale = 1;
+
+        function recomputeFitScale() {
+            const ws = document.getElementById('workspace');
+            if (!ws) { _fitScale = 1; return; }
+            const style = getComputedStyle(ws);
+            const padL = parseFloat(style.paddingLeft) || 0;
+            const padR = parseFloat(style.paddingRight) || 0;
+            const padT = parseFloat(style.paddingTop) || 0;
+            const padB = parseFloat(style.paddingBottom) || 0;
+            const maxW = ws.clientWidth - padL - padR;
+            const maxH = ws.clientHeight - padT - padB;
+            if (!canvas.width || !canvas.height || maxW <= 0 || maxH <= 0) {
+                _fitScale = 1;
+                return;
+            }
+            const s = Math.min(maxW / canvas.width, maxH / canvas.height);
+            _fitScale = Math.max(0.02, s);
+        }
+
+        function applyPreviewZoom() {
+            recomputeFitScale();
+            const cssW = canvas.width * _fitScale * previewZoom;
+            const cssH = canvas.height * _fitScale * previewZoom;
+            canvas.style.width = cssW + 'px';
+            canvas.style.height = cssH + 'px';
+            container.style.width = cssW + 'px';
+            container.style.height = cssH + 'px';
+
+            _renderScale = cssW / canvas.width;
+
+            repositionAllOverlays();
+
+            const label = document.getElementById('previewZoomLabel');
+            if (label) label.textContent = Math.round(previewZoom * 100) + '%';
+        }
+
+        function repositionAllOverlays() {
+            const scale = getScale();
+            project.layers.forEach(layer => {
+                const el = document.getElementById(layer.id);
+                if (!el) return;
+                const px = backgroundVisible ? layer.x : layer.hiddenX;
+                const py = backgroundVisible ? layer.y : layer.hiddenY;
+                el.style.fontSize = getScaledSize(layer.size) + 'px';
+                el.style.letterSpacing = getScaledSize(layer.letterSpacing || 0) + 'px';
+                el.style.lineHeight = layer.lineHeight || 1.2;
+                positionElement(el, px, py);
+            });
+            positionMaskRuler();
+            updateTotalLabel();
+            positionMultiMoveDpad();
+        }
+
+        function getScale() {
+            if (!canvas.width) return 1;
+            return (canvas.clientWidth || 1) / canvas.width;
+        }
+
+        function getScaledSize(size) {
+            return size * getScale();
+        }
+
+        function positionElement(el, x, y) {
+            const scale = getScale();
+            el.style.transform = `translate3d(${x * scale}px, ${y * scale}px, 0)`;
         }
 
         let _audioCtx = null;
@@ -1365,17 +2248,14 @@
             }
         }
 
-        // ========== STRONGER VIBRATION ON DOWNLOAD ==========
         function vibrateOnDownload() {
             try {
                 if (navigator && typeof navigator.vibrate === 'function') {
-                    // Stronger pattern: two strong bursts followed by a long pulse
                     navigator.vibrate([100, 60, 150, 60, 250]);
                 }
-            } catch(e) { /* vibration unsupported — silently ignore */ }
+            } catch(e) { }
         }
 
-        // Vibration helper for destructive actions / confirmations
         function vibrateStrong() {
             try {
                 if (navigator && typeof navigator.vibrate === 'function') {
@@ -1504,7 +2384,6 @@
                 });
                 itemEl.querySelector('.remove-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
-                    // ===== CONFIRMATION BEFORE REMOVING SAVED A8 =====
                     const confirmed = window.confirm('Delete this saved A8 entry?\n\n' + item.value + (a3Text !== '—' ? '\nA3: ' + a3Text : ''));
                     if (!confirmed) return;
                     vibrateStrong();
@@ -1866,6 +2745,7 @@
         }
 
         function updateBgToggleButtonUI() {
+            const bgToggleBtn = document.getElementById('bgToggleBtn');
             if (backgroundVisible) {
                 bgToggleBtn.classList.remove('hidden-state');
                 bgToggleBtn.textContent = 'BG';
@@ -1880,7 +2760,7 @@
         function saveBgVisibility() {
             try {
                 localStorage.setItem('bee72342368/bg_visible', backgroundVisible ? '1' : '0');
-            } catch(e) { /* ignore */ }
+            } catch(e) { }
         }
 
         function loadBgVisibility() {
@@ -1896,7 +2776,6 @@
 
         const sidebar = document.getElementById('sidebar');
 
-        // ========== BEEAPP TOGGLE (Text Engine collapse/expand) ==========
         (function initBeeappToggle() {
             const btn = document.getElementById('beeappToggleBtn');
             const contents = document.getElementById('textEngineContents');
@@ -1921,20 +2800,47 @@
             });
         })();
 
-        // ========== JUMP TO SAVED A8 ==========
+        // ========== COLLAPSIBLE SECTIONS: PaymentMethod & Calculated Matrix ==========
+        (function initCollapsibleSections() {
+            const sections = [
+                { btnId: 'paymentMethodToggleBtn', contentsId: 'paymentMethodContents', storageKey: 'bee72342368/payment_method_collapsed' },
+                { btnId: 'calculatedMatrixToggleBtn', contentsId: 'calculatedMatrixContents', storageKey: 'bee72342368/calculated_matrix_collapsed' }
+            ];
+            sections.forEach(({ btnId, contentsId, storageKey }) => {
+                const btn = document.getElementById(btnId);
+                const contents = document.getElementById(contentsId);
+                if (!btn || !contents) return;
+                let collapsed = false;
+                try { collapsed = localStorage.getItem(storageKey) === '1'; } catch(e) {}
+                const applyState = () => {
+                    if (collapsed) {
+                        contents.classList.add('collapsed');
+                        btn.textContent = '(show)';
+                    } else {
+                        contents.classList.remove('collapsed');
+                        btn.textContent = '(hide)';
+                    }
+                };
+                applyState();
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    collapsed = !collapsed;
+                    applyState();
+                    try { localStorage.setItem(storageKey, collapsed ? '1' : '0'); } catch(e) {}
+                });
+            });
+        })();
+
         document.getElementById('jumpToSavedBtn').addEventListener('click', () => {
             const section = document.getElementById('savedA8Section');
             if (!section) return;
             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            // Highlight the section card briefly for feedback
             section.style.transition = 'box-shadow 0.35s ease';
             section.style.boxShadow = '0 0 0 2px var(--accent), 0 0 22px rgba(255,204,0,0.5)';
             setTimeout(() => { section.style.boxShadow = ''; }, 1200);
-            // Small haptic tap if supported
             try { if (navigator.vibrate) navigator.vibrate(25); } catch(e) {}
         });
 
-        // ========== FAST SCROLL — PRESS-AND-HOLD ==========
         const SCROLL_STEP = 400;
         const SCROLL_INITIAL_DELAY = 300;
         const SCROLL_REPEAT_INTERVAL = 90;
@@ -2009,8 +2915,7 @@
             window.addEventListener('blur', stopScrollHold);
         })();
 
-        const bgToggleBtn = document.getElementById('bgToggleBtn');
-        bgToggleBtn.addEventListener('click', () => {
+        document.getElementById('bgToggleBtn').addEventListener('click', () => {
             backgroundVisible = !backgroundVisible;
 
             project.layers.forEach(layer => {
@@ -2033,6 +2938,7 @@
             updateTotalLabel();
             renderCanvas();
             saveProject();
+            positionMultiMoveDpad();
         });
 
         const isAndroid = /Android/i.test(navigator.userAgent);
@@ -2300,6 +3206,8 @@
             const a3Layer  = project.layers[2];
             const a10Layer = project.layers[9];
 
+            pushUndoSnapshot(true);
+
             const log = [];
             let changed = false;
 
@@ -2327,7 +3235,11 @@
             if (setInput(a8Layer, id))        { changed = true; log.push(`A8=${id}`); }
             else if (a8Layer)                 { log.push('A8=—'); }
 
-            if (setInput(a3Layer, amount))    { changed = true; log.push(`A3=${amount}`); }
+            if (setInput(a3Layer, amount))    { 
+                changed = true; 
+                log.push(`A3=${amount}`); 
+                showAppNotification('Layer A3 Routing', `Inserted amount: ${amount}`);
+            }
             else if (a3Layer)                 { log.push('A3=—'); }
 
             if (setInput(a10Layer, name))     { changed = true; log.push(`A10=${name}`); addNameToMemory(name); }
@@ -2546,6 +3458,46 @@
                     document.getElementById('layerText').value = project.layers[activeIdx].text;
                 }
             }, 1000);
+
+            document.getElementById('multiSelectToggleBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleMultiSelectMode();
+            });
+            document.getElementById('multiSelectAllBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                selectAllLayersForMulti();
+            });
+            document.getElementById('multiSelectClearBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                clearMultiSelect();
+            });
+
+            document.getElementById('undoBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                undoLastChange();
+            });
+
+            attachDpadButton('dpadUp', 'up');
+            attachDpadButton('dpadDown', 'down');
+            attachDpadButton('dpadLeft', 'left');
+            attachDpadButton('dpadRight', 'right');
+
+            const closeBtn = document.getElementById('dpadClose');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dpadHiddenByUser = true;
+                    updateDpadVisibility();
+                });
+            }
+
+            window.addEventListener('mouseup', stopDpadHold);
+            window.addEventListener('touchend', stopDpadHold);
+            window.addEventListener('touchcancel', stopDpadHold);
+            window.addEventListener('blur', stopDpadHold);
+
+            updateUndoButtonState();
         });
 
         function saveProject() {
@@ -2572,11 +3524,28 @@
                 });
                 document.getElementById('inspector').style.display = 'none';
                 selectedLayerId = null;
+                multiSelectedIds.clear();
                 if (project.bgImage) {
                     baseImgObj.src = project.bgImage;
-                    baseImgObj.onload = () => { renderCanvas(); rebuildHTMLLayers(); updateAllFormulas(); ensureMaskRulerExists(); ensureTotalLabelExists(); applyAppBorderAndShine(); updateTotalLabel(); applyA9Shine(); };
+                    baseImgObj.onload = () => {
+                        renderCanvas();
+                        rebuildHTMLLayers();
+                        updateAllFormulas();
+                        ensureMaskRulerExists();
+                        ensureTotalLabelExists();
+                        applyAppBorderAndShine();
+                        updateTotalLabel();
+                        applyA9Shine();
+                    };
                 } else {
-                    renderCanvas(); rebuildHTMLLayers(); updateAllFormulas(); ensureMaskRulerExists(); ensureTotalLabelExists(); applyAppBorderAndShine(); updateTotalLabel(); applyA9Shine();
+                    renderCanvas();
+                    rebuildHTMLLayers();
+                    updateAllFormulas();
+                    ensureMaskRulerExists();
+                    ensureTotalLabelExists();
+                    applyAppBorderAndShine();
+                    updateTotalLabel();
+                    applyA9Shine();
                 }
                 project.layers.forEach(l => { if (l.text && !l.text.startsWith('=')) addNameToMemory(l.text); });
             } catch(e) { alert("Error reading project architecture."); console.error(e); }
@@ -2651,7 +3620,14 @@
                 baseImgObj.src = event.target.result;
                 baseImgObj.onload = () => {
                     if (maskRulerY != null && maskRulerY > baseImgObj.height) maskRulerY = baseImgObj.height / 2;
-                    renderCanvas(); rebuildHTMLLayers(); updateAllFormulas(); ensureMaskRulerExists(); applyAppBorderAndShine(); updateTotalLabel(); applyA9Shine(); saveProject();
+                    renderCanvas();
+                    rebuildHTMLLayers();
+                    updateAllFormulas();
+                    ensureMaskRulerExists();
+                    applyAppBorderAndShine();
+                    updateTotalLabel();
+                    applyA9Shine();
+                    saveProject();
                 };
             };
             if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
@@ -2720,6 +3696,8 @@
                 ctx.fillRect(-diagonal, 0, diagonal * 2, diagonal);
                 ctx.restore();
             }
+
+            applyPreviewZoom();
         }
 
         function formatSumResult(value) {
@@ -2792,6 +3770,7 @@
             saveProject();
             applyAppBorderAndShine();
             updateTotalLabel();
+            updateMultiSelectVisuals();
         }
 
         function createHTMLLayer(layer) {
@@ -2827,32 +3806,38 @@
                 lastTouchY = clientY;
             };
 
-            el.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+            el.addEventListener('mousedown', (e) => {
+                if (multiSelectMode) {
+                    e.preventDefault();
+                    toggleMultiSelectLayer(layer.id);
+                    return;
+                }
+                startDrag(e.clientX, e.clientY);
+            });
             el.addEventListener('touchstart', (e) => {
+                if (multiSelectMode) {
+                    e.preventDefault();
+                    toggleMultiSelectLayer(layer.id);
+                    return;
+                }
                 if(e.touches.length === 1) startDrag(e.touches[0].clientX, e.touches[0].clientY);
-            }, { passive: true });
+            }, { passive: false });
 
             container.appendChild(el);
             updateLayersList();
             applyAppBorderAndShine();
             updateTotalLabel();
-        }
-
-        function positionElement(el, x, y) {
-            const scale = getScale();
-            el.style.transform = `translate3d(${x * scale}px, ${y * scale}px, 0)`;
-        }
-
-        function getScaledSize(size) {
-            return size * getScale();
+            updateMultiSelectVisuals();
         }
 
         function rebuildHTMLLayers() {
             document.querySelectorAll('.text-layer').forEach(el => el.remove());
+            applyPreviewZoom();
             project.layers.forEach(layer => createHTMLLayer(layer));
             applyA9Shine();
             applyAppBorderAndShine();
             updateTotalLabel();
+            repositionAllOverlays();
         }
 
         function updateAllFormulas() {
@@ -2900,6 +3885,7 @@
                     }
                     applyA9Shine();
                     updateTotalLabel();
+                    positionMultiMoveDpad();
                     rafPending = false;
                 });
             }
@@ -2916,6 +3902,7 @@
                 document.body.classList.remove('dragging-active');
                 saveProject();
                 updateTotalLabel();
+                positionMultiMoveDpad();
             }
         };
         window.addEventListener('mouseup', endDrag);
@@ -2926,20 +3913,7 @@
             if (_resizeRafPending) return;
             _resizeRafPending = true;
             requestAnimationFrame(() => {
-                _lastCanvasWidth = 0;
-                project.layers.forEach(layer => {
-                    const el = document.getElementById(layer.id);
-                    if(el) {
-                        positionElement(el,
-                            backgroundVisible ? layer.x : layer.hiddenX,
-                            backgroundVisible ? layer.y : layer.hiddenY);
-                        el.style.fontSize = getScaledSize(layer.size) + 'px';
-                        el.style.letterSpacing = getScaledSize(layer.letterSpacing || 0) + 'px';
-                    }
-                });
-                positionMaskRuler();
-                applyA9Shine();
-                updateTotalLabel();
+                applyPreviewZoom();
                 _resizeRafPending = false;
             });
         });
@@ -2971,6 +3945,10 @@
                     textInput.select();
                 }, 50);
             }
+            if (multiSelectMode) {
+                multiSelectedIds.add(id);
+                updateMultiSelectVisuals();
+            }
             updateLayersList();
             updateTotalLabel();
         }
@@ -2995,6 +3973,8 @@
             const el = document.getElementById(selectedLayerId);
             const textInput = document.getElementById('layerText');
             if (layer && el) {
+                pushUndoSnapshot(false);
+
                 const newText = textInput.value;
                 const oldText = layer.text;
 
@@ -3002,6 +3982,10 @@
                 const idx = project.layers.findIndex(l => l.id === selectedLayerId);
                 if (inputIndices.includes(idx)) {
                     layer.isInput = true;
+                    // Trigger Notification Bar if typing in Layer A3 (index 2)
+                    if (idx === 2) {
+                        showAppNotification('Layer A3 Update', `Number inserted: ${newText}`);
+                    }
                 }
 
                 layer.text = newText;
@@ -3044,7 +4028,6 @@
             targetEl.addEventListener('change', updateActiveLayerProps);
         });
 
-        // ========== NUDGE + PRESS-AND-HOLD ==========
         const NUDGE_DIRS = {
             up:    { dx: 0,  dy: -1 },
             down:  { dx: 0,  dy:  1 },
@@ -3066,7 +4049,11 @@
         function doNudgeStep(dir) {
             const d = NUDGE_DIRS[dir];
             if (!d) return;
-            nudgeActiveLayer(d.dx, d.dy);
+            if (multiSelectMode && multiSelectedIds.size > 0) {
+                moveSelectedBy(d.dx, d.dy);
+            } else {
+                nudgeActiveLayer(d.dx, d.dy);
+            }
         }
 
         function stopNudgeHold() {
@@ -3082,7 +4069,7 @@
 
         function beginNudgeHold(btn, dir) {
             stopNudgeHold();
-            if (!selectedLayerId) return;
+            if (!selectedLayerId && !(multiSelectMode && multiSelectedIds.size > 0)) return;
             nudgeHoldState.btn = btn;
             nudgeHoldState.dir = dir;
             nudgeHoldState.active = true;
@@ -3143,6 +4130,7 @@
                 if (selectedLayerId === project.layers[8]?.id) applyA9Shine();
                 saveProject();
                 updateTotalLabel();
+                positionMultiMoveDpad();
             }
         }
 
@@ -3173,7 +4161,6 @@
 
         function deleteLayer(id, e) {
             e.stopPropagation();
-            // ===== CONFIRMATION BEFORE DELETING LAYER =====
             const layer = project.layers.find(l => l.id === id);
             const label = layer ? (layer.text.length > 30 ? layer.text.slice(0, 30) + '…' : layer.text) : 'this layer';
             const confirmed = window.confirm('Delete layer "' + label + '"?\nThis cannot be undone.');
@@ -3186,11 +4173,13 @@
                 document.getElementById('inspector').style.display = 'none';
                 selectedLayerId = null;
             }
+            multiSelectedIds.delete(id);
             updateAllFormulas();
             updateLayersList();
             saveProject();
             applyAppBorderAndShine();
             updateTotalLabel();
+            updateMultiSelectVisuals();
         }
 
         function updateLayersList() {
@@ -3198,8 +4187,16 @@
             container.innerHTML = '';
             project.layers.forEach((layer, idx) => {
                 const item = document.createElement('div');
-                item.className = `layer-item ${layer.id === selectedLayerId ? 'active' : ''}${layer.hiddenOnly ? ' bg-hidden-only' : ''}`;
-                item.onclick = () => selectLayer(layer.id);
+                item.className = `layer-item ${layer.id === selectedLayerId ? 'active' : ''}${layer.hiddenOnly ? ' bg-hidden-only' : ''}${multiSelectedIds.has(layer.id) ? ' multi-selected' : ''}`;
+                item.dataset.layerId = layer.id;
+                item.onclick = (e) => {
+                    if (multiSelectMode) {
+                        e.preventDefault();
+                        toggleMultiSelectLayer(layer.id);
+                    } else {
+                        selectLayer(layer.id);
+                    }
+                };
                 const displayTitle = layer.text.length > 12 ? layer.text.slice(0, 12) + '...' : layer.text;
                 const tagClass = layer.hiddenOnly ? 'layer-ref hidden-only-tag' : 'layer-ref';
                 const tagLabel = layer.hiddenOnly ? 'HID' : 'A' + (idx + 1);
@@ -3212,6 +4209,7 @@
                 `;
                 container.appendChild(item);
             });
+            updateMultiSelectVisuals();
         }
 
         function flattenAndDownload(format) {
@@ -3396,6 +4394,7 @@
             const fontSelect = document.getElementById('layerFont');
             const selectedFont = fontSelect.value;
             if (!selectedFont) return;
+            pushUndoSnapshot(true);
             project.layers.forEach(layer => {
                 layer.font = selectedFont;
                 const el = document.getElementById(layer.id);
@@ -3427,6 +4426,7 @@
                 a9MenuDropdown.classList.remove('show');
                 const a9Layer = project.layers[8];
                 if (a9Layer) {
+                    pushUndoSnapshot(true);
                     a9Layer.text = selectedVal;
                     const a9El = document.getElementById(a9Layer.id);
                     if (a9El) a9El.innerText = selectedVal;
@@ -3447,7 +4447,6 @@
         window.addEventListener('click', () => { if (a9MenuDropdown.classList.contains('show')) a9MenuDropdown.classList.remove('show'); });
         window.deleteLayer = deleteLayer;
 
-        // ========== HEART BUTTON ==========
         document.getElementById('heartSaveA8Btn').addEventListener('click', () => {
             const a8 = getCurrentA8Value();
             if (!a8) {
@@ -3461,192 +4460,19 @@
             setTimeout(() => btn.classList.remove('saved'), 800);
         });
 
-        // =========================================================
-        // ============= BLE THERMAL PRINTER (Web Bluetooth) ========
-        // =========================================================
-        (function initBluetoothPrinter() {
-            const PRINT_WIDTH = 384; // 58mm @ 203dpi
-            const CHUNK_SIZE  = 120;
-            const CHUNK_DELAY = 12;
-
-            const btBtn    = document.getElementById('printBluetoothBtn');
-            const btStatus = document.getElementById('btStatus');
-
-            function setStatus(msg, color) {
-                if (!btStatus) return;
-                btStatus.textContent = msg || '';
-                btStatus.style.color = color || 'var(--text-muted)';
-            }
-
-            function canvasToPrinterBitmap(sourceCanvas) {
-                const srcW = sourceCanvas.width;
-                const srcH = sourceCanvas.height;
-                const outW = PRINT_WIDTH;
-                const outH = Math.max(1, Math.round(srcH * (outW / srcW)));
-
-                const tmp = document.createElement('canvas');
-                tmp.width = outW;
-                tmp.height = outH;
-                const tctx = tmp.getContext('2d');
-                tctx.fillStyle = '#ffffff';
-                tctx.fillRect(0, 0, outW, outH);
-                tctx.drawImage(sourceCanvas, 0, 0, outW, outH);
-
-                const imgData = tctx.getImageData(0, 0, outW, outH);
-                const d = imgData.data;
-
-                const gray = new Float32Array(outW * outH);
-                for (let i = 0, p = 0; i < d.length; i += 4, p++) {
-                    const a = d[i + 3] / 255;
-                    const r = d[i]     * a + 255 * (1 - a);
-                    const g = d[i + 1] * a + 255 * (1 - a);
-                    const b = d[i + 2] * a + 255 * (1 - a);
-                    gray[p] = 0.299 * r + 0.587 * g + 0.114 * b;
-                }
-
-                const bits = new Uint8Array(outW * outH);
-                for (let y = 0; y < outH; y++) {
-                    for (let x = 0; x < outW; x++) {
-                        const idx = y * outW + x;
-                        const oldVal = gray[idx];
-                        const newVal = oldVal < 128 ? 0 : 255;
-                        const err = oldVal - newVal;
-                        bits[idx] = newVal === 0 ? 1 : 0;
-
-                        if (x + 1 < outW)              gray[idx + 1]         += err * 7 / 16;
-                        if (y + 1 < outH) {
-                            if (x > 0)                 gray[idx + outW - 1]  += err * 3 / 16;
-                            gray[idx + outW]                                  += err * 5 / 16;
-                            if (x + 1 < outW)          gray[idx + outW + 1]  += err * 1 / 16;
-                        }
-                    }
-                }
-
-                const bytesPerRow = (outW + 7) >> 3;
-                const raster = new Uint8Array(bytesPerRow * outH);
-                for (let y = 0; y < outH; y++) {
-                    for (let x = 0; x < outW; x++) {
-                        if (bits[y * outW + x]) {
-                            raster[y * bytesPerRow + (x >> 3)] |= (0x80 >> (x & 7));
-                        }
-                    }
-                }
-
-                return { width: outW, height: outH, bytesPerRow, raster };
-            }
-
-            async function writeChunks(characteristic, data) {
-                for (let i = 0; i < data.length; i += CHUNK_SIZE) {
-                    const slice = data.slice(i, i + CHUNK_SIZE);
-                    await characteristic.writeValue(slice);
-                    await new Promise(r => setTimeout(r, CHUNK_DELAY));
-                }
-            }
-
-            function buildPrintJob(bmp) {
-                const parts = [];
-                parts.push(new Uint8Array([0x10, 0xFF, 0xF1, 0x03]));
-                parts.push(new Uint8Array([0x10, 0xFF, 0xF1, 0x02, 0x40]));
-
-                const w = bmp.width;
-                const h = bmp.height;
-                const header = new Uint8Array([
-                    0x1D, 0x76, 0x30, 0x00,
-                    w & 0xFF, (w >> 8) & 0xFF,
-                    h & 0xFF, (h >> 8) & 0xFF
-                ]);
-                parts.push(header);
-
-                const rowPrefix = new Uint8Array([0x00]);
-                for (let y = 0; y < h; y++) {
-                    parts.push(rowPrefix);
-                    parts.push(bmp.raster.slice(y * bmp.bytesPerRow, (y + 1) * bmp.bytesPerRow));
-                }
-
-                parts.push(new Uint8Array([0x1B, 0x4A, 0x50]));
-                return parts;
-            }
-
-            btBtn.addEventListener('click', async () => {
-                if (!navigator.bluetooth) {
-                    setStatus('⚠ Web Bluetooth not supported on this browser.', '#ef4444');
-                    return;
-                }
-
-                btBtn.disabled = true;
-                const originalLabel = btBtn.textContent;
-                btBtn.textContent = '⏳ Connecting…';
-                setStatus('Requesting device…');
-
-                let device;
-                try {
-                    device = await navigator.bluetooth.requestDevice({
-                        acceptAllDevices: true,
-                        optionalServices: ['ff00', 'ae30', 'ff00']
-                    });
-                } catch (err) {
-                    setStatus('✕ Pairing cancelled.', '#ef4444');
-                    btBtn.disabled = false;
-                    btBtn.textContent = originalLabel;
-                    return;
-                }
-
-                setStatus('Connecting to ' + (device.name || 'printer') + '…');
-
-                try {
-                    const server = await device.gatt.connect();
-
-                    const serviceCandidates = ['ff00', 'ae30', 'ff00'];
-                    let service = null;
-                    for (const uuid of serviceCandidates) {
-                        try {
-                            service = await server.getPrimaryService(uuid);
-                            if (service) break;
-                        } catch (_) {}
-                    }
-                    if (!service) {
-                        throw new Error('Printer service not found. Try a different device.');
-                    }
-
-                    const charCandidates = ['ff02', 'ae01', 'ff01'];
-                    let characteristic = null;
-                    for (const uuid of charCandidates) {
-                        try {
-                            characteristic = await service.getCharacteristic(uuid);
-                            if (characteristic) break;
-                        } catch (_) {}
-                    }
-                    if (!characteristic) {
-                        throw new Error('Write characteristic not found.');
-                    }
-
-                    setStatus('Connected. Rendering…');
-
-                    const bmp = canvasToPrinterBitmap(canvas);
-
-                    setStatus('Sending to printer (' + bmp.width + '×' + bmp.height + ')…');
-
-                    const job = buildPrintJob(bmp);
-                    for (let i = 0; i < job.length; i++) {
-                        await writeChunks(characteristic, job[i]);
-                    }
-
-                    setStatus('✓ Print job sent!', '#5cd65c');
-                    setTimeout(() => setStatus(''), 4000);
-
-                    setTimeout(() => {
-                        try { server.disconnect(); } catch (_) {}
-                    }, 3000);
-
-                } catch (err) {
-                    console.error('BLE print error:', err);
-                    setStatus('✕ ' + (err.message || 'Print failed.'), '#ef4444');
-                } finally {
-                    btBtn.disabled = false;
-                    btBtn.textContent = originalLabel;
-                }
-            });
-        })();
+        // ========== PREVIEW ZOOM CONTROLS ==========
+        document.getElementById('previewZoomIn').addEventListener('click', () => {
+            previewZoom = Math.min(3.0, previewZoom + 0.1);
+            applyPreviewZoom();
+        });
+        document.getElementById('previewZoomOut').addEventListener('click', () => {
+            previewZoom = Math.max(0.3, previewZoom - 0.1);
+            applyPreviewZoom();
+        });
+        document.getElementById('previewZoomReset').addEventListener('click', () => {
+            previewZoom = 1.0;
+            applyPreviewZoom();
+        });
     </script>
 </body>
 </html>
