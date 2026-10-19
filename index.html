@@ -91,94 +91,10 @@
             background: #0d0d0b;
             object-fit: contain;
         }
-        /* ===== ALWAYS-ON NOTIFICATION BAR WIDGET ===== */
-        .app-notification-bar {
-            position: absolute;
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-120px);
-            width: calc(100% - 32px);
-            max-width: 420px;
-            background: rgba(22, 22, 18, 0.96);
-            border: 1px solid rgba(255, 204, 0, 0.5);
-            border-radius: 14px;
-            padding: 12px 16px;
-            z-index: 5000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255,204,0,0.25);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
-            opacity: 0;
-            pointer-events: none;
-        }
-        .app-notification-bar.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .notif-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            border-bottom: 1px solid rgba(255,204,0,0.1);
-            padding-bottom: 6px;
-        }
-        .notif-app-info {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 700;
-            color: var(--accent);
-        }
-        .notif-body {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .notif-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            object-fit: contain;
-            background: #111;
-            border: 1px solid var(--border);
-            padding: 2px;
-        }
-        .notif-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .notif-title {
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: var(--text-main);
-        }
-        .notif-text {
-            font-size: 0.78rem;
-            color: var(--text-blue);
-            font-family: monospace;
-        }
-        .notif-close {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 16px;
-            cursor: pointer;
-            padding: 4px;
-        }
-        .notif-close:active { color: #ef4444; }
-
         /* ===== PREVIEW SIZE CONTROLS ===== */
         .preview-controls {
             position: absolute;
-            top: 72px;
+            top: 8px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -299,7 +215,7 @@
             font-family: inherit;
         }
         textarea { min-height: 70px; resize: vertical; }
-        input[type="text"] { direction: auto; -webkit-appearance: none; appearance: none; }
+        input[type="text"] { dir: auto; -webkit-appearance: none; appearance: none; }
         input[type="range"] { padding: 0; height: 12px; background: var(--bg-control); border: none; cursor: pointer; }
         button:active, select:active { background: var(--bg-control-hover); transform: scale(0.98); }
         input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
@@ -595,7 +511,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            direction: rtl;
+            dir: rtl;
             text-align: right;
         }
         .suggestion-item:hover, .suggestion-item:active { background: var(--bg-control-hover); }
@@ -819,6 +735,12 @@
             background: #3a1f1f;
             border-color: #ef4444;
             color: #ef4444;
+        }
+        .bg-toggle-btn.notify-on {
+            background: rgba(77,166,255,0.15);
+            border-color: var(--multi-select);
+            color: var(--multi-select);
+            box-shadow: 0 0 10px var(--multi-select-glow);
         }
         .flash-message {
             position: fixed;
@@ -1194,82 +1116,6 @@
             pointer-events: none;
         }
 
-        /* ===== COLLAPSIBLE SECTION TOGGLE ===== */
-        .collapsible-section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
-        .collapsible-section-header h3 {
-            margin: 0;
-            flex: 1;
-        }
-        .section-toggle-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.65rem;
-            font-weight: 700;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 4px;
-            letter-spacing: 0.03em;
-            -webkit-tap-highlight-color: transparent;
-            transition: color 0.15s, background 0.15s;
-            min-height: auto;
-            width: auto;
-            white-space: nowrap;
-        }
-        .section-toggle-btn:hover, .section-toggle-btn:active {
-            color: var(--accent);
-            background: rgba(255,204,0,0.08);
-        }
-        .collapsible-section-contents {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            overflow: hidden;
-            transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.3s ease;
-            max-height: 1200px;
-            opacity: 1;
-        }
-        .collapsible-section-contents.collapsed {
-            max-height: 0;
-            opacity: 0;
-            margin: 0;
-            pointer-events: none;
-        }
-
-        /* ===== UNDO BUTTON ===== */
-        .undo-btn {
-            background: rgba(255, 120, 120, 0.08);
-            border: 1px solid rgba(255, 120, 120, 0.45);
-            color: #ffb3b3;
-            border-radius: var(--radius-md);
-            padding: 8px 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            min-height: 36px;
-            width: 100%;
-            margin-top: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: background 0.15s, transform 0.1s;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .undo-btn:active {
-            background: rgba(255, 120, 120, 0.18);
-            transform: scale(0.97);
-        }
-        .undo-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
         /* ===== MULTI-SELECT MODE STYLES ===== */
         .multi-select-mode-indicator {
             display: inline-flex;
@@ -1484,25 +1330,6 @@
 <body>
 
     <div id="workspace">
-        <!-- Always-On Persistent Notification Bar -->
-        <div class="app-notification-bar show" id="appNotificationBar">
-            <div class="notif-header">
-                <div class="notif-app-info">
-                    <img src="bee72342368/Gemini_Generated_Image_m9ale3m9ale3m9al.png" alt="Icon" style="width:14px;height:14px;">
-                    <span>Bee Project • Active Session</span>
-                </div>
-                <span id="notifTime">Always On</span>
-            </div>
-            <div class="notif-body">
-                <img src="bee72342368/Gemini_Generated_Image_m9ale3m9ale3m9al.png" alt="Logo" class="notif-icon">
-                <div class="notif-content">
-                    <div class="notif-title" id="notifBarTitle">App Running</div>
-                    <div class="notif-text" id="notifBarText">Ready for data input (Layer A3)</div>
-                </div>
-                <button class="notif-close" id="notifBarCloseBtn" title="Dismiss">✕</button>
-            </div>
-        </div>
-
         <div class="preview-controls">
             <button id="previewZoomOut" title="Zoom out preview">−</button>
             <span class="zoom-label" id="previewZoomLabel">100%</span>
@@ -1523,6 +1350,7 @@
                 <h2>Payment Method</h2>
                 <div class="hint">Safe payment server from e&</div>
             </div>
+            <button class="bg-toggle-btn" id="notifyToggleBtn" title="Pin persistent notification">🔔</button>
             <button class="bg-toggle-btn" id="bgToggleBtn" title="Hide/Show background image">BG</button>
         </div>
 
@@ -1565,24 +1393,19 @@
             </div>
         </div>
 
-        <div class="section-card" id="paymentMethodCard">
-            <div class="collapsible-section-header">
-                <h3>PaymentMethod</h3>
-                <button class="section-toggle-btn" id="paymentMethodToggleBtn" title="Hide/Show PaymentMethod contents">(hide)</button>
-            </div>
-            <div class="collapsible-section-contents" id="paymentMethodContents">
-                <div class="clipboard-panel">
-                    <h4> A8 (ID) + A3 (Amount) + A10 (Name )</h4>
-                    <div class="paste-select-row">
-                        <button class="primary" id="autoFillClipboardBtn">Auto-Fill </button>
-                        <button class="mini-select" id="pasteSelectBtn" title="Insert clipboard text into paste area">Select</button>
-                    </div>
-                    <div class="btn-row">
-                        <button class="secondary" id="parseManualBtn">Parse Below</button>
-                    </div>
-                    <textarea id="manualPasteArea" placeholder="Or paste here manually:&#10;30210092502154&#10;1467.00&#10;الاسم:عبدالله مؤمن عبدالله شحاته شحاته"></textarea>
-                    <div class="clipboard-status" id="clipboardStatus"> </div>
+        <div class="section-card">
+            <h3>PaymentMethod</h3>
+            <div class="clipboard-panel">
+                <h4> A8 (ID) + A3 (Amount) + A10 (Name )</h4>
+                <div class="paste-select-row">
+                    <button class="primary" id="autoFillClipboardBtn">Auto-Fill </button>
+                    <button class="mini-select" id="pasteSelectBtn" title="Insert clipboard text into paste area">Select</button>
                 </div>
+                <div class="btn-row">
+                    <button class="secondary" id="parseManualBtn">Parse Below</button>
+                </div>
+                <textarea id="manualPasteArea" placeholder="Or paste here manually:&#10;30210092502154&#10;1467.00&#10;الاسم:عبدالله مؤمن عبدالله شحاته شحاته"></textarea>
+                <div class="clipboard-status" id="clipboardStatus"> </div>
             </div>
         </div>
 
@@ -1647,7 +1470,6 @@
                         </div>
                         <button id="nextLayerBtn" class="select-all-btn" style="flex: 0 0 auto;">Next</button>
                     </div>
-                    <button id="undoBtn" class="undo-btn" title="Undo last change">↶ Undo Last Change</button>
                     <div class="hint" style="margin-top: 5px;">
                         Use text or expressions like `=TIME()`, `=DATE()`, or `=SUM(A1,A2)` — decimals allowed.
                     </div>
@@ -1753,14 +1575,9 @@
             </div>
         </div>
 
-        <div class="section-card" id="calculatedMatrixCard">
-            <div class="collapsible-section-header">
-                <h3>Calculated Matrix Layers</h3>
-                <button class="section-toggle-btn" id="calculatedMatrixToggleBtn" title="Hide/Show Calculated Matrix contents">(hide)</button>
-            </div>
-            <div class="collapsible-section-contents" id="calculatedMatrixContents">
-                <div id="layersList"></div>
-            </div>
+        <div class="section-card">
+            <h3>Calculated Matrix Layers</h3>
+            <div id="layersList"></div>
         </div>
 
         <div class="section-card" style="margin-top:auto; padding-bottom: 24px;">
@@ -1787,7 +1604,7 @@
         <span class="dl-count-badge" id="dlCountValue">1</span>
     </div>
 
-    <!-- ON-CANVAS MULTI-MOVE DPAD -->
+    <!-- ON-CANVAS MULTI-MOVE DPAD (appears when multi-select active and >1 layer selected) -->
     <div class="multi-move-dpad" id="multiMoveDpad">
         <div class="dpad-inner">
             <div class="dpad-badge">MOVE ALL</div>
@@ -1812,123 +1629,6 @@
         const canvas = document.getElementById('imageCanvas');
         const ctx = canvas.getContext('2d', { alpha: false });
         const container = document.getElementById('canvasContainer');
-
-        // ========== ALWAYS-ON NOTIFICATION BAR CONTROLLER ==========
-        function showAppNotification(title, message) {
-            const bar = document.getElementById('appNotificationBar');
-            const titleEl = document.getElementById('notifBarTitle');
-            const textEl = document.getElementById('notifBarText');
-            if (!bar || !titleEl || !textEl) return;
-
-            titleEl.textContent = title || 'Bee Project Active';
-            textEl.textContent = message || 'Ready for data entry (Layer A3)';
-            bar.classList.add('show');
-        }
-
-        document.getElementById('notifBarCloseBtn').addEventListener('click', () => {
-            const bar = document.getElementById('appNotificationBar');
-            if (bar) bar.classList.remove('show');
-        });
-
-        // Request browser permission
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission().catch(() => {});
-        }
-
-        // ========== UNDO STATE ==========
-        const undoStack = [];
-        const UNDO_MAX = 50;
-        let undoApplying = false;
-        let undoLastPushTime = 0;
-        const UNDO_DEBOUNCE_MS = 350;
-
-        function pushUndoSnapshot(force) {
-            if (undoApplying) return;
-            const now = Date.now();
-            if (!force && now - undoLastPushTime < UNDO_DEBOUNCE_MS) return;
-            undoLastPushTime = now;
-            try {
-                const snapshot = JSON.stringify({
-                    layers: project.layers,
-                    maskRulerY: maskRulerY,
-                    maskRulerAngle: maskRulerAngle
-                });
-                undoStack.push(snapshot);
-                if (undoStack.length > UNDO_MAX) undoStack.shift();
-                updateUndoButtonState();
-            } catch(e) { console.warn('Undo snapshot failed', e); }
-        }
-
-        function updateUndoButtonState() {
-            const btn = document.getElementById('undoBtn');
-            if (!btn) return;
-            if (undoStack.length === 0) {
-                btn.disabled = true;
-                btn.style.opacity = '0.4';
-            } else {
-                btn.disabled = false;
-                btn.style.opacity = '1';
-            }
-        }
-
-        function undoLastChange() {
-            if (undoStack.length === 0) {
-                showFlashMessage('Nothing to undo');
-                return;
-            }
-            const snapshot = undoStack.pop();
-            undoApplying = true;
-            try {
-                const data = JSON.parse(snapshot);
-                project.layers = data.layers;
-                if (data.maskRulerY !== undefined && data.maskRulerY !== null) {
-                    maskRulerY = data.maskRulerY;
-                }
-                if (data.maskRulerAngle !== undefined && data.maskRulerAngle !== null) {
-                    maskRulerAngle = data.maskRulerAngle;
-                }
-                project.layers.forEach(layer => {
-                    if (typeof layer.hiddenX !== 'number') layer.hiddenX = layer.x;
-                    if (typeof layer.hiddenY !== 'number') layer.hiddenY = layer.y;
-                    if (typeof layer.hiddenOnly !== 'boolean') layer.hiddenOnly = false;
-                });
-                document.querySelectorAll('.text-layer').forEach(el => el.remove());
-                applyPreviewZoom();
-                project.layers.forEach(layer => createHTMLLayer(layer));
-                if (selectedLayerId && !project.layers.some(l => l.id === selectedLayerId)) {
-                    selectedLayerId = null;
-                    document.getElementById('inspector').style.display = 'none';
-                }
-                if (selectedLayerId) {
-                    const layer = project.layers.find(l => l.id === selectedLayerId);
-                    if (layer) {
-                        document.getElementById('layerText').value = layer.text;
-                        document.getElementById('layerSize').value = layer.size;
-                        document.getElementById('layerSizeSlider').value = layer.size;
-                        document.getElementById('layerColor').value = layer.color;
-                        document.getElementById('layerBgColor').value = layer.bgColor || '#000000';
-                        document.getElementById('useBgColor').checked = !!layer.useBg;
-                        document.getElementById('useBoldText').checked = !!layer.isBold;
-                        document.getElementById('layerFont').value = layer.font;
-                    }
-                }
-                updateAllFormulas();
-                updateLayersList();
-                applyAppBorderAndShine();
-                updateTotalLabel();
-                applyA9Shine();
-                positionMaskRuler();
-                renderCanvas();
-                saveProject();
-                showFlashMessage('Undone');
-            } catch(e) {
-                console.error('Undo failed', e);
-                showFlashMessage('Undo failed');
-            } finally {
-                undoApplying = false;
-                updateUndoButtonState();
-            }
-        }
 
         // ========== MULTI-SELECT STATE ==========
         let multiSelectMode = false;
@@ -2028,7 +1728,6 @@
         function positionMultiMoveDpad() {
             const dpad = document.getElementById('multiMoveDpad');
             if (!dpad || !dpad.classList.contains('visible')) return;
-
             let sumX = 0, sumY = 0, count = 0;
             multiSelectedIds.forEach(id => {
                 const layer = project.layers.find(l => l.id === id);
@@ -2042,15 +1741,12 @@
             if (count === 0) return;
             const avgX = sumX / count;
             const avgY = sumY / count;
-
             const scale = getScale();
             const dpadSize = 132;
             const dpadW = dpadSize * scale;
             const dpadH = dpadSize * scale;
-
             let leftPx = avgX * scale - dpadW / 2;
             let topPx = avgY * scale - dpadH - (20 * scale);
-
             const containerW = canvas.clientWidth || 0;
             const containerH = canvas.clientHeight || 0;
             if (containerW > 0) {
@@ -2060,7 +1756,6 @@
                 if (topPx < 4) topPx = avgY * scale + (30 * scale);
                 if (topPx + dpadH > containerH) topPx = Math.max(4, containerH - dpadH - 4);
             }
-
             dpad.style.left = leftPx + 'px';
             dpad.style.top = topPx + 'px';
         }
@@ -2794,37 +2489,6 @@
             });
         })();
 
-        // ========== COLLAPSIBLE SECTIONS: PaymentMethod & Calculated Matrix ==========
-        (function initCollapsibleSections() {
-            const sections = [
-                { btnId: 'paymentMethodToggleBtn', contentsId: 'paymentMethodContents', storageKey: 'bee72342368/payment_method_collapsed' },
-                { btnId: 'calculatedMatrixToggleBtn', contentsId: 'calculatedMatrixContents', storageKey: 'bee72342368/calculated_matrix_collapsed' }
-            ];
-            sections.forEach(({ btnId, contentsId, storageKey }) => {
-                const btn = document.getElementById(btnId);
-                const contents = document.getElementById(contentsId);
-                if (!btn || !contents) return;
-                let collapsed = false;
-                try { collapsed = localStorage.getItem(storageKey) === '1'; } catch(e) {}
-                const applyState = () => {
-                    if (collapsed) {
-                        contents.classList.add('collapsed');
-                        btn.textContent = '(show)';
-                    } else {
-                        contents.classList.remove('collapsed');
-                        btn.textContent = '(hide)';
-                    }
-                };
-                applyState();
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    collapsed = !collapsed;
-                    applyState();
-                    try { localStorage.setItem(storageKey, collapsed ? '1' : '0'); } catch(e) {}
-                });
-            });
-        })();
-
         document.getElementById('jumpToSavedBtn').addEventListener('click', () => {
             const section = document.getElementById('savedA8Section');
             if (!section) return;
@@ -3200,8 +2864,6 @@
             const a3Layer  = project.layers[2];
             const a10Layer = project.layers[9];
 
-            pushUndoSnapshot(true);
-
             const log = [];
             let changed = false;
 
@@ -3229,11 +2891,7 @@
             if (setInput(a8Layer, id))        { changed = true; log.push(`A8=${id}`); }
             else if (a8Layer)                 { log.push('A8=—'); }
 
-            if (setInput(a3Layer, amount))    { 
-                changed = true; 
-                log.push(`A3=${amount}`); 
-                showAppNotification('Layer A3 Assigned', `Inserted Amount/Number: ${amount}`);
-            }
+            if (setInput(a3Layer, amount))    { changed = true; log.push(`A3=${amount}`); }
             else if (a3Layer)                 { log.push('A3=—'); }
 
             if (setInput(a10Layer, name))     { changed = true; log.push(`A10=${name}`); addNameToMemory(name); }
@@ -3257,6 +2915,7 @@
 
             updateLayersList();
             saveProject();
+            scheduleBannerUpdate && scheduleBannerUpdate();
             setClipboardStatus('✓ ' + log.join(' | '), 'ok');
             return true;
         }
@@ -3453,6 +3112,7 @@
                 }
             }, 1000);
 
+            // Init multi-select button
             document.getElementById('multiSelectToggleBtn').addEventListener('click', (e) => {
                 e.preventDefault();
                 toggleMultiSelectMode();
@@ -3466,11 +3126,7 @@
                 clearMultiSelect();
             });
 
-            document.getElementById('undoBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                undoLastChange();
-            });
-
+            // Attach on-canvas dpad buttons
             attachDpadButton('dpadUp', 'up');
             attachDpadButton('dpadDown', 'down');
             attachDpadButton('dpadLeft', 'left');
@@ -3491,7 +3147,8 @@
             window.addEventListener('touchcancel', stopDpadHold);
             window.addEventListener('blur', stopDpadHold);
 
-            updateUndoButtonState();
+            // Init notify toggle button
+            initNotifyBanner();
         });
 
         function saveProject() {
@@ -3503,6 +3160,7 @@
                     localStorage.setItem('bee72342368/formula_photo_studio_v4', JSON.stringify(project));
                 }
                 catch(e) { console.error("Local storage sync error:", e); }
+                scheduleBannerUpdate && scheduleBannerUpdate();
             }, 300);
         }
 
@@ -3967,8 +3625,6 @@
             const el = document.getElementById(selectedLayerId);
             const textInput = document.getElementById('layerText');
             if (layer && el) {
-                pushUndoSnapshot(false);
-
                 const newText = textInput.value;
                 const oldText = layer.text;
 
@@ -3976,9 +3632,6 @@
                 const idx = project.layers.findIndex(l => l.id === selectedLayerId);
                 if (inputIndices.includes(idx)) {
                     layer.isInput = true;
-                    if (idx === 2) {
-                        showAppNotification('Layer A3 Updated', `Inserted Number: ${newText}`);
-                    }
                 }
 
                 layer.text = newText;
@@ -3999,6 +3652,7 @@
                 el.style.letterSpacing = getScaledSize(layer.letterSpacing || 0) + 'px';
                 updateAllFormulas(); 
                 saveProject();
+                scheduleBannerUpdate && scheduleBannerUpdate();
                 const activeIdx = project.layers.findIndex(l => l.id === selectedLayerId);
                 if (activeIdx === 7 && oldText !== newText) {
                     clearTimeout(window._a8LookupTimeout);
@@ -4387,7 +4041,6 @@
             const fontSelect = document.getElementById('layerFont');
             const selectedFont = fontSelect.value;
             if (!selectedFont) return;
-            pushUndoSnapshot(true);
             project.layers.forEach(layer => {
                 layer.font = selectedFont;
                 const el = document.getElementById(layer.id);
@@ -4419,7 +4072,6 @@
                 a9MenuDropdown.classList.remove('show');
                 const a9Layer = project.layers[8];
                 if (a9Layer) {
-                    pushUndoSnapshot(true);
                     a9Layer.text = selectedVal;
                     const a9El = document.getElementById(a9Layer.id);
                     if (a9El) a9El.innerText = selectedVal;
@@ -4466,6 +4118,115 @@
             previewZoom = 1.0;
             applyPreviewZoom();
         });
+
+        /* ===== PERSISTENT SYSTEM NOTIFICATION (visible over other apps) ===== */
+        const NOTIFY_FLAG_KEY = 'bee72342368/persistent_notify_enabled';
+        let _notifyThrottle = null;
+        let _lastNotifyBody = '';
+
+        const isNotifyEnabled = () => {
+            try { return localStorage.getItem(NOTIFY_FLAG_KEY) === '1'; } catch(e) { return false; }
+        };
+        const setNotifyEnabled = (v) => {
+            try { localStorage.setItem(NOTIFY_FLAG_KEY, v ? '1' : '0'); } catch(e) {}
+        };
+
+        function buildNotifyBody() {
+            const a8 = (typeof getCurrentA8Value === 'function' && getCurrentA8Value()) || '—';
+            const a3 = (typeof getCurrentA3Value === 'function' && getCurrentA3Value()) || '—';
+            const a10Layer = project && project.layers ? project.layers[9] : null;
+            const a10 = a10Layer ? (parseFormula(a10Layer.text) || '').toString().trim() : '';
+            let s = `A8: ${a8}\nA3: ${a3}`;
+            if (a10) s += `\n${a10}`;
+            return s;
+        }
+
+        async function getSwReady() {
+            if (!('serviceWorker' in navigator)) return null;
+            try { return await navigator.serviceWorker.ready; } catch(e) { return null; }
+        }
+
+        async function pushSystemNotification() {
+            if (!isNotifyEnabled()) return;
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            const reg = await getSwReady();
+            if (!reg || !reg.active) return;
+            const body = buildNotifyBody();
+            if (body === _lastNotifyBody) return;   // skip identical updates
+            _lastNotifyBody = body;
+            reg.active.postMessage({
+                type: 'SHOW_NOTIFICATION',
+                title: 'Payment Method · Bee',
+                body: body,
+                icon: 'bee72342368/Gemini_Generated_Image_m9ale3m9ale3m9al.png'
+            });
+        }
+
+        function scheduleBannerUpdate() {
+            if (!isNotifyEnabled()) return;
+            if (_notifyThrottle) return;
+            _notifyThrottle = setTimeout(() => {
+                _notifyThrottle = null;
+                pushSystemNotification();
+            }, 900);
+        }
+
+        async function hideSystemNotification() {
+            const reg = await getSwReady();
+            if (reg && reg.active) reg.active.postMessage({ type: 'HIDE_NOTIFICATION' });
+        }
+
+        async function enableSystemNotify() {
+            if (!('Notification' in window)) { showFlashMessage('Notifications not supported'); return false; }
+            if (!('serviceWorker' in navigator)) { showFlashMessage('Service Worker unavailable'); return false; }
+            let perm = Notification.permission;
+            if (perm === 'default') perm = await Notification.requestPermission();
+            if (perm !== 'granted') { showFlashMessage('Notification permission denied'); return false; }
+            setNotifyEnabled(true);
+            _lastNotifyBody = '';
+            await pushSystemNotification();
+            updateNotifyButtonUI();
+            showFlashMessage('Notification pinned');
+            return true;
+        }
+
+        async function disableSystemNotify() {
+            setNotifyEnabled(false);
+            _lastNotifyBody = '';
+            await hideSystemNotification();
+            updateNotifyButtonUI();
+            showFlashMessage('Notification removed');
+        }
+
+        function updateNotifyButtonUI() {
+            const btn = document.getElementById('notifyToggleBtn');
+            if (!btn) return;
+            const on = isNotifyEnabled() && ('Notification' in window) && Notification.permission === 'granted';
+            btn.classList.toggle('notify-on', on);
+            btn.textContent = on ? '🔔' : '🔕';
+            btn.title = on ? 'Notification pinned — tap to remove' : 'Pin persistent notification';
+        }
+
+        function initNotifyBanner() {
+            const btn = document.getElementById('notifyToggleBtn');
+            if (!btn) return;
+            updateNotifyButtonUI();
+            btn.addEventListener('click', async () => {
+                if (isNotifyEnabled() && Notification.permission === 'granted') {
+                    await disableSystemNotify();
+                } else {
+                    await enableSystemNotify();
+                }
+            });
+            // Re-pin on load if it was previously enabled
+            if (isNotifyEnabled() && ('Notification' in window) && Notification.permission === 'granted') {
+                navigator.serviceWorker.ready.then(() => pushSystemNotification()).catch(()=>{});
+            }
+            // Re-show when returning to app (Android may have dropped it)
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && isNotifyEnabled()) pushSystemNotification();
+            });
+        }
     </script>
 </body>
 </html>
