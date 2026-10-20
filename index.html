@@ -736,12 +736,6 @@
             border-color: #ef4444;
             color: #ef4444;
         }
-        .bg-toggle-btn.notify-on {
-            background: rgba(77,166,255,0.15);
-            border-color: var(--multi-select);
-            color: var(--multi-select);
-            box-shadow: 0 0 10px var(--multi-select-glow);
-        }
         .flash-message {
             position: fixed;
             top: 50%;
@@ -1325,6 +1319,125 @@
             color: #ef4444;
             transform: scale(0.9);
         }
+
+        /* Saved Data Pairs Panel */
+        .saved-pairs-section {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .saved-pairs-section.visible { display: flex; }
+        .saved-pairs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .saved-pairs-header h3 {
+            margin: 0;
+            font-size: 0.7rem;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+        .saved-pairs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 180px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .saved-pair-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-control);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 0.78rem;
+            gap: 6px;
+            transition: background 0.12s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .saved-pair-item:active { background: var(--bg-control-hover); }
+        .saved-pair-item .pair-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+            gap: 1px;
+        }
+        .saved-pair-item .pair-a8 {
+            font-weight: 700;
+            color: var(--text-blue);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .saved-pair-item .pair-a8:active { opacity: 0.7; }
+        .saved-pair-item .pair-detail {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .saved-pair-item .pair-actions {
+            display: flex;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+        .saved-pair-item .pair-actions button {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            padding: 4px 6px;
+            border-radius: 5px;
+            cursor: pointer;
+            min-height: auto;
+            width: auto;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.15s, color 0.15s;
+        }
+        .saved-pair-item .pair-actions button.load-btn:active {
+            background: rgba(77, 166, 255, 0.2);
+            color: var(--multi-select);
+        }
+        .saved-pair-item .pair-actions button.copy-btn:active {
+            background: rgba(255,204,0,0.15);
+            color: var(--accent);
+        }
+        .saved-pair-item .pair-actions button.remove-btn:active {
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+        }
+        .mini-select-bake {
+            background: rgba(255, 204, 0, 0.15) !important;
+            border: 1px solid var(--accent) !important;
+            color: var(--accent) !important;
+            font-weight: 700;
+            font-size: 0.62rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            height: 24px;
+            min-height: 24px;
+            width: auto;
+            line-height: 1;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mini-select-bake:active {
+            transform: scale(0.94);
+            background: rgba(255, 204, 0, 0.3) !important;
+        }
     </style>
 </head>
 <body>
@@ -1350,7 +1463,6 @@
                 <h2>Payment Method</h2>
                 <div class="hint">Safe payment server from e&</div>
             </div>
-            <button class="bg-toggle-btn" id="notifyToggleBtn" title="Pin persistent notification">🔔</button>
             <button class="bg-toggle-btn" id="bgToggleBtn" title="Hide/Show background image">BG</button>
         </div>
 
@@ -1416,6 +1528,20 @@
             </div>
             <div class="saved-a8-list" id="savedA8List"></div>
             <div class="empty-saved-msg" id="emptySavedMsg">No saved A8 yet. Use the heart on the canvas.</div>
+        </div>
+
+        <!-- Saved Data Pairs Section -->
+        <div class="section-card saved-pairs-section" id="savedPairsSection">
+            <div class="saved-pairs-header">
+                <h3>📦 Saved Data Pairs</h3>
+                <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+                    <button id="exportPairsBtn" class="mini-select" style="background:var(--bg-control);border:1px solid var(--accent);color:var(--accent);font-weight:700;font-size:0.62rem;padding:4px 8px;border-radius:6px;cursor:pointer;height:24px;min-height:24px;width:auto;line-height:1;" title="Download pairs as JSON">⇩ Exp</button>
+                    <button id="importPairsBtn" class="mini-select" style="background:var(--bg-control);border:1px solid var(--accent);color:var(--accent);font-weight:700;font-size:0.62rem;padding:4px 8px;border-radius:6px;cursor:pointer;height:24px;min-height:24px;width:auto;line-height:1;" title="Import pairs JSON">⇧ Imp</button>
+                    <button id="bakeIntoHtmlBtn" class="mini-select-bake" title="Download a new HTML file with all your pairs baked inside">🔥 Bake HTML</button>
+                </div>
+            </div>
+            <div class="saved-pairs-list" id="savedPairsList"></div>
+            <div class="empty-saved-msg" id="emptyPairsMsg">No saved pairs yet. JPEG download saves them.</div>
         </div>
 
         <div id="inspector" class="section-card" style="display:none;">
@@ -1630,6 +1756,304 @@
         const ctx = canvas.getContext('2d', { alpha: false });
         const container = document.getElementById('canvasContainer');
 
+        // ========== SAVED DATA PAIRS (A8 -> {A10, A9, A3, A4}) ==========
+        const SAVED_PAIRS_STORAGE_KEY = 'bee72342368/saved_data_pairs_v1';
+
+        // === BAKED-IN DEFAULTS ===
+        // These pairs seed localStorage on first run.
+        // Format: "A8value": { a10: "...", a9: "...", a3: "...", a4: "...", savedAt: 0 }
+        const DEFAULT_SAVED_PAIRS = {
+            // Add your entries here — they will travel with the HTML file.
+            // "30210092502154": { a10: "عبدالله مؤمن عبدالله", a9: "بدايتي للتمويل متناهي الصغر", a3: "1467", a4: "13", savedAt: 0 }
+        };
+
+        function loadSavedDataPairs() {
+            try {
+                const raw = localStorage.getItem(SAVED_PAIRS_STORAGE_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch(e) { return {}; }
+        }
+
+        function saveSavedDataPairs(obj) {
+            try { localStorage.setItem(SAVED_PAIRS_STORAGE_KEY, JSON.stringify(obj)); } catch(e) {}
+        }
+
+        // Merge baked-in pairs into localStorage without overwriting the user's own entries.
+        function mergeDefaultPairs() {
+            if (!DEFAULT_SAVED_PAIRS || Object.keys(DEFAULT_SAVED_PAIRS).length === 0) return;
+            const current = loadSavedDataPairs();
+            let changed = false;
+            for (const a8 in DEFAULT_SAVED_PAIRS) {
+                if (!(a8 in current)) {
+                    current[a8] = DEFAULT_SAVED_PAIRS[a8];
+                    changed = true;
+                }
+            }
+            if (changed) saveSavedDataPairs(current);
+        }
+
+        // Find layer by role (A3/A4/A8/A9/A10) using fixed indices.
+        function findLayerByRole(role) {
+            const roleToIndex = { 'A3': 2, 'A4': 3, 'A8': 7, 'A9': 8, 'A10': 9 };
+            const idx = roleToIndex[role];
+            if (idx !== undefined && project.layers[idx]) return project.layers[idx];
+            return null;
+        }
+
+        function captureCurrentLayerInputs() {
+            const a8 = findLayerByRole('A8');
+            if (!a8) return null;
+            const a8Val = (parseFormula(a8.text) || '').toString().trim();
+            if (!a8Val || a8Val === '[Syntax Error]') return null;
+            const grab = (role) => {
+                const l = findLayerByRole(role);
+                return l ? (parseFormula(l.text) || '').toString().trim() : '';
+            };
+            return {
+                a8: a8Val,
+                a10: grab('A10'),
+                a9:  grab('A9'),
+                a3:  grab('A3'),
+                a4:  grab('A4')
+            };
+        }
+
+        function saveCurrentDataPair() {
+            const pair = captureCurrentLayerInputs();
+            if (!pair) {
+                showFlashMessage('⚠ No A8 value — nothing saved');
+                return false;
+            }
+            const saved = loadSavedDataPairs();
+            saved[pair.a8] = {
+                a10: pair.a10,
+                a9: pair.a9,
+                a3: pair.a3,
+                a4: pair.a4,
+                savedAt: Date.now()
+            };
+            saveSavedDataPairs(saved);
+            renderSavedPairsList();
+            console.log('Saved pair:', pair);
+            return true;
+        }
+
+        function applySavedDataPair(a8Value) {
+            if (!a8Value) return false;
+            const saved = loadSavedDataPairs();
+            const pair = saved[a8Value];
+            if (!pair) return false;
+
+            const setByRole = (role, value) => {
+                if (value === undefined || value === null || value === '') return;
+                const layer = findLayerByRole(role);
+                if (!layer) return;
+                layer.text = String(value);
+                layer.isInput = true;
+                delete layer.formula;
+                delete layer.isFormula;
+                const el = document.getElementById(layer.id);
+                if (el) {
+                    el.innerText = String(value);
+                    el.style.transition = 'box-shadow 0.3s';
+                    el.style.boxShadow = '0 0 18px rgba(255,204,0,0.9)';
+                    setTimeout(() => { el.style.boxShadow = ''; }, 900);
+                }
+            };
+
+            setByRole('A10', pair.a10);
+            setByRole('A9',  pair.a9);
+            setByRole('A3',  pair.a3);
+            setByRole('A4',  pair.a4);
+
+            if (selectedLayerId) {
+                const activeLayer = project.layers.find(l => l.id === selectedLayerId);
+                if (activeLayer) {
+                    const inp = document.getElementById('layerText');
+                    if (inp) inp.value = activeLayer.text;
+                }
+            }
+
+            updateAllFormulas();
+            updateLayersList();
+            saveProject();
+            applyA9Shine();
+
+            showFlashMessage('Loaded saved data for A8');
+            return true;
+        }
+
+        function renderSavedPairsList() {
+            const listEl = document.getElementById('savedPairsList');
+            const emptyMsg = document.getElementById('emptyPairsMsg');
+            const section = document.getElementById('savedPairsSection');
+            if (!listEl) return;
+
+            const saved = loadSavedDataPairs();
+            const keys = Object.keys(saved).sort((a, b) => (saved[b].savedAt || 0) - (saved[a].savedAt || 0));
+
+            if (keys.length === 0) {
+                listEl.innerHTML = '';
+                if (emptyMsg) emptyMsg.style.display = 'block';
+                if (section) section.classList.add('visible');
+                return;
+            }
+            if (emptyMsg) emptyMsg.style.display = 'none';
+            if (section) section.classList.add('visible');
+
+            listEl.innerHTML = '';
+            keys.forEach(a8 => {
+                const pair = saved[a8];
+                const itemEl = document.createElement('div');
+                itemEl.className = 'saved-pair-item';
+                itemEl.dataset.a8 = a8;
+
+                const detailParts = [];
+                if (pair.a3) detailParts.push('A3:' + pair.a3);
+                if (pair.a4) detailParts.push('A4:' + pair.a4);
+                if (pair.a10) detailParts.push('A10:' + (pair.a10.length > 15 ? pair.a10.slice(0, 15) + '…' : pair.a10));
+                if (pair.a9) detailParts.push('A9:' + (pair.a9.length > 15 ? pair.a9.slice(0, 15) + '…' : pair.a9));
+
+                itemEl.innerHTML = `
+                    <div class="pair-info">
+                        <span class="pair-a8" title="Tap to load saved data">${escapeHtml(a8)}</span>
+                        <span class="pair-detail">${escapeHtml(detailParts.join(' · '))}</span>
+                    </div>
+                    <div class="pair-actions">
+                        <button class="load-btn" title="Load saved inputs">↩</button>
+                        <button class="copy-btn" title="Copy A8">📋</button>
+                        <button class="remove-btn" title="Remove">✕</button>
+                    </div>
+                `;
+                itemEl.querySelector('.pair-a8').addEventListener('click', () => {
+                    applySavedDataPair(a8);
+                });
+                itemEl.querySelector('.load-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    applySavedDataPair(a8);
+                });
+                itemEl.querySelector('.copy-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    copyA8ToClipboard(a8);
+                });
+                itemEl.querySelector('.remove-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const confirmed = window.confirm('Delete saved data pair for A8: ' + a8 + '?');
+                    if (!confirmed) return;
+                    vibrateStrong();
+                    const current = loadSavedDataPairs();
+                    delete current[a8];
+                    saveSavedDataPairs(current);
+                    renderSavedPairsList();
+                });
+                listEl.appendChild(itemEl);
+            });
+        }
+
+        // ========== EXPORT / IMPORT / BAKE PAIRS ==========
+        function exportSavedPairs() {
+            const data = localStorage.getItem(SAVED_PAIRS_STORAGE_KEY) || '{}';
+            const blob = new Blob([data], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `saved_pairs_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showFlashMessage('Pairs exported');
+            vibrateOnDownload();
+        }
+
+        function importSavedPairsFromFile(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const incoming = JSON.parse(e.target.result);
+                    if (typeof incoming !== 'object' || Array.isArray(incoming)) throw new Error('bad format');
+                    const current = loadSavedDataPairs();
+                    Object.assign(current, incoming);
+                    saveSavedDataPairs(current);
+                    renderSavedPairsList();
+                    showFlashMessage('Pairs imported: ' + Object.keys(incoming).length);
+                    vibrateOnDownload();
+                } catch(err) {
+                    showFlashMessage('Invalid pairs file');
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function triggerImportPairs() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,application/json';
+            input.onchange = (e) => importSavedPairsFromFile(e.target.files[0]);
+            input.click();
+        }
+
+        async function bakeIntoHtml() {
+            try {
+                // 1. Get all saved pairs from localStorage
+                const pairs = loadSavedDataPairs();
+                const pairCount = Object.keys(pairs).length;
+                if (pairCount === 0) {
+                    showFlashMessage('No pairs to bake — save some first');
+                    return;
+                }
+
+                // 2. Fetch the current HTML file source
+                const response = await fetch(window.location.href);
+                let htmlSource = await response.text();
+
+                // 3. Build the new DEFAULT_SAVED_PAIRS literal
+                const pairsLiteral = JSON.stringify(pairs, null, 4);
+
+                // 4. Replace the existing DEFAULT_SAVED_PAIRS block
+                const regex = /const DEFAULT_SAVED_PAIRS\s*=\s*\{[\s\S]*?\};/;
+                const replacement = `const DEFAULT_SAVED_PAIRS = ${pairsLiteral};`;
+                if (!regex.test(htmlSource)) {
+                    showFlashMessage('Could not locate DEFAULT_SAVED_PAIRS in source');
+                    console.error('regex miss — source did not contain the block');
+                    return;
+                }
+                htmlSource = htmlSource.replace(regex, replacement);
+
+                // 5. Also upgrade seedDefaultPairsIfEmpty → mergeDefaultPairs so it always merges
+                const seedOld = `function seedDefaultPairsIfEmpty() {
+            const current = loadSavedDataPairs();
+            if (Object.keys(current).length === 0 && Object.keys(DEFAULT_SAVED_PAIRS).length > 0) {
+                saveSavedDataPairs(DEFAULT_SAVED_PAIRS);
+            }
+        }`;
+                const seedNew = `function seedDefaultPairsIfEmpty() {
+            if (!DEFAULT_SAVED_PAIRS || Object.keys(DEFAULT_SAVED_PAIRS).length === 0) return;
+            const current = loadSavedDataPairs();
+            let changed = false;
+            for (const a8 in DEFAULT_SAVED_PAIRS) {
+                if (!(a8 in current)) { current[a8] = DEFAULT_SAVED_PAIRS[a8]; changed = true; }
+            }
+            if (changed) saveSavedDataPairs(current);
+        }`;
+                if (htmlSource.includes(seedOld)) htmlSource = htmlSource.replace(seedOld, seedNew);
+
+                // 6. Trigger download of the new HTML file
+                const blob = new Blob([htmlSource], { type: 'text/html' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'bee-shared.html';
+                a.click();
+                URL.revokeObjectURL(a.href);
+
+                showFlashMessage('Baked ' + pairCount + ' pairs → bee-shared.html');
+                vibrateOnDownload();
+                playNotificationSound();
+            } catch (err) {
+                console.error('Bake failed:', err);
+                showFlashMessage('Bake failed — open this file over http:// or https://');
+            }
+        }
+
         // ========== MULTI-SELECT STATE ==========
         let multiSelectMode = false;
         let multiSelectedIds = new Set();
@@ -1728,6 +2152,7 @@
         function positionMultiMoveDpad() {
             const dpad = document.getElementById('multiMoveDpad');
             if (!dpad || !dpad.classList.contains('visible')) return;
+
             let sumX = 0, sumY = 0, count = 0;
             multiSelectedIds.forEach(id => {
                 const layer = project.layers.find(l => l.id === id);
@@ -1741,12 +2166,15 @@
             if (count === 0) return;
             const avgX = sumX / count;
             const avgY = sumY / count;
+
             const scale = getScale();
             const dpadSize = 132;
             const dpadW = dpadSize * scale;
             const dpadH = dpadSize * scale;
+
             let leftPx = avgX * scale - dpadW / 2;
             let topPx = avgY * scale - dpadH - (20 * scale);
+
             const containerW = canvas.clientWidth || 0;
             const containerH = canvas.clientHeight || 0;
             if (containerW > 0) {
@@ -1756,6 +2184,7 @@
                 if (topPx < 4) topPx = avgY * scale + (30 * scale);
                 if (topPx + dpadH > containerH) topPx = Math.max(4, containerH - dpadH - 4);
             }
+
             dpad.style.left = leftPx + 'px';
             dpad.style.top = topPx + 'px';
         }
@@ -2915,8 +3344,18 @@
 
             updateLayersList();
             saveProject();
-            scheduleBannerUpdate && scheduleBannerUpdate();
             setClipboardStatus('✓ ' + log.join(' | '), 'ok');
+
+            if (id) {
+                const saved = loadSavedDataPairs();
+                if (saved[id]) {
+                    setTimeout(() => {
+                        applySavedDataPair(id);
+                        setClipboardStatus('✓ Loaded saved data for A8 ' + id, 'ok');
+                    }, 1800);
+                }
+            }
+
             return true;
         }
 
@@ -3080,7 +3519,16 @@
             updateTotalLabel();
             applyA9Shine();
 
+            mergeDefaultPairs();
             renderSavedA8List();
+            renderSavedPairsList();
+
+            const expBtn = document.getElementById('exportPairsBtn');
+            const impBtn = document.getElementById('importPairsBtn');
+            const bakeBtn = document.getElementById('bakeIntoHtmlBtn');
+            if (expBtn) expBtn.addEventListener('click', exportSavedPairs);
+            if (impBtn) impBtn.addEventListener('click', triggerImportPairs);
+            if (bakeBtn) bakeBtn.addEventListener('click', bakeIntoHtml);
 
             setInterval(cycleA6Values, 1000);
             setInterval(cycleA7Values, 3000);
@@ -3112,7 +3560,6 @@
                 }
             }, 1000);
 
-            // Init multi-select button
             document.getElementById('multiSelectToggleBtn').addEventListener('click', (e) => {
                 e.preventDefault();
                 toggleMultiSelectMode();
@@ -3126,7 +3573,6 @@
                 clearMultiSelect();
             });
 
-            // Attach on-canvas dpad buttons
             attachDpadButton('dpadUp', 'up');
             attachDpadButton('dpadDown', 'down');
             attachDpadButton('dpadLeft', 'left');
@@ -3146,9 +3592,6 @@
             window.addEventListener('touchend', stopDpadHold);
             window.addEventListener('touchcancel', stopDpadHold);
             window.addEventListener('blur', stopDpadHold);
-
-            // Init notify toggle button
-            initNotifyBanner();
         });
 
         function saveProject() {
@@ -3160,7 +3603,6 @@
                     localStorage.setItem('bee72342368/formula_photo_studio_v4', JSON.stringify(project));
                 }
                 catch(e) { console.error("Local storage sync error:", e); }
-                scheduleBannerUpdate && scheduleBannerUpdate();
             }, 300);
         }
 
@@ -3652,7 +4094,6 @@
                 el.style.letterSpacing = getScaledSize(layer.letterSpacing || 0) + 'px';
                 updateAllFormulas(); 
                 saveProject();
-                scheduleBannerUpdate && scheduleBannerUpdate();
                 const activeIdx = project.layers.findIndex(l => l.id === selectedLayerId);
                 if (activeIdx === 7 && oldText !== newText) {
                     clearTimeout(window._a8LookupTimeout);
@@ -3860,6 +4301,14 @@
         }
 
         function flattenAndDownload(format) {
+            // ===== SAVE DATA PAIR ON JPEG DOWNLOAD =====
+            if (format === 'jpg') {
+                const savedPair = saveCurrentDataPair();
+                if (savedPair) {
+                    console.log('JPEG download → saved data pair');
+                }
+            }
+
             saveCurrentPair();
 
             if (project.bgImage && baseImgObj.width) {
@@ -4118,115 +4567,6 @@
             previewZoom = 1.0;
             applyPreviewZoom();
         });
-
-        /* ===== PERSISTENT SYSTEM NOTIFICATION (visible over other apps) ===== */
-        const NOTIFY_FLAG_KEY = 'bee72342368/persistent_notify_enabled';
-        let _notifyThrottle = null;
-        let _lastNotifyBody = '';
-
-        const isNotifyEnabled = () => {
-            try { return localStorage.getItem(NOTIFY_FLAG_KEY) === '1'; } catch(e) { return false; }
-        };
-        const setNotifyEnabled = (v) => {
-            try { localStorage.setItem(NOTIFY_FLAG_KEY, v ? '1' : '0'); } catch(e) {}
-        };
-
-        function buildNotifyBody() {
-            const a8 = (typeof getCurrentA8Value === 'function' && getCurrentA8Value()) || '—';
-            const a3 = (typeof getCurrentA3Value === 'function' && getCurrentA3Value()) || '—';
-            const a10Layer = project && project.layers ? project.layers[9] : null;
-            const a10 = a10Layer ? (parseFormula(a10Layer.text) || '').toString().trim() : '';
-            let s = `A8: ${a8}\nA3: ${a3}`;
-            if (a10) s += `\n${a10}`;
-            return s;
-        }
-
-        async function getSwReady() {
-            if (!('serviceWorker' in navigator)) return null;
-            try { return await navigator.serviceWorker.ready; } catch(e) { return null; }
-        }
-
-        async function pushSystemNotification() {
-            if (!isNotifyEnabled()) return;
-            if (!('Notification' in window) || Notification.permission !== 'granted') return;
-            const reg = await getSwReady();
-            if (!reg || !reg.active) return;
-            const body = buildNotifyBody();
-            if (body === _lastNotifyBody) return;   // skip identical updates
-            _lastNotifyBody = body;
-            reg.active.postMessage({
-                type: 'SHOW_NOTIFICATION',
-                title: 'Payment Method · Bee',
-                body: body,
-                icon: 'bee72342368/Gemini_Generated_Image_m9ale3m9ale3m9al.png'
-            });
-        }
-
-        function scheduleBannerUpdate() {
-            if (!isNotifyEnabled()) return;
-            if (_notifyThrottle) return;
-            _notifyThrottle = setTimeout(() => {
-                _notifyThrottle = null;
-                pushSystemNotification();
-            }, 900);
-        }
-
-        async function hideSystemNotification() {
-            const reg = await getSwReady();
-            if (reg && reg.active) reg.active.postMessage({ type: 'HIDE_NOTIFICATION' });
-        }
-
-        async function enableSystemNotify() {
-            if (!('Notification' in window)) { showFlashMessage('Notifications not supported'); return false; }
-            if (!('serviceWorker' in navigator)) { showFlashMessage('Service Worker unavailable'); return false; }
-            let perm = Notification.permission;
-            if (perm === 'default') perm = await Notification.requestPermission();
-            if (perm !== 'granted') { showFlashMessage('Notification permission denied'); return false; }
-            setNotifyEnabled(true);
-            _lastNotifyBody = '';
-            await pushSystemNotification();
-            updateNotifyButtonUI();
-            showFlashMessage('Notification pinned');
-            return true;
-        }
-
-        async function disableSystemNotify() {
-            setNotifyEnabled(false);
-            _lastNotifyBody = '';
-            await hideSystemNotification();
-            updateNotifyButtonUI();
-            showFlashMessage('Notification removed');
-        }
-
-        function updateNotifyButtonUI() {
-            const btn = document.getElementById('notifyToggleBtn');
-            if (!btn) return;
-            const on = isNotifyEnabled() && ('Notification' in window) && Notification.permission === 'granted';
-            btn.classList.toggle('notify-on', on);
-            btn.textContent = on ? '🔔' : '🔕';
-            btn.title = on ? 'Notification pinned — tap to remove' : 'Pin persistent notification';
-        }
-
-        function initNotifyBanner() {
-            const btn = document.getElementById('notifyToggleBtn');
-            if (!btn) return;
-            updateNotifyButtonUI();
-            btn.addEventListener('click', async () => {
-                if (isNotifyEnabled() && Notification.permission === 'granted') {
-                    await disableSystemNotify();
-                } else {
-                    await enableSystemNotify();
-                }
-            });
-            // Re-pin on load if it was previously enabled
-            if (isNotifyEnabled() && ('Notification' in window) && Notification.permission === 'granted') {
-                navigator.serviceWorker.ready.then(() => pushSystemNotification()).catch(()=>{});
-            }
-            // Re-show when returning to app (Android may have dropped it)
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden && isNotifyEnabled()) pushSystemNotification();
-            });
-        }
     </script>
 </body>
 </html>
