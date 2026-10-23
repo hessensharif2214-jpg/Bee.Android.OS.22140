@@ -1,17 +1,21 @@
 {
-  "name": "Bee Project",
-  "short_name": "Bee",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#0c0c0a",
-  "theme_color": "#FFCC00",
-  "orientation": "portrait",
+  "short_name": "Bee Project",
+  "name": "Bee Project Payment Method",
   "icons": [
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCI+PHJlY3QgeD0iNiIgeT0iMTIiIHdpZHRoPSIzNiIgaGVpZ2h0PSIyNiIgcng9IjUiIHJ5PSI1IiBmaWxsPSIjRkZDQzAwIiBzdHJva2U9IiMxMTEiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik02IDE4IEw0MiAxOCIgc3Ryb2tlPSIjMTExIiBzdHJva2Utd2lkdGg9IjIiLz48cmVjdCB4PSIzMCIgeT0iMjIiIHdpZHRoPSIxMiIgaGVpZ2h0PSI4IiByeD0iMiIgcnk9IjIiIGZpbGw9IiMxMTEiLz48Y2lyY2xlIGN4PSIzNiIgY3k9IjI2IiByPSIyIiBmaWxsPSIjRkZDQzAwIi8+PC9zdmc+",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0c0c0a",
+  "theme_color": "#0c0c0a",
+  "display": "standalone",
+  "orientation": "portrait"
 }
