@@ -6,10 +6,6 @@
     <title>Bee Project · Multi-Select Move</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0c0c0a">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Bee Project">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;800;900&family=Almarai:wght@700;800&family=Baloo+Bhaijaan+2:wght@700;800&family=Cairo:wght@900&family=Changa:wght@800;900&family=El+Messiri:wght@700&family=IBM+Plex+Sans+Arabic:wght@700&family=Lalezar&family=Noto+Sans+Arabic:wght@800;900&family=Plus+Jakarta+Sans:wght@800&family=Readex+Pro:wght@700;800&family=Rubik:wght@800;900&family=Tajawal:wght@900&family=Vazirmatn:wght@900&display=swap" rel="stylesheet">
@@ -55,10 +51,31 @@
             --radius-md: 12px;
             --multi-select: #4da6ff;
             --multi-select-glow: rgba(77, 166, 255, 0.4);
-            --notif-bg: #0b2a4a;
-            --notif-accent: #4da6ff;
-            --notif-glow: rgba(77, 166, 255, 0.45);
         }
+
+        /* ===== PERMANENT IN-APP NOTIFICATION BAR ===== */
+        .system-notification-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #161612;
+            border-bottom: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 0.04em;
+            z-index: 99999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            pointer-events: none;
+        }
+
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -98,9 +115,10 @@
             background: #0d0d0b;
             object-fit: contain;
         }
+        /* ===== PREVIEW SIZE CONTROLS ===== */
         .preview-controls {
             position: absolute;
-            top: 8px;
+            top: 42px; /* Adjusted to clear the permanent notification bar */
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -1116,6 +1134,8 @@
             margin: 0;
             pointer-events: none;
         }
+
+        /* ===== MULTI-SELECT MODE STYLES ===== */
         .multi-select-mode-indicator {
             display: inline-flex;
             align-items: center;
@@ -1206,6 +1226,8 @@
         .multi-select-actions button.clear-all:active {
             background: rgba(239, 68, 68, 0.15);
         }
+
+        /* ===== ON-CANVAS MULTI-MOVE DPAD ===== */
         .multi-move-dpad {
             position: absolute;
             z-index: 300;
@@ -1322,6 +1344,8 @@
             color: #ef4444;
             transform: scale(0.9);
         }
+
+        /* Saved Data Pairs Panel */
         .saved-pairs-section {
             display: none;
             flex-direction: column;
@@ -1439,6 +1463,8 @@
             transform: scale(0.94);
             background: rgba(255, 204, 0, 0.3) !important;
         }
+
+        /* ===== SAVED PAIRS COUNTER BADGE ===== */
         .saved-pairs-count-badge {
             display: inline-flex;
             align-items: center;
@@ -1461,6 +1487,8 @@
             -webkit-user-select: none;
             flex: 0 0 auto;
         }
+
+        /* ===== SAVED PAIRS HIDE TOGGLE ===== */
         .saved-pairs-hide-btn {
             background: rgba(255, 204, 0, 0.10);
             border: 1px solid var(--accent);
@@ -1485,6 +1513,8 @@
         .saved-pairs-list.saved-pairs-collapsed {
             display: none;
         }
+
+        /* ===== LAYERS COLLAPSE TOGGLE ===== */
         .layers-header-row {
             display: flex;
             align-items: center;
@@ -1528,6 +1558,8 @@
         #layersList.layers-collapsed {
             display: none;
         }
+
+        /* ===== CLIPBOARD SECTION HIDE TOGGLE ===== */
         .clipboard-header-row {
             display: flex;
             align-items: center;
@@ -1558,237 +1590,13 @@
         .clipboard-panel.clipboard-collapsed {
             display: none;
         }
-        .notif-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(135deg, #0b2a4a 0%, #0d1f33 100%);
-            border-bottom: 2px solid var(--notif-accent);
-            box-shadow: 0 6px 28px rgba(11, 42, 74, 0.75), 0 0 22px rgba(77, 166, 255, 0.3);
-            z-index: 100000;
-            display: flex;
-            flex-direction: column;
-            transform: translateY(-120%);
-            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-            -webkit-tap-highlight-color: transparent;
-            pointer-events: none;
-        }
-        .notif-banner.visible {
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-        .notif-banner-inner {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            max-width: 100%;
-        }
-        .notif-icon {
-            width: 40px;
-            height: 40px;
-            flex: 0 0 auto;
-            border-radius: 10px;
-            background: rgba(77, 166, 255, 0.18);
-            border: 1.5px solid var(--notif-accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: var(--notif-accent);
-            box-shadow: 0 0 14px rgba(77, 166, 255, 0.35);
-        }
-        .notif-content {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .notif-title {
-            font-size: 0.82rem;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: 0.02em;
-            line-height: 1.2;
-        }
-        .notif-subtitle {
-            font-size: 0.68rem;
-            color: rgba(255, 255, 255, 0.55);
-            font-weight: 500;
-            letter-spacing: 0.01em;
-            line-height: 1.2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .notif-close {
-            width: 30px;
-            height: 30px;
-            flex: 0 0 auto;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 0;
-            min-height: auto;
-            -webkit-tap-highlight-color: transparent;
-            transition: background 0.15s, transform 0.12s;
-            line-height: 1;
-        }
-        .notif-close:active {
-            background: rgba(239, 68, 68, 0.25);
-            border-color: #ef4444;
-            color: #ef4444;
-            transform: scale(0.9);
-        }
-        .notif-input-row {
-            display: flex;
-            gap: 8px;
-            padding: 0 16px 12px 16px;
-            align-items: stretch;
-        }
-        .notif-input-row input {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(77, 166, 255, 0.4);
-            border-radius: 8px;
-            color: #ffffff;
-            padding: 10px 12px;
-            font-size: 0.82rem;
-            outline: none;
-            min-height: 38px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            -webkit-tap-highlight-color: transparent;
-            font-family: inherit;
-        }
-        .notif-input-row input:focus {
-            border-color: var(--notif-accent);
-            box-shadow: 0 0 0 3px rgba(77, 166, 255, 0.2);
-        }
-        .notif-input-row input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-        .notif-send-btn {
-            flex: 0 0 auto;
-            min-width: 70px;
-            height: 38px;
-            min-height: 38px;
-            background: var(--notif-accent);
-            border: none;
-            border-radius: 8px;
-            color: #0b2a4a;
-            font-size: 0.72rem;
-            font-weight: 900;
-            letter-spacing: 0.04em;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 0 14px;
-            -webkit-tap-highlight-color: transparent;
-            transition: background 0.15s, transform 0.12s;
-            line-height: 1;
-        }
-        .notif-send-btn:active {
-            background: #6db8ff;
-            transform: scale(0.94);
-        }
-        .notif-send-btn:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        .notif-text-display {
-            padding: 0 16px 12px 16px;
-            display: none;
-        }
-        .notif-text-display.visible {
-            display: block;
-        }
-        .notif-text-display-inner {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(77, 166, 255, 0.25);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.4;
-            max-height: 80px;
-            overflow-y: auto;
-            word-break: break-word;
-            direction: auto;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 0.3px;
-        }
-        .notif-text-display-inner .notif-empty-hint {
-            color: rgba(255, 255, 255, 0.3);
-            font-style: italic;
-            font-family: -apple-system, sans-serif;
-        }
-        .notif-permission-badge {
-            font-size: 0.55rem;
-            font-weight: 700;
-            padding: 1px 6px;
-            border-radius: 6px;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            flex: 0 0 auto;
-            margin-left: 4px;
-        }
-        .notif-permission-badge.granted {
-            background: rgba(92, 214, 92, 0.15);
-            color: #5cd65c;
-            border: 1px solid rgba(92, 214, 92, 0.35);
-        }
-        .notif-permission-badge.denied {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.35);
-        }
-        .notif-permission-badge.default {
-            background: rgba(255, 204, 0, 0.15);
-            color: var(--accent);
-            border: 1px solid rgba(255, 204, 0, 0.35);
-        }
-        @media (max-width: 380px) {
-            .notif-title { font-size: 0.72rem; }
-            .notif-subtitle { font-size: 0.62rem; }
-            .notif-input-row input { font-size: 0.75rem; padding: 8px 10px; }
-            .notif-send-btn { min-width: 58px; font-size: 0.65rem; padding: 0 10px; }
-        }
     </style>
 </head>
 <body>
 
-    <div class="notif-banner" id="notifBanner">
-        <div class="notif-banner-inner">
-            <div class="notif-icon">🔔</div>
-            <div class="notif-content">
-                <div class="notif-title">
-                    Bee Project
-                    <span class="notif-permission-badge default" id="notifPermBadge">…</span>
-                </div>
-                <div class="notif-subtitle" id="notifSubtitle">Type or paste text below — it will appear in A10 (Name)</div>
-            </div>
-            <button class="notif-close" id="notifCloseBtn" title="Dismiss banner">✕</button>
-        </div>
-        <div class="notif-input-row" id="notifInputRow">
-            <input type="text" id="notifTextInput" placeholder="Type or paste text for A10…" autocomplete="off" dir="auto">
-            <button class="notif-send-btn" id="notifSendBtn" title="Send to A10 Name layer">SEND →</button>
-        </div>
-        <div class="notif-text-display" id="notifTextDisplay">
-            <div class="notif-text-display-inner" id="notifTextDisplayInner">
-                <span class="notif-empty-hint">No text sent yet. Type above and press SEND.</span>
-            </div>
-        </div>
+    <!-- Permanent In-App Notification Bar -->
+    <div class="system-notification-bar">
+        <span>🔔 Secure Web Access · Active & Permanent</span>
     </div>
 
     <div id="workspace">
@@ -1888,6 +1696,7 @@
             <div class="empty-saved-msg" id="emptySavedMsg">No saved A8 yet. Use the heart on the canvas.</div>
         </div>
 
+        <!-- Saved Data Pairs Section -->
         <div class="section-card saved-pairs-section" id="savedPairsSection">
             <div class="saved-pairs-header">
                 <h3 style="display:flex;align-items:center;gap:0;">📦 Saved Data Pairs<span class="saved-pairs-count-badge" id="savedPairsCountBadge">0</span></h3>
@@ -2051,6 +1860,7 @@
                     </div>
                 </div>
 
+                <!-- Multi-select actions panel -->
                 <div class="multi-select-actions" id="multiSelectActionsPanel" style="display:none;">
                     <button id="multiSelectAllBtn" title="Select all layers">Select All Layers</button>
                     <button id="multiSelectClearBtn" class="clear-all" title="Clear all multi-selections">Clear Selection</button>
@@ -2093,6 +1903,7 @@
         <span class="dl-count-badge" id="dlCountValue">1</span>
     </div>
 
+    <!-- ON-CANVAS MULTI-MOVE DPAD (appears when multi-select active and >1 layer selected) -->
     <div class="multi-move-dpad" id="multiMoveDpad">
         <div class="dpad-inner">
             <div class="dpad-badge">MOVE ALL</div>
@@ -2114,332 +1925,9 @@
     </div>
 
     <script>
-        // ============================================================
-        // SERVICE WORKER REGISTRATION
-        // ============================================================
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('[SW] registered:', reg.scope))
-                    .catch(err => console.warn('[SW] registration failed:', err));
-            });
-        }
-
-        // ============================================================
-        // NOTIFICATION BANNER SYSTEM
-        // ============================================================
-        const notifBanner = document.getElementById('notifBanner');
-        const notifCloseBtn = document.getElementById('notifCloseBtn');
-        const notifTextInput = document.getElementById('notifTextInput');
-        const notifSendBtn = document.getElementById('notifSendBtn');
-        const notifTextDisplay = document.getElementById('notifTextDisplay');
-        const notifTextDisplayInner = document.getElementById('notifTextDisplayInner');
-        const notifSubtitle = document.getElementById('notifSubtitle');
-        const notifPermBadge = document.getElementById('notifPermBadge');
-
-        let notifBannerVisible = false;
-        let lastSentNotifText = '';
-        let notifDismissedThisForeground = false;
-
-        const NOTIF_STORAGE_KEY = 'bee72342368/notif_last_text';
-
-        function loadNotifLastText() {
-            try { return localStorage.getItem(NOTIF_STORAGE_KEY) || ''; } catch(e) { return ''; }
-        }
-        function saveNotifLastText(text) {
-            try { localStorage.setItem(NOTIF_STORAGE_KEY, text); } catch(e) {}
-        }
-
-        function updateNotifPermissionBadge() {
-            if (!notifPermBadge) return;
-            if (!('Notification' in window)) {
-                notifPermBadge.textContent = 'N/A';
-                notifPermBadge.className = 'notif-permission-badge denied';
-                return;
-            }
-            const p = Notification.permission;
-            notifPermBadge.textContent = p;
-            notifPermBadge.className = 'notif-permission-badge ' + (p === 'granted' ? 'granted' : p === 'denied' ? 'denied' : 'default');
-        }
-
-        function showNotifBanner() {
-            if (!notifBanner) return;
-            notifDismissedThisForeground = false;
-            notifBanner.classList.add('visible');
-            notifBannerVisible = true;
-            updateNotifPermissionBadge();
-            renderNotifTextDisplay();
-        }
-
-        function hideNotifBanner() {
-            if (!notifBanner) return;
-            notifBanner.classList.remove('visible');
-            notifBannerVisible = false;
-        }
-
-        function onAppBackground() {
-            notifDismissedThisForeground = false;
-        }
-
-        function onAppForeground() {
-            if (!notifDismissedThisForeground) {
-                showNotifBanner();
-            }
-            updateNotifPermissionBadge();
-        }
-
-        function renderNotifTextDisplay() {
-            if (!notifTextDisplayInner) return;
-            const txt = lastSentNotifText || loadNotifLastText();
-            if (!txt || !txt.trim()) {
-                notifTextDisplayInner.innerHTML = '<span class="notif-empty-hint">No text sent yet. Type above and press SEND.</span>';
-                return;
-            }
-            notifTextDisplayInner.textContent = txt;
-        }
-
-        async function requestNotificationPermission() {
-            if (!('Notification' in window)) return false;
-            if (Notification.permission === 'granted') return true;
-            if (Notification.permission === 'denied') return false;
-            try {
-                const result = await Notification.requestPermission();
-                updateNotifPermissionBadge();
-                return result === 'granted';
-            } catch(e) {
-                updateNotifPermissionBadge();
-                return false;
-            }
-        }
-
-        // Service-worker based notification — appears in phone's notification bar
-        async function sendNativeNotification(title, body) {
-            if (!('Notification' in window)) return;
-            if (Notification.permission !== 'granted') return;
-            try {
-                const reg = await navigator.serviceWorker.ready;
-                if (reg && reg.showNotification) {
-                    await reg.showNotification(title, {
-                        body: body,
-                        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCI+PHJlY3QgeD0iNiIgeT0iMTIiIHdpZHRoPSIzNiIgaGVpZ2h0PSIyNiIgcng9IjUiIHJ5PSI1IiBmaWxsPSIjRkZDQzAwIiBzdHJva2U9IiMxMTEiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik02IDE4IEw0MiAxOCIgc3Ryb2tlPSIjMTExIiBzdHJva2Utd2lkdGg9IjIiLz48cmVjdCB4PSIzMCIgeT0iMjIiIHdpZHRoPSIxMiIgaGVpZ2h0PSI4IiByeD0iMiIgcnk9IjIiIGZpbGw9IiMxMTEiLz48Y2lyY2xlIGN4PSIzNiIgY3k9IjI2IiByPSIyIiBmaWxsPSIjRkZDQzAwIi8+PC9zdmc+',
-                        badge: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCI+PHJlY3QgeD0iNiIgeT0iMTIiIHdpZHRoPSIzNiIgaGVpZ2h0PSIyNiIgcng9IjUiIHJ5PSI1IiBmaWxsPSIjRkZDQzAwIiBzdHJva2U9IiMxMTEiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==',
-                        tag: 'bee-project',
-                        renotify: true,
-                        requireInteraction: false,
-                        vibrate: [100, 60, 150]
-                    });
-                } else {
-                    new Notification(title, { body: body });
-                }
-            } catch(e) { console.warn('Notification failed:', e); }
-        }
-
-        function handleNotifSend() {
-            const val = (notifTextInput.value || '').trim();
-            if (!val) {
-                notifSubtitle.textContent = '⚠ Type something first!';
-                notifTextInput.focus();
-                setTimeout(() => {
-                    notifSubtitle.textContent = 'Type or paste text below — it will appear in A10 (Name)';
-                }, 2000);
-                return;
-            }
-
-            lastSentNotifText = val;
-            saveNotifLastText(val);
-            renderNotifTextDisplay();
-            notifTextDisplay.classList.add('visible');
-
-            notifSubtitle.textContent = '✓ Sending to A10 (Name)…';
-            notifSendBtn.disabled = true;
-
-            setTimeout(() => {
-                try {
-                    const a10Layer = project.layers[9];
-                    if (a10Layer) {
-                        a10Layer.text = val;
-                        a10Layer.isInput = true;
-                        delete a10Layer.formula;
-                        delete a10Layer.isFormula;
-                        const a10El = document.getElementById(a10Layer.id);
-                        if (a10El) {
-                            a10El.innerText = val;
-                            a10El.style.transition = 'box-shadow 0.3s';
-                            a10El.style.boxShadow = '0 0 22px rgba(77,166,255,0.9)';
-                            setTimeout(() => { a10El.style.boxShadow = ''; }, 1000);
-                        }
-                        if (selectedLayerId === a10Layer.id) {
-                            const inp = document.getElementById('layerText');
-                            if (inp) inp.value = val;
-                        }
-                        addNameToMemory(val);
-                        updateAllFormulas();
-                        updateLayersList();
-                        saveProject();
-                        notifSubtitle.textContent = '✓ Sent to A10: ' + (val.length > 30 ? val.slice(0, 30) + '…' : val);
-                        showFlashMessage('Notification text → A10');
-                        vibrateStrong();
-                        sendNativeNotification('Bee Project — Text Sent', val.length > 120 ? val.slice(0, 120) + '…' : val);
-                    } else {
-                        notifSubtitle.textContent = '⚠ A10 layer not found';
-                    }
-                } catch(err) {
-                    console.error('Notif send error:', err);
-                    notifSubtitle.textContent = '⚠ Error sending text';
-                } finally {
-                    notifSendBtn.disabled = false;
-                }
-            }, 150);
-
-            notifTextInput.value = '';
-        }
-
-        function setupNotificationBanner() {
-            updateNotifPermissionBadge();
-
-            const requestPermOnce = async () => {
-                if (!('Notification' in window)) return;
-                if (Notification.permission === 'default') {
-                    await requestNotificationPermission();
-                }
-            };
-
-            const AWAY_GAP_MS = 800;
-            let lastTick = Date.now();
-            let lastRAF = performance.now();
-            let lastInteraction = Date.now();
-            let wasAway = false;
-
-            function detectReturn(reason) {
-                const now = Date.now();
-                const clockGap = now - lastTick;
-                const rafGap = performance.now() - lastRAF;
-                lastTick = now;
-                lastRAF = performance.now();
-                const suspended = clockGap > AWAY_GAP_MS || rafGap > AWAY_GAP_MS * 1.5;
-                if (suspended || document.visibilityState === 'visible') {
-                    if (wasAway || suspended) {
-                        wasAway = false;
-                        onAppForeground();
-                        requestPermOnce();
-                    }
-                }
-            }
-
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) {
-                    wasAway = true;
-                    lastTick = Date.now();
-                    lastRAF = performance.now();
-                    onAppBackground();
-                } else {
-                    detectReturn('visibilitychange');
-                }
-            });
-
-            window.addEventListener('pagehide', () => {
-                wasAway = true;
-                lastTick = Date.now();
-                onAppBackground();
-            });
-            window.addEventListener('pageshow', () => {
-                detectReturn('pageshow');
-            });
-
-            window.addEventListener('blur', () => {
-                wasAway = true;
-                lastTick = Date.now();
-                lastRAF = performance.now();
-                onAppBackground();
-            });
-            window.addEventListener('focus', () => {
-                detectReturn('focus');
-            });
-
-            let rafWatchdogActive = true;
-            function rafLoop(ts) {
-                if (!rafWatchdogActive) return;
-                const gap = ts - lastRAF;
-                lastRAF = ts;
-                if (gap > AWAY_GAP_MS * 1.5) {
-                    detectReturn('raf-watchdog');
-                }
-                requestAnimationFrame(rafLoop);
-            }
-            requestAnimationFrame(rafLoop);
-
-            setInterval(() => {
-                const now = Date.now();
-                const gap = now - lastTick;
-                lastTick = now;
-                if (gap > AWAY_GAP_MS) {
-                    detectReturn('poll');
-                }
-            }, 300);
-
-            const interactionEvents = ['pointerdown','touchstart','mousedown','keydown','click'];
-            const interactionHandler = () => {
-                const now = Date.now();
-                const gap = now - lastInteraction;
-                lastInteraction = now;
-                if (gap > AWAY_GAP_MS) {
-                    detectReturn('interaction');
-                }
-            };
-            interactionEvents.forEach(evt => {
-                document.addEventListener(evt, interactionHandler, { passive: true, capture: true });
-            });
-
-            document.addEventListener('resume', () => detectReturn('resume'));
-            document.addEventListener('appresume', () => detectReturn('appresume'));
-
-            setTimeout(() => {
-                onAppForeground();
-                requestPermOnce();
-            }, 400);
-
-            notifCloseBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                notifDismissedThisForeground = true;
-                hideNotifBanner();
-            });
-
-            notifSendBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                handleNotifSend();
-            });
-
-            notifTextInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') { e.preventDefault(); handleNotifSend(); }
-            });
-
-            notifTextInput.addEventListener('paste', () => {
-                setTimeout(() => {
-                    const val = (notifTextInput.value || '').trim();
-                    if (val && val.length > 0) {
-                        notifSubtitle.textContent = 'Pasted: ' + (val.length > 40 ? val.slice(0, 40) + '…' : val) + ' — press SEND';
-                    }
-                }, 30);
-            });
-
-            notifBanner.addEventListener('click', (e) => {
-                if (e.target === notifBanner || e.target.classList.contains('notif-banner-inner') ||
-                    e.target.classList.contains('notif-content') || e.target.classList.contains('notif-title') ||
-                    e.target.classList.contains('notif-subtitle')) {
-                    notifTextInput.focus();
-                }
-            });
-
-            const storedText = loadNotifLastText();
-            if (storedText) {
-                lastSentNotifText = storedText;
-                renderNotifTextDisplay();
-                notifTextDisplay.classList.add('visible');
-                if (!notifTextInput.value) {
-                    notifTextInput.value = storedText.length > 80 ? storedText.slice(0, 80) : storedText;
-                }
-            }
-        }
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false });
+        const container = document.getElementById('canvasContainer');
 
         // ========== ARABIC NUMERAL CONVERSION ==========
         function convertArabicNumerals(str) {
@@ -2449,9 +1937,12 @@
                 .replace(/[\u06F0-\u06F9]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x06F0 + 48));
         }
 
-        // ========== SAVED DATA PAIRS ==========
+        // ========== SAVED DATA PAIRS (A8 -> {A10, A9, A3, A4}) ==========
         const SAVED_PAIRS_STORAGE_KEY = 'bee72342368/saved_data_pairs_v1';
-        const DEFAULT_SAVED_PAIRS = {};
+
+        const DEFAULT_SAVED_PAIRS = {
+            // Add your entries here — they will travel with the HTML file.
+        };
 
         function loadSavedDataPairs() {
             try {
@@ -2459,19 +1950,25 @@
                 return raw ? JSON.parse(raw) : {};
             } catch(e) { return {}; }
         }
+
         function saveSavedDataPairs(obj) {
             try { localStorage.setItem(SAVED_PAIRS_STORAGE_KEY, JSON.stringify(obj)); } catch(e) {}
         }
+
         function mergeDefaultPairs() {
             if (!DEFAULT_SAVED_PAIRS || Object.keys(DEFAULT_SAVED_PAIRS).length === 0) return;
             const current = loadSavedDataPairs();
             let changed = false;
             for (const a8 in DEFAULT_SAVED_PAIRS) {
-                if (!(a8 in current)) { current[a8] = DEFAULT_SAVED_PAIRS[a8]; changed = true; }
+                if (!(a8 in current)) {
+                    current[a8] = DEFAULT_SAVED_PAIRS[a8];
+                    changed = true;
+                }
             }
             if (changed) saveSavedDataPairs(current);
         }
 
+        // Find layer by role (A3/A4/A8/A9/A10) using fixed indices.
         function findLayerByRole(role) {
             const roleToIndex = { 'A3': 2, 'A4': 3, 'A8': 7, 'A9': 8, 'A10': 9 };
             const idx = roleToIndex[role];
@@ -2488,16 +1985,32 @@
                 const l = findLayerByRole(role);
                 return l ? (parseFormula(l.text) || '').toString().trim() : '';
             };
-            return { a8: a8Val, a10: grab('A10'), a9: grab('A9'), a3: grab('A3'), a4: grab('A4') };
+            return {
+                a8: a8Val,
+                a10: grab('A10'),
+                a9:  grab('A9'),
+                a3:  grab('A3'),
+                a4:  grab('A4')
+            };
         }
 
         function saveCurrentDataPair() {
             const pair = captureCurrentLayerInputs();
-            if (!pair) { showFlashMessage('⚠ No A8 value — nothing saved'); return false; }
+            if (!pair) {
+                showFlashMessage('⚠ No A8 value — nothing saved');
+                return false;
+            }
             const saved = loadSavedDataPairs();
-            saved[pair.a8] = { a10: pair.a10, a9: pair.a9, a3: pair.a3, a4: pair.a4, savedAt: Date.now() };
+            saved[pair.a8] = {
+                a10: pair.a10,
+                a9: pair.a9,
+                a3: pair.a3,
+                a4: pair.a4,
+                savedAt: Date.now()
+            };
             saveSavedDataPairs(saved);
             renderSavedPairsList();
+            console.log('Saved pair:', pair);
             return true;
         }
 
@@ -2510,6 +2023,7 @@
             const setByRole = (role, value) => {
                 const layer = findLayerByRole(role);
                 if (!layer) return;
+                // Always set — even empty string clears stale data
                 const str = (value === undefined || value === null) ? '' : String(value);
                 layer.text = str;
                 layer.isInput = true;
@@ -2529,11 +2043,14 @@
             setByRole('A3',  pair.a3);
             setByRole('A4',  pair.a4);
 
+            // Force-refresh A3 innerText (bypass any formula parsing edge cases)
             const a3L = findLayerByRole('A3');
             if (a3L) {
                 const a3Str = (pair.a3 === undefined || pair.a3 === null) ? '' : String(pair.a3);
-                a3L.text = a3Str; a3L.isInput = true;
-                delete a3L.formula; delete a3L.isFormula;
+                a3L.text = a3Str;
+                a3L.isInput = true;
+                delete a3L.formula;
+                delete a3L.isFormula;
                 const a3El = document.getElementById(a3L.id);
                 if (a3El) a3El.innerText = a3Str;
             }
@@ -2551,6 +2068,7 @@
             saveProject();
             applyA4Rule();
             applyA9Shine();
+
             showFlashMessage('Loaded saved data for A8');
             return true;
         }
@@ -2564,6 +2082,7 @@
 
             const saved = loadSavedDataPairs();
             const keys = Object.keys(saved).sort((a, b) => (saved[b].savedAt || 0) - (saved[a].savedAt || 0));
+
             if (countBadge) countBadge.textContent = String(keys.length);
 
             if (keys.length === 0) {
@@ -2599,9 +2118,17 @@
                         <button class="remove-btn" title="Remove">✕</button>
                     </div>
                 `;
-                itemEl.querySelector('.pair-a8').addEventListener('click', () => applySavedDataPair(a8));
-                itemEl.querySelector('.load-btn').addEventListener('click', (e) => { e.stopPropagation(); applySavedDataPair(a8); });
-                itemEl.querySelector('.copy-btn').addEventListener('click', (e) => { e.stopPropagation(); copyA8ToClipboard(a8); });
+                itemEl.querySelector('.pair-a8').addEventListener('click', () => {
+                    applySavedDataPair(a8);
+                });
+                itemEl.querySelector('.load-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    applySavedDataPair(a8);
+                });
+                itemEl.querySelector('.copy-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    copyA8ToClipboard(a8);
+                });
                 itemEl.querySelector('.remove-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
                     const confirmed = window.confirm('Delete saved data pair for A8: ' + a8 + '?');
@@ -2616,6 +2143,7 @@
             });
         }
 
+        // ========== EXPORT / IMPORT / BAKE PAIRS ==========
         function exportSavedPairs() {
             const data = localStorage.getItem(SAVED_PAIRS_STORAGE_KEY) || '{}';
             const blob = new Blob([data], { type: 'application/json' });
@@ -2653,10 +2181,7 @@
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.json,application/json';
-            input.onchange = (e) => {
-                importSavedPairsFromFile(e.target.files[0]);
-                input.value = '';
-            };
+            input.onchange = (e) => importSavedPairsFromFile(e.target.files[0]);
             input.click();
         }
 
@@ -2664,15 +2189,23 @@
             try {
                 const pairs = loadSavedDataPairs();
                 const pairCount = Object.keys(pairs).length;
-                if (pairCount === 0) { showFlashMessage('No pairs to bake — save some first'); return; }
+                if (pairCount === 0) {
+                    showFlashMessage('No pairs to bake — save some first');
+                    return;
+                }
 
                 const response = await fetch(window.location.href);
                 let htmlSource = await response.text();
+
                 const pairsLiteral = JSON.stringify(pairs, null, 4);
 
                 const regex = /const DEFAULT_SAVED_PAIRS\s*=\s*\{[\s\S]*?\};/;
                 const replacement = `const DEFAULT_SAVED_PAIRS = ${pairsLiteral};`;
-                if (!regex.test(htmlSource)) { showFlashMessage('Could not locate DEFAULT_SAVED_PAIRS in source'); return; }
+                if (!regex.test(htmlSource)) {
+                    showFlashMessage('Could not locate DEFAULT_SAVED_PAIRS in source');
+                    console.error('regex miss — source did not contain the block');
+                    return;
+                }
                 htmlSource = htmlSource.replace(regex, replacement);
 
                 const blob = new Blob([htmlSource], { type: 'text/html' });
@@ -2681,6 +2214,7 @@
                 a.download = 'bee-shared.html';
                 a.click();
                 URL.revokeObjectURL(a.href);
+
                 showFlashMessage('Baked ' + pairCount + ' pairs → bee-shared.html');
                 vibrateOnDownload();
                 playNotificationSound();
@@ -2706,7 +2240,10 @@
                 indicator.style.display = 'inline-flex';
                 indicator.classList.add('active');
                 actionsPanel.style.display = 'flex';
-                if (selectedLayerId) { multiSelectedIds.add(selectedLayerId); updateMultiSelectVisuals(); }
+                if (selectedLayerId) {
+                    multiSelectedIds.add(selectedLayerId);
+                    updateMultiSelectVisuals();
+                }
             } else {
                 btn.classList.remove('active');
                 indicator.style.display = 'none';
@@ -2721,21 +2258,30 @@
 
         function updateMultiSelectVisuals() {
             document.querySelectorAll('.text-layer').forEach(el => {
-                if (multiSelectedIds.has(el.id)) el.classList.add('multi-selected');
-                else el.classList.remove('multi-selected');
+                if (multiSelectedIds.has(el.id)) {
+                    el.classList.add('multi-selected');
+                } else {
+                    el.classList.remove('multi-selected');
+                }
             });
             document.querySelectorAll('.layer-item').forEach(item => {
                 const id = item.dataset.layerId;
-                if (id && multiSelectedIds.has(id)) item.classList.add('multi-selected');
-                else item.classList.remove('multi-selected');
+                if (id && multiSelectedIds.has(id)) {
+                    item.classList.add('multi-selected');
+                } else {
+                    item.classList.remove('multi-selected');
+                }
             });
             updateDpadVisibility();
         }
 
         function toggleMultiSelectLayer(id) {
             if (!multiSelectMode) return;
-            if (multiSelectedIds.has(id)) multiSelectedIds.delete(id);
-            else multiSelectedIds.add(id);
+            if (multiSelectedIds.has(id)) {
+                multiSelectedIds.delete(id);
+            } else {
+                multiSelectedIds.add(id);
+            }
             if (multiSelectedIds.size < 2) dpadHiddenByUser = false;
             updateMultiSelectVisuals();
             updateLayersList();
@@ -2743,7 +2289,9 @@
 
         function selectAllLayersForMulti() {
             multiSelectedIds.clear();
-            project.layers.forEach(layer => multiSelectedIds.add(layer.id));
+            project.layers.forEach(layer => {
+                multiSelectedIds.add(layer.id);
+            });
             dpadHiddenByUser = false;
             updateMultiSelectVisuals();
             updateLayersList();
@@ -2756,6 +2304,7 @@
             updateLayersList();
         }
 
+        // ========== ON-CANVAS MULTI-MOVE DPAD ==========
         function updateDpadVisibility() {
             const dpad = document.getElementById('multiMoveDpad');
             if (!dpad) return;
@@ -2773,27 +2322,39 @@
         function positionMultiMoveDpad() {
             const dpad = document.getElementById('multiMoveDpad');
             if (!dpad || !dpad.classList.contains('visible')) return;
+
             let sumX = 0, sumY = 0, count = 0;
             multiSelectedIds.forEach(id => {
                 const layer = project.layers.find(l => l.id === id);
                 if (!layer) return;
-                sumX += backgroundVisible ? layer.x : layer.hiddenX;
-                sumY += backgroundVisible ? layer.y : layer.hiddenY;
+                const px = backgroundVisible ? layer.x : layer.hiddenX;
+                const py = backgroundVisible ? layer.y : layer.hiddenY;
+                sumX += px;
+                sumY += py;
                 count++;
             });
             if (count === 0) return;
-            const avgX = sumX / count, avgY = sumY / count;
+            const avgX = sumX / count;
+            const avgY = sumY / count;
+
             const scale = getScale();
             const dpadSize = 132;
-            const dpadW = dpadSize * scale, dpadH = dpadSize * scale;
+            const dpadW = dpadSize * scale;
+            const dpadH = dpadSize * scale;
+
             let leftPx = avgX * scale - dpadW / 2;
             let topPx = avgY * scale - dpadH - (20 * scale);
-            const containerW = canvas.clientWidth || 0, containerH = canvas.clientHeight || 0;
-            if (containerW > 0) leftPx = Math.max(4, Math.min(leftPx, containerW - dpadW - 4));
+
+            const containerW = canvas.clientWidth || 0;
+            const containerH = canvas.clientHeight || 0;
+            if (containerW > 0) {
+                leftPx = Math.max(4, Math.min(leftPx, containerW - dpadW - 4));
+            }
             if (containerH > 0) {
                 if (topPx < 4) topPx = avgY * scale + (30 * scale);
                 if (topPx + dpadH > containerH) topPx = Math.max(4, containerH - dpadH - 4);
             }
+
             dpad.style.left = leftPx + 'px';
             dpad.style.top = topPx + 'px';
         }
@@ -2804,10 +2365,18 @@
             multiSelectedIds.forEach(id => {
                 const layer = project.layers.find(l => l.id === id);
                 if (!layer) return;
-                if (backgroundVisible) { layer.x += dx * stepMultiplier; layer.y += dy * stepMultiplier; }
-                else { layer.hiddenX += dx * stepMultiplier; layer.hiddenY += dy * stepMultiplier; }
+                if (backgroundVisible) {
+                    layer.x += dx * stepMultiplier;
+                    layer.y += dy * stepMultiplier;
+                } else {
+                    layer.hiddenX += dx * stepMultiplier;
+                    layer.hiddenY += dy * stepMultiplier;
+                }
                 const el = document.getElementById(id);
-                if (el) positionElement(el, backgroundVisible ? layer.x : layer.hiddenX, backgroundVisible ? layer.y : layer.hiddenY);
+                if (el) {
+                    positionElement(el, backgroundVisible ? layer.x : layer.hiddenX,
+                                          backgroundVisible ? layer.y : layer.hiddenY);
+                }
             });
             saveProject();
             updateTotalLabel();
@@ -2817,20 +2386,30 @@
         const DPAD_NUDGE_INITIAL_DELAY = 320;
         const DPAD_NUDGE_REPEAT_INTERVAL = 55;
         const dpadHoldState = { timer: null, interval: null, btn: null, dir: null, active: false };
-        const DPAD_DIRS = { up: {dx:0,dy:-1}, down: {dx:0,dy:1}, left: {dx:-1,dy:0}, right: {dx:1,dy:0} };
+
+        const DPAD_DIRS = {
+            up:    { dx: 0,  dy: -1 },
+            down:  { dx: 0,  dy:  1 },
+            left:  { dx: -1, dy:  0 },
+            right: { dx: 1,  dy:  0 }
+        };
 
         function stopDpadHold() {
             if (dpadHoldState.timer) { clearTimeout(dpadHoldState.timer); dpadHoldState.timer = null; }
             if (dpadHoldState.interval) { clearInterval(dpadHoldState.interval); dpadHoldState.interval = null; }
             if (dpadHoldState.btn) dpadHoldState.btn.classList.remove('holding');
-            dpadHoldState.btn = null; dpadHoldState.dir = null; dpadHoldState.active = false;
+            dpadHoldState.btn = null;
+            dpadHoldState.dir = null;
+            dpadHoldState.active = false;
         }
 
         function beginDpadHold(btn, dir) {
             stopDpadHold();
             const d = DPAD_DIRS[dir];
             if (!d) return;
-            dpadHoldState.btn = btn; dpadHoldState.dir = dir; dpadHoldState.active = true;
+            dpadHoldState.btn = btn;
+            dpadHoldState.dir = dir;
+            dpadHoldState.active = true;
             btn.classList.add('holding');
             moveSelectedBy(d.dx, d.dy);
             dpadHoldState.timer = setTimeout(() => {
@@ -2851,7 +2430,7 @@
             btn.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
-        // ========== PREVIEW ZOOM ==========
+        // ========== PREVIEW ZOOM STATE ==========
         let previewZoom = 1.0;
         let _fitScale = 1;
         let _renderScale = 1;
@@ -2866,8 +2445,12 @@
             const padB = parseFloat(style.paddingBottom) || 0;
             const maxW = ws.clientWidth - padL - padR;
             const maxH = ws.clientHeight - padT - padB;
-            if (!canvas.width || !canvas.height || maxW <= 0 || maxH <= 0) { _fitScale = 1; return; }
-            _fitScale = Math.max(0.02, Math.min(maxW / canvas.width, maxH / canvas.height));
+            if (!canvas.width || !canvas.height || maxW <= 0 || maxH <= 0) {
+                _fitScale = 1;
+                return;
+            }
+            const s = Math.min(maxW / canvas.width, maxH / canvas.height);
+            _fitScale = Math.max(0.02, s);
         }
 
         function applyPreviewZoom() {
@@ -2878,8 +2461,11 @@
             canvas.style.height = cssH + 'px';
             container.style.width = cssW + 'px';
             container.style.height = cssH + 'px';
+
             _renderScale = cssW / canvas.width;
+
             repositionAllOverlays();
+
             const label = document.getElementById('previewZoomLabel');
             if (label) label.textContent = Math.round(previewZoom * 100) + '%';
         }
@@ -2905,7 +2491,11 @@
             if (!canvas.width) return 1;
             return (canvas.clientWidth || 1) / canvas.width;
         }
-        function getScaledSize(size) { return size * getScale(); }
+
+        function getScaledSize(size) {
+            return size * getScale();
+        }
+
         function positionElement(el, x, y) {
             const scale = getScale();
             el.style.transform = `translate3d(${x * scale}px, ${y * scale}px, 0)`;
@@ -2921,45 +2511,76 @@
                 }
                 if (_audioCtx.state === 'suspended') _audioCtx.resume();
                 const now = _audioCtx.currentTime;
-                [{f:880,s:0,d:0.35},{f:1108.73,s:0.35,d:0.35},{f:1318.51,s:0.70,d:0.60}].forEach(n => {
-                    const osc = _audioCtx.createOscillator(); const gain = _audioCtx.createGain();
-                    osc.type = 'sine'; osc.frequency.value = n.f;
-                    const t0 = now + n.s, t1 = t0 + n.d;
+                const notes = [
+                    { freq: 880.00,  start: 0.00, dur: 0.35 },
+                    { freq: 1108.73, start: 0.35, dur: 0.35 },
+                    { freq: 1318.51, start: 0.70, dur: 0.60 }
+                ];
+                notes.forEach(n => {
+                    const osc = _audioCtx.createOscillator();
+                    const gain = _audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = n.freq;
+                    const t0 = now + n.start;
+                    const t1 = t0 + n.dur;
                     gain.gain.setValueAtTime(0, t0);
                     gain.gain.linearRampToValueAtTime(0.22, t0 + 0.03);
                     gain.gain.exponentialRampToValueAtTime(0.0001, t1);
-                    osc.connect(gain); gain.connect(_audioCtx.destination);
-                    osc.start(t0); osc.stop(t1 + 0.03);
+                    osc.connect(gain);
+                    gain.connect(_audioCtx.destination);
+                    osc.start(t0);
+                    osc.stop(t1 + 0.03);
                 });
-            } catch (e) { console.warn('Notification sound failed:', e); }
+            } catch (e) {
+                console.warn('Notification sound failed:', e);
+            }
         }
 
         function vibrateOnDownload() {
-            try { if (navigator && typeof navigator.vibrate === 'function') navigator.vibrate([100,60,150,60,250]); } catch(e) {}
+            try {
+                if (navigator && typeof navigator.vibrate === 'function') {
+                    navigator.vibrate([100, 60, 150, 60, 250]);
+                }
+            } catch(e) { }
         }
+
         function vibrateStrong() {
-            try { if (navigator && typeof navigator.vibrate === 'function') navigator.vibrate([80,40,80]); } catch(e) {}
+            try {
+                if (navigator && typeof navigator.vibrate === 'function') {
+                    navigator.vibrate([80, 40, 80]);
+                }
+            } catch(e) {}
         }
 
         const DL_COUNT_STORAGE_KEY = 'bee72342368/dl_count_per_a8';
+
         function loadDownloadCounts() {
-            try { const raw = localStorage.getItem(DL_COUNT_STORAGE_KEY); return raw ? JSON.parse(raw) : {}; } catch(e) { return {}; }
+            try {
+                const raw = localStorage.getItem(DL_COUNT_STORAGE_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch(e) { return {}; }
         }
+
         function saveDownloadCounts(obj) {
             try { localStorage.setItem(DL_COUNT_STORAGE_KEY, JSON.stringify(obj)); } catch(e) {}
         }
+
         function getCurrentA8Value() {
             const a8Layer = project.layers[7];
             if (!a8Layer) return null;
             const raw = (parseFormula(a8Layer.text) || '').toString().trim();
-            return raw || null;
+            if (!raw) return null;
+            return raw;
         }
+
         function getCurrentA3Value() {
             const a3Layer = project.layers[2];
             if (!a3Layer) return null;
             const raw = (parseFormula(a3Layer.text) || '').toString().trim();
-            return raw || null;
+            if (!raw) return null;
+            return raw;
         }
+
         function bumpDownloadCountForA8() {
             const a8Val = getCurrentA8Value();
             if (!a8Val) return null;
@@ -2979,18 +2600,31 @@
             val.textContent = String(count);
             el.classList.add('show');
             clearTimeout(_dlToastTimer);
-            _dlToastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+            _dlToastTimer = setTimeout(() => {
+                el.classList.remove('show');
+            }, 2500);
         }
 
         const SAVED_A8_STORAGE_KEY = 'bee72342368/saved_a8_values';
+
         function loadSavedA8Values() {
-            try { const raw = localStorage.getItem(SAVED_A8_STORAGE_KEY); return raw ? JSON.parse(raw) : []; } catch(e) { return []; }
+            try {
+                const raw = localStorage.getItem(SAVED_A8_STORAGE_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch(e) { return []; }
         }
+
         function saveSavedA8Values(arr) {
             try { localStorage.setItem(SAVED_A8_STORAGE_KEY, JSON.stringify(arr)); } catch(e) {}
         }
+
         function escapeHtml(str) {
-            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         function renderSavedA8List() {
@@ -2998,6 +2632,7 @@
             const emptyMsg = document.getElementById('emptySavedMsg');
             const section = document.getElementById('savedA8Section');
             if (!listEl) return;
+
             const saved = loadSavedA8Values();
             if (saved.length === 0) {
                 listEl.innerHTML = '';
@@ -3007,12 +2642,17 @@
             }
             if (emptyMsg) emptyMsg.style.display = 'none';
             if (section) section.classList.add('visible');
+
             listEl.innerHTML = '';
             saved.forEach((item, index) => {
                 const itemEl = document.createElement('div');
                 itemEl.className = 'saved-a8-item';
                 itemEl.dataset.index = index;
-                const a3Text = (item.a3 !== undefined && item.a3 !== null && String(item.a3).trim() !== '') ? String(item.a3) : '—';
+
+                const a3Text = (item.a3 !== undefined && item.a3 !== null && String(item.a3).trim() !== '')
+                    ? String(item.a3)
+                    : '—';
+
                 itemEl.innerHTML = `
                     <div class="a8-value-col">
                         <span class="a8-value" title="Tap to copy">${escapeHtml(item.value)}</span>
@@ -3023,8 +2663,13 @@
                         <button class="remove-btn" title="Remove">✕</button>
                     </div>
                 `;
-                itemEl.querySelector('.a8-value').addEventListener('click', () => copyA8ToClipboard(item.value));
-                itemEl.querySelector('.copy-btn').addEventListener('click', (e) => { e.stopPropagation(); copyA8ToClipboard(item.value); });
+                itemEl.querySelector('.a8-value').addEventListener('click', () => {
+                    copyA8ToClipboard(item.value);
+                });
+                itemEl.querySelector('.copy-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    copyA8ToClipboard(item.value);
+                });
                 itemEl.querySelector('.remove-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
                     const confirmed = window.confirm('Delete this saved A8 entry?\n\n' + item.value + (a3Text !== '—' ? '\nA3: ' + a3Text : ''));
@@ -3041,14 +2686,24 @@
 
         function copyA8ToClipboard(text) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => showFlashMessage('A8 copied')).catch(() => {
-                    const ta = document.createElement('textarea'); ta.value = text;
-                    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+                navigator.clipboard.writeText(text).then(() => {
+                    showFlashMessage('A8 copied');
+                }).catch(() => {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    ta.remove();
                     showFlashMessage('A8 copied');
                 });
             } else {
-                const ta = document.createElement('textarea'); ta.value = text;
-                document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
                 showFlashMessage('A8 copied');
             }
         }
@@ -3059,7 +2714,10 @@
             if (!clean) return;
             const cleanA3 = (a3Value !== undefined && a3Value !== null) ? String(a3Value).trim() : '';
             const saved = loadSavedA8Values();
-            if (saved.some(item => item.value === clean)) { showFlashMessage('Already saved'); return; }
+            if (saved.some(item => item.value === clean)) {
+                showFlashMessage('Already saved');
+                return;
+            }
             saved.unshift({ value: clean, a3: cleanA3 });
             saveSavedA8Values(saved);
             renderSavedA8List();
@@ -3073,6 +2731,7 @@
             const a9Layer = project.layers[8];
             const a3Layer = project.layers[2];
             const a4Layer = project.layers[3];
+
             if (!a9Layer || !a3Layer || !a4Layer) return false;
 
             const a9Text = (parseFormula(a9Layer.text) || '').toString().trim();
@@ -3083,22 +2742,26 @@
             if (isNaN(a3Num)) return false;
 
             let a4Value = null;
+
             if (a9Text === A9_TARGET_VALUE_1) {
                 if (a3Num < 1000) a4Value = '9';
                 else if (a3Num < 2000) a4Value = '13';
                 else if (a3Num < 5000) a4Value = '22';
                 else if (a3Num < 10000) a4Value = '26';
-                else a4Value = '42';
+                else a4Value = '42'; // > 10000 for بدايتي
             } else if (a9Text === A9_TARGET_VALUE_2) {
                 if (a3Num < 1000) a4Value = '13';
                 else if (a3Num < 2000) a4Value = '20';
                 else if (a3Num < 5000) a4Value = '26';
                 else if (a3Num < 10000) a4Value = '32';
-                else a4Value = '52';
-            } else return false;
+                else a4Value = '52'; // > 10000 for تمويلي
+            } else {
+                return false;
+            }
 
             if (a4Value === null) return false;
             if (a4Layer.text === a4Value) return false;
+
             a4Layer.text = a4Value;
             a4Layer.isInput = true;
             const a4El = document.getElementById(a4Layer.id);
@@ -3120,8 +2783,11 @@
             if (!a9Layer) return;
             const a9El = document.getElementById(a9Layer.id);
             if (!a9El) return;
-            if (backgroundVisible) a9El.classList.add('a9-shine');
-            else a9El.classList.remove('a9-shine');
+            if (backgroundVisible) {
+                a9El.classList.add('a9-shine');
+            } else {
+                a9El.classList.remove('a9-shine');
+            }
         }
 
         let maskRulerY = null;
@@ -3135,17 +2801,25 @@
             ruler.id = 'maskRuler';
             ruler.className = 'mask-ruler';
             ruler.innerHTML = '<div class="mask-ruler-grip"><span></span><span></span><span></span></div>';
+
             const rotateCenter = document.createElement('button');
             rotateCenter.className = 'mask-rotate-center';
             rotateCenter.innerHTML = '↻';
             rotateCenter.title = 'Rotate 180°';
-            rotateCenter.addEventListener('mousedown', (e) => e.stopPropagation());
-            rotateCenter.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
-            rotateCenter.addEventListener('click', (e) => { e.stopPropagation(); rotateMask(180); });
+            rotateCenter.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+            rotateCenter.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
+            rotateCenter.addEventListener('click', (e) => {
+                e.stopPropagation();
+                rotateMask(180);
+            });
             ruler.appendChild(rotateCenter);
+
             container.appendChild(ruler);
             attachMaskRulerDrag(ruler);
-            if (maskRulerY == null) maskRulerY = Math.round(canvas.height / 2);
+
+            if (maskRulerY == null) {
+                maskRulerY = Math.round(canvas.height / 2);
+            }
             positionMaskRuler();
             renderCanvas();
             return ruler;
@@ -3158,48 +2832,86 @@
             applyA9Shine();
             saveProject();
         }
+
         function setMaskActive(active) {
             maskActive = active;
             const ruler = document.getElementById('maskRuler');
-            if (ruler) { if (active) ruler.classList.add('mask-active'); else ruler.classList.remove('mask-active'); }
+            if (ruler) {
+                if (active) ruler.classList.add('mask-active');
+                else ruler.classList.remove('mask-active');
+            }
         }
 
         function attachMaskRulerDrag(ruler) {
-            let dragging = false, startClientY = 0, startCanvasY = 0, pendingY = null;
-            const onDown = (clientY) => { dragging = true; startClientY = clientY; startCanvasY = (maskRulerY == null) ? 0 : maskRulerY; setMaskActive(true); };
+            let dragging = false;
+            let startClientY = 0;
+            let startCanvasY = 0;
+            let pendingY = null;
+            let moved = false;
+
+            const onDown = (clientY) => {
+                dragging = true;
+                moved = false;
+                startClientY = clientY;
+                startCanvasY = (maskRulerY == null) ? 0 : maskRulerY;
+                setMaskActive(true);
+            };
             const onMove = (clientY) => {
                 if (!dragging) return;
-                const scale = getScale(); if (!scale) return;
+                const scale = getScale();
+                if (!scale) return;
                 const deltaCanvas = (clientY - startClientY) / scale;
+                if (Math.abs(deltaCanvas) > 0.5) moved = true;
                 let newY = startCanvasY + deltaCanvas;
                 if (newY < 0) newY = 0;
                 if (newY > canvas.height - 2) newY = canvas.height - 2;
-                maskRulerY = newY; pendingY = newY;
+                maskRulerY = newY;
+                pendingY = newY;
                 if (!rafPending) {
                     rafPending = true;
                     requestAnimationFrame(() => {
                         positionMaskRuler();
-                        if (pendingY !== null) { renderCanvas(); applyA9Shine(); pendingY = null; }
+                        if (pendingY !== null) {
+                            renderCanvas();
+                            applyA9Shine();
+                            pendingY = null;
+                        }
                         rafPending = false;
                     });
                 }
             };
-            const onUp = () => { if (dragging) { dragging = false; saveProject(); } };
+            const onUp = () => {
+                if (dragging) {
+                    dragging = false;
+                    saveProject();
+                }
+            };
 
-            ruler.addEventListener('mousedown', (e) => { if (e.target.classList.contains('mask-rotate-center')) return; e.preventDefault(); onDown(e.clientY); });
+            ruler.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('mask-rotate-center')) return;
+                e.preventDefault();
+                onDown(e.clientY);
+            });
             ruler.addEventListener('touchstart', (e) => {
                 if (e.target.classList.contains('mask-rotate-center')) return;
                 if (e.touches.length === 1) { e.preventDefault(); onDown(e.touches[0].clientY); }
             }, { passive: false });
+
             window.addEventListener('mousemove', (e) => onMove(e.clientY));
-            window.addEventListener('touchmove', (e) => { if (dragging && e.touches.length === 1) { e.preventDefault(); onMove(e.touches[0].clientY); } }, { passive: false });
+            window.addEventListener('touchmove', (e) => {
+                if (dragging && e.touches.length === 1) { e.preventDefault(); onMove(e.touches[0].clientY); }
+            }, { passive: false });
+
             window.addEventListener('mouseup', onUp);
             window.addEventListener('touchend', onUp);
             window.addEventListener('touchcancel', onUp);
+
             const outsideHandler = (e) => {
                 const r = document.getElementById('maskRuler');
                 if (!r) return;
-                if (!r.contains(e.target)) setMaskActive(false);
+                if (!r.contains(e.target)) {
+                    setMaskActive(false);
+                }
             };
             document.addEventListener('mousedown', outsideHandler);
             document.addEventListener('touchstart', outsideHandler, { passive: true });
@@ -3208,7 +2920,10 @@
         function positionMaskRuler() {
             const ruler = document.getElementById('maskRuler');
             if (!ruler) return;
-            if (maskRulerY == null) { ruler.style.display = 'none'; return; }
+            if (maskRulerY == null) {
+                ruler.style.display = 'none';
+                return;
+            }
             const scale = getScale();
             ruler.style.display = 'flex';
             ruler.style.top = (maskRulerY * scale) + 'px';
@@ -3224,12 +2939,16 @@
             txt.textContent = msg || 'Completed Operation';
             el.classList.add('show');
             clearTimeout(_flashTimer);
-            _flashTimer = setTimeout(() => el.classList.remove('show'), 2200);
+            _flashTimer = setTimeout(() => {
+                el.classList.remove('show');
+            }, 2200);
         }
 
         let backgroundVisible = true;
+
         const APP_BORDER_INDICES = [2, 3, 4, 7, 8, 9];
         const A5_INDEX = 4;
+
         let totalLabelEl = null;
 
         function ensureTotalLabelExists() {
@@ -3242,11 +2961,13 @@
         }
 
         function applyAppBorderAndShine() {
-            document.querySelectorAll('.text-layer').forEach(el => {
+            const allEls = document.querySelectorAll('.text-layer');
+            allEls.forEach(el => {
                 el.classList.remove('bg-hidden-appborder');
                 el.classList.remove('user-hidden-only');
                 el.classList.remove('hidden-only-hidden');
             });
+
             if (!backgroundVisible) {
                 APP_BORDER_INDICES.forEach(idx => {
                     const layer = project.layers[idx];
@@ -3257,7 +2978,10 @@
                 project.layers.forEach(layer => {
                     if (layer.hiddenOnly) {
                         const el = document.getElementById(layer.id);
-                        if (el) { el.classList.add('bg-hidden-appborder'); el.classList.add('user-hidden-only'); }
+                        if (el) {
+                            el.classList.add('bg-hidden-appborder');
+                            el.classList.add('user-hidden-only');
+                        }
                     }
                 });
             } else {
@@ -3268,22 +2992,31 @@
                     }
                 });
             }
+
             applyA9Shine();
+
             if (!backgroundVisible && project.layers[A5_INDEX]) {
-                ensureTotalLabelExists().classList.add('visible');
+                const label = ensureTotalLabelExists();
+                label.classList.add('visible');
                 positionTotalLabel();
-            } else if (totalLabelEl) totalLabelEl.classList.remove('visible');
+            } else if (totalLabelEl) {
+                totalLabelEl.classList.remove('visible');
+            }
         }
 
         function positionTotalLabel() {
             if (!totalLabelEl) return;
             const a5Layer = project.layers[A5_INDEX];
-            if (!a5Layer || !backgroundVisible) { totalLabelEl.classList.remove('visible'); return; }
+            if (!a5Layer) { totalLabelEl.classList.remove('visible'); return; }
+            if (!backgroundVisible) { totalLabelEl.classList.remove('visible'); return; }
             totalLabelEl.classList.remove('visible');
         }
 
         function updateTotalLabel() {
-            if (!totalLabelEl) { if (backgroundVisible) return; ensureTotalLabelExists(); }
+            if (!totalLabelEl) {
+                if (backgroundVisible) return;
+                ensureTotalLabelExists();
+            }
             const a5Layer = project.layers[A5_INDEX];
             if (!backgroundVisible && a5Layer) {
                 totalLabelEl.classList.add('visible');
@@ -3313,16 +3046,22 @@
                 bgToggleBtn.title = 'Show background image';
             }
         }
+
         function saveBgVisibility() {
-            try { localStorage.setItem('bee72342368/bg_visible', backgroundVisible ? '1' : '0'); } catch(e) {}
+            try {
+                localStorage.setItem('bee72342368/bg_visible', backgroundVisible ? '1' : '0');
+            } catch(e) { }
         }
+
         function loadBgVisibility() {
             try {
                 const stored = localStorage.getItem('bee72342368/bg_visible');
                 if (stored === '0') backgroundVisible = false;
                 else if (stored === '1') backgroundVisible = true;
                 else backgroundVisible = true;
-            } catch(e) { backgroundVisible = true; }
+            } catch(e) {
+                backgroundVisible = true;
+            }
         }
 
         const sidebar = document.getElementById('sidebar');
@@ -3335,16 +3074,23 @@
             let collapsed = false;
             try { collapsed = localStorage.getItem(STORAGE_KEY) === '1'; } catch(e) {}
             const applyState = () => {
-                if (collapsed) { contents.classList.add('collapsed'); btn.classList.add('collapsed'); }
-                else { contents.classList.remove('collapsed'); btn.classList.remove('collapsed'); }
+                if (collapsed) {
+                    contents.classList.add('collapsed');
+                    btn.classList.add('collapsed');
+                } else {
+                    contents.classList.remove('collapsed');
+                    btn.classList.remove('collapsed');
+                }
             };
             applyState();
             btn.addEventListener('click', () => {
-                collapsed = !collapsed; applyState();
+                collapsed = !collapsed;
+                applyState();
                 try { localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0'); } catch(e) {}
             });
         })();
 
+        // ========== CLIPBOARD PANEL HIDE TOGGLE ==========
         (function initClipboardHideButton() {
             const btn = document.getElementById('clipboardHideBtn');
             const panel = document.getElementById('clipboardPanel');
@@ -3353,16 +3099,25 @@
             let hidden = false;
             try { hidden = localStorage.getItem(STORAGE_KEY) === '1'; } catch(e) {}
             const applyState = () => {
-                if (hidden) { panel.classList.add('clipboard-collapsed'); btn.textContent = 'SHOW'; btn.title = 'Show PaymentMethod panel'; }
-                else { panel.classList.remove('clipboard-collapsed'); btn.textContent = 'HIDE'; btn.title = 'Hide PaymentMethod panel'; }
+                if (hidden) {
+                    panel.classList.add('clipboard-collapsed');
+                    btn.textContent = 'SHOW';
+                    btn.title = 'Show PaymentMethod panel';
+                } else {
+                    panel.classList.remove('clipboard-collapsed');
+                    btn.textContent = 'HIDE';
+                    btn.title = 'Hide PaymentMethod panel';
+                }
             };
             applyState();
             btn.addEventListener('click', () => {
-                hidden = !hidden; applyState();
+                hidden = !hidden;
+                applyState();
                 try { localStorage.setItem(STORAGE_KEY, hidden ? '1' : '0'); } catch(e) {}
             });
         })();
 
+        // ========== SAVED PAIRS HIDE TOGGLE ==========
         (function initSavedPairsHideButton() {
             const btn = document.getElementById('savedPairsHideBtn');
             const listEl = document.getElementById('savedPairsList');
@@ -3371,16 +3126,25 @@
             let collapsed = false;
             try { collapsed = localStorage.getItem(STORAGE_KEY) === '1'; } catch(e) {}
             const applyState = () => {
-                if (collapsed) { listEl.classList.add('saved-pairs-collapsed'); btn.textContent = 'SHOW'; btn.title = 'Show saved pairs list'; }
-                else { listEl.classList.remove('saved-pairs-collapsed'); btn.textContent = 'HIDE'; btn.title = 'Hide saved pairs list'; }
+                if (collapsed) {
+                    listEl.classList.add('saved-pairs-collapsed');
+                    btn.textContent = 'SHOW';
+                    btn.title = 'Show saved pairs list';
+                } else {
+                    listEl.classList.remove('saved-pairs-collapsed');
+                    btn.textContent = 'HIDE';
+                    btn.title = 'Hide saved pairs list';
+                }
             };
             applyState();
             btn.addEventListener('click', () => {
-                collapsed = !collapsed; applyState();
+                collapsed = !collapsed;
+                applyState();
                 try { localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0'); } catch(e) {}
             });
         })();
 
+        // ========== LAYERS COLLAPSE TOGGLE ==========
         (function initLayersCollapse() {
             const btn = document.getElementById('layersCollapseBtn');
             const listEl = document.getElementById('layersList');
@@ -3403,7 +3167,8 @@
             };
             applyState();
             btn.addEventListener('click', () => {
-                collapsed = !collapsed; applyState();
+                collapsed = !collapsed;
+                applyState();
                 try { localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0'); } catch(e) {}
             });
         })();
@@ -3418,21 +3183,41 @@
             try { if (navigator.vibrate) navigator.vibrate(25); } catch(e) {}
         });
 
-        const SCROLL_STEP = 400, SCROLL_INITIAL_DELAY = 300, SCROLL_REPEAT_INTERVAL = 90;
-        const scrollHoldState = { timer: null, interval: null, btn: null, direction: 0, active: false };
+        const SCROLL_STEP = 400;
+        const SCROLL_INITIAL_DELAY = 300;
+        const SCROLL_REPEAT_INTERVAL = 90;
 
-        function doScrollStep(direction) { sidebar.scrollBy({ top: SCROLL_STEP * direction, behavior: 'auto' }); }
+        const scrollHoldState = {
+            timer: null,
+            interval: null,
+            btn: null,
+            direction: 0,
+            active: false
+        };
+
+        function doScrollStep(direction) {
+            const delta = SCROLL_STEP * direction;
+            sidebar.scrollBy({ top: delta, behavior: 'auto' });
+        }
+
         function stopScrollHold() {
             if (scrollHoldState.timer) { clearTimeout(scrollHoldState.timer); scrollHoldState.timer = null; }
             if (scrollHoldState.interval) { clearInterval(scrollHoldState.interval); scrollHoldState.interval = null; }
             if (scrollHoldState.btn) scrollHoldState.btn.classList.remove('holding');
-            scrollHoldState.btn = null; scrollHoldState.direction = 0; scrollHoldState.active = false;
+            scrollHoldState.btn = null;
+            scrollHoldState.direction = 0;
+            scrollHoldState.active = false;
         }
+
         function beginScrollHold(btn, direction) {
             stopScrollHold();
-            scrollHoldState.btn = btn; scrollHoldState.direction = direction; scrollHoldState.active = true;
+            scrollHoldState.btn = btn;
+            scrollHoldState.direction = direction;
+            scrollHoldState.active = true;
             btn.classList.add('holding');
+
             doScrollStep(direction);
+
             scrollHoldState.timer = setTimeout(() => {
                 if (!scrollHoldState.active) return;
                 scrollHoldState.interval = setInterval(() => {
@@ -3445,14 +3230,27 @@
         (function attachFastScrollHold() {
             const upBtn = document.getElementById('fastScrollUpBtn');
             const downBtn = document.getElementById('fastScrollDownBtn');
+
             const bind = (btn, direction) => {
                 if (!btn) return;
-                btn.addEventListener('mousedown', (e) => { e.preventDefault(); beginScrollHold(btn, direction); });
-                btn.addEventListener('touchstart', (e) => { e.preventDefault(); beginScrollHold(btn, direction); }, { passive: false });
-                btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
+                btn.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    beginScrollHold(btn, direction);
+                });
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    beginScrollHold(btn, direction);
+                }, { passive: false });
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
                 btn.addEventListener('contextmenu', (e) => e.preventDefault());
             };
-            bind(upBtn, -1); bind(downBtn, 1);
+
+            bind(upBtn, -1);
+            bind(downBtn, 1);
+
             window.addEventListener('mouseup', stopScrollHold);
             window.addEventListener('touchend', stopScrollHold);
             window.addEventListener('touchcancel', stopScrollHold);
@@ -3461,15 +3259,21 @@
 
         document.getElementById('bgToggleBtn').addEventListener('click', () => {
             backgroundVisible = !backgroundVisible;
+
             project.layers.forEach(layer => {
                 if (!backgroundVisible) {
                     if (typeof layer.hiddenX !== 'number' || typeof layer.hiddenY !== 'number') {
-                        layer.hiddenX = layer.x; layer.hiddenY = layer.y;
+                        layer.hiddenX = layer.x;
+                        layer.hiddenY = layer.y;
                     }
                 }
                 const el = document.getElementById(layer.id);
-                if (el) positionElement(el, backgroundVisible ? layer.x : layer.hiddenX, backgroundVisible ? layer.y : layer.hiddenY);
+                if (el) {
+                    positionElement(el, backgroundVisible ? layer.x : layer.hiddenX,
+                                          backgroundVisible ? layer.y : layer.hiddenY);
+                }
             });
+
             updateBgToggleButtonUI();
             saveBgVisibility();
             applyAppBorderAndShine();
@@ -3480,32 +3284,45 @@
         });
 
         const isAndroid = /Android/i.test(navigator.userAgent);
-        const touchSpeedMultiplier = isAndroid ? 1.8 : 1.2;
+        const touchSpeedMultiplier = isAndroid ? 1.8 : 1.2; 
 
-        let lastTouchX = 0, lastTouchY = 0;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
         let rafPending = false;
         let saveTimeout = null;
-
-        let project = { bgImage: null, layers: [], maskRulerY: null, maskRulerAngle: 0 };
+        
+        let project = {
+            bgImage: null,
+            layers: [],
+            maskRulerY: null,
+            maskRulerAngle: 0
+        };
+        
         let selectedLayerId = null;
         let isDragging = false;
         let dragTarget = null;
         let startX, startY;
         let baseImgObj = new Image();
+        
         let projectFileHandle = null;
         let lastUploadedFontName = null;
 
         const defaultArabicNames = [
-            "أحمد", "محمد", "محمود", "مصطفى", "علي", "حسين", "حسن", "عمر",
+            "أحمد", "محمد", "محمود", "مصطفى", "علي", "حسين", "حسن", "عمر", 
             "إبراهيم", "يوسف", "خالد", "عبدالله", "عبد الرحمن", "طارق", "سعيد",
             "فاطمة", "مريم", "زينب", "آية", "نور", "سارة", "هدى", "منى", "أميرة"
         ];
+
         let textMemory = [];
         let numberNamePairs = {};
 
         function loadNumberNamePairs() {
-            try { const stored = localStorage.getItem('bee72342368/number_name_pairs_bee'); numberNamePairs = stored ? JSON.parse(stored) : {}; } catch(e) { numberNamePairs = {}; }
+            try {
+                const stored = localStorage.getItem('bee72342368/number_name_pairs_bee');
+                numberNamePairs = stored ? JSON.parse(stored) : {};
+            } catch(e) { numberNamePairs = {}; }
         }
+
         function saveNumberNamePairs() {
             try { localStorage.setItem('bee72342368/number_name_pairs_bee', JSON.stringify(numberNamePairs)); } catch(e) {}
         }
@@ -3532,7 +3349,9 @@
                     a10Layer.text = matchedName;
                     const a10El = document.getElementById(a10Layer.id);
                     if (a10El) a10El.innerText = matchedName;
-                    if (selectedLayerId === a10Layer.id) document.getElementById('layerText').value = matchedName;
+                    if (selectedLayerId === a10Layer.id) {
+                        document.getElementById('layerText').value = matchedName;
+                    }
                     updateAllFormulas();
                     updateLayersList();
                     saveProject();
@@ -3557,18 +3376,20 @@
                 else { textMemory = [...defaultArabicNames]; saveTextMemory(); }
             } catch(e) { textMemory = [...defaultArabicNames]; }
         }
+
         function saveTextMemory() {
             try { localStorage.setItem('bee72342368/text_memory_bee', JSON.stringify(textMemory)); } catch(e) {}
         }
+
         function addNameToMemory(name) {
             if (!name || name.startsWith('=')) return;
             const cleaned = name.trim();
             if (cleaned.length < 2) return;
             const normCleaned = normalizeArabic(cleaned);
-            if (!textMemory.some(item => normalizeArabic(item) === normCleaned)) {
-                textMemory.unshift(cleaned); saveTextMemory();
-            }
+            const exists = textMemory.some(item => normalizeArabic(item) === normCleaned);
+            if (!exists) { textMemory.unshift(cleaned); saveTextMemory(); }
         }
+
         function removeNameFromMemory(name, e) {
             if (e) e.stopPropagation();
             textMemory = textMemory.filter(item => item !== name);
@@ -3592,10 +3413,14 @@
             matches.forEach(text => {
                 const div = document.createElement('div');
                 div.className = 'suggestion-item';
-                const span = document.createElement('span'); span.textContent = text;
-                const removeBtn = document.createElement('span'); removeBtn.className = 'remove-mem'; removeBtn.innerHTML = '✕';
+                const span = document.createElement('span');
+                span.textContent = text;
+                const removeBtn = document.createElement('span');
+                removeBtn.className = 'remove-mem';
+                removeBtn.innerHTML = '✕';
                 removeBtn.onclick = (e) => removeNameFromMemory(text, e);
-                div.appendChild(span); div.appendChild(removeBtn);
+                div.appendChild(span);
+                div.appendChild(removeBtn);
                 div.addEventListener('mousedown', (e) => {
                     e.preventDefault();
                     textInput.value = text;
@@ -3608,7 +3433,9 @@
         }
 
         textInput.addEventListener('input', () => {
-            const start = textInput.selectionStart, end = textInput.selectionEnd;
+            // Auto-convert Arabic numerals to English on input
+            const start = textInput.selectionStart;
+            const end = textInput.selectionEnd;
             const converted = convertArabicNumerals(textInput.value);
             if (converted !== textInput.value) {
                 textInput.value = converted;
@@ -3619,10 +3446,14 @@
         textInput.addEventListener('blur', () => setTimeout(() => suggestionDropdown.classList.remove('show'), 200));
         textInput.addEventListener('focus', () => { if (textInput.value.trim()) updateSuggestions(textInput.value); });
 
+        // Auto-fill from saved pairs when A8 is PASTED
         textInput.addEventListener('paste', () => {
             setTimeout(() => {
+                // Convert Arabic numerals in pasted text
                 const converted = convertArabicNumerals(textInput.value);
-                if (converted !== textInput.value) textInput.value = converted;
+                if (converted !== textInput.value) {
+                    textInput.value = converted;
+                }
                 const activeIdx = project.layers.findIndex(l => l.id === selectedLayerId);
                 if (activeIdx !== 7) return;
                 const pastedValue = (textInput.value || '').trim();
@@ -3632,7 +3463,9 @@
                     applySavedDataPair(pastedValue);
                     showFlashMessage('Auto-filled from saved pair');
                 } else {
-                    const a3L = project.layers[2], a4L = project.layers[3];
+                    // No saved pair — clear A3/A4 so stale data doesn't linger
+                    const a3L = project.layers[2];
+                    const a4L = project.layers[3];
                     if (a3L) { a3L.text = ''; a3L.isInput = true; delete a3L.formula; const el = document.getElementById(a3L.id); if (el) el.innerText = ''; }
                     if (a4L) { a4L.text = ''; a4L.isInput = true; delete a4L.formula; const el = document.getElementById(a4L.id); if (el) el.innerText = ''; }
                     updateAllFormulas();
@@ -3659,19 +3492,25 @@
 
         function firstWords(text, n) {
             if (!text) return '';
-            return text.split(/\s+/).filter(w => w.length > 0).slice(0, n).join(' ');
+            const words = text.split(/\s+/).filter(w => w.length > 0);
+            return words.slice(0, n).join(' ');
         }
 
         function parseClipboardSmart(text) {
             if (!text || typeof text !== 'string') return { id: null, amount: null, name: null };
+
             let normalized = text
                 .replace(/\r\n?/g, '\n')
                 .replace(/[\u0660-\u0669]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x0660 + 48))
                 .replace(/[\u06F0-\u06F9]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x06F0 + 48))
-                .replace(/[\u066B]/g, '.').replace(/[\u066C]/g, ',');
+                .replace(/[\u066B]/g, '.')
+                .replace(/[\u066C]/g, ',');
 
             const lines = normalized.split('\n').map(l => l.trim()).filter(Boolean);
-            let id = null, amount = null, name = null;
+
+            let id = null;
+            let amount = null;
+            let name = null;
 
             const nameLabelPatterns = [
                 /(?:الاسم|الاسم\s*الكامل|اسم\s*العميل|اسم|Name)\s*[:：\-]\s*(.+)/i,
@@ -3681,13 +3520,19 @@
                 const m = normalized.match(pat);
                 if (m && m[1]) {
                     const candidate = m[1].split(/\n/)[0].trim();
-                    const arabicWords = candidate.split(/\s+/).filter(w => /[\u0600-\u06FF]/.test(w));
-                    if (arabicWords.length > 0) { name = arabicWords.slice(0, 3).join(' '); break; }
+                    const words = candidate.split(/\s+/).filter(Boolean);
+                    const arabicWords = words.filter(w => /[\u0600-\u06FF]/.test(w));
+                    if (arabicWords.length > 0) {
+                        name = arabicWords.slice(0, 3).join(' ');
+                        break;
+                    }
                 }
             }
 
-            const idCandidates = normalized.match(/\d{8,19}/g) || [];
-            if (idCandidates.length > 0) id = idCandidates.reduce((a, b) => (b.length > a.length ? b : a));
+            const idCandidates = (normalized.match(/\d{8,19}/g) || []);
+            if (idCandidates.length > 0) {
+                id = idCandidates.reduce((a, b) => (b.length > a.length ? b : a));
+            }
 
             let textForAmount = normalized;
             if (id) textForAmount = textForAmount.replace(new RegExp(id, 'g'), ' ');
@@ -3702,6 +3547,7 @@
                 if (num < 0.01 || num > 100000000) continue;
                 amountCandidates.push({ raw, num, hasDecimal: raw.includes('.') });
             }
+
             if (amountCandidates.length > 0) {
                 const withDecimal = amountCandidates.filter(c => c.hasDecimal);
                 const pool = withDecimal.length > 0 ? withDecimal : amountCandidates;
@@ -3716,29 +3562,42 @@
                     if (/[:：]/.test(line) && !/[\u0600-\u06FF]/.test(line.replace(/[:：].*/, ''))) continue;
                     if (/[\u0600-\u06FF]/.test(line) && !/^\d/.test(line)) {
                         const words = line.split(/\s+/).filter(w => /[\u0600-\u06FF]/.test(w));
-                        if (words.length > 0) { name = words.slice(0, 3).join(' '); break; }
+                        if (words.length > 0) {
+                            name = words.slice(0, 3).join(' ');
+                            break;
+                        }
                     }
                 }
             }
+
             if (name) name = firstWords(name, 3);
+
             return { id, amount, name };
         }
 
         function applyClipboardData(text) {
-            const { id, amount, name } = parseClipboardSmart(text);
+            const parsed = parseClipboardSmart(text);
+            const { id, amount, name } = parsed;
+
             if (!id && !amount && !name) {
                 setClipboardStatus('⚠ No usable data found. Check your clipboard content.', 'err');
                 return false;
             }
-            const a8Layer = project.layers[7], a3Layer = project.layers[2], a10Layer = project.layers[9];
+
+            const a8Layer  = project.layers[7];
+            const a3Layer  = project.layers[2];
+            const a10Layer = project.layers[9];
+
             const log = [];
             let changed = false;
 
             const setInput = (layer, value) => {
                 if (!layer || value == null || value === '') return false;
                 const str = String(value);
-                layer.text = str; layer.isInput = true;
-                delete layer.formula; delete layer.isFormula;
+                layer.text = str;
+                layer.isInput = true;
+                delete layer.formula;
+                delete layer.isFormula;
                 const el = document.getElementById(layer.id);
                 if (el) {
                     el.innerText = str;
@@ -3753,25 +3612,35 @@
                 return true;
             };
 
-            if (setInput(a8Layer, id)) { changed = true; log.push(`A8=${id}`); } else if (a8Layer) log.push('A8=—');
-            if (setInput(a3Layer, amount)) { changed = true; log.push(`A3=${amount}`); } else if (a3Layer) log.push('A3=—');
-            if (setInput(a10Layer, name)) { changed = true; log.push(`A10=${name}`); addNameToMemory(name); } else if (a10Layer) log.push('A10=—');
+            if (setInput(a8Layer, id))        { changed = true; log.push(`A8=${id}`); }
+            else if (a8Layer)                 { log.push('A8=—'); }
 
-            if (!changed) { setClipboardStatus('⚠ Nothing applied. ' + log.join(' | '), 'err'); return false; }
+            if (setInput(a3Layer, amount))    { changed = true; log.push(`A3=${amount}`); }
+            else if (a3Layer)                 { log.push('A3=—'); }
+
+            if (setInput(a10Layer, name))     { changed = true; log.push(`A10=${name}`); addNameToMemory(name); }
+            else if (a10Layer)                { log.push('A10=—'); }
+
+            if (!changed) {
+                setClipboardStatus('⚠ Nothing applied. ' + log.join(' | '), 'err');
+                return false;
+            }
 
             updateAllFormulas();
             applyA4Rule();
 
             const reassert = () => {
-                if (a8Layer && id) { const el = document.getElementById(a8Layer.id); if (el) el.innerText = String(id); }
+                if (a8Layer && id)     { const el = document.getElementById(a8Layer.id);  if (el) el.innerText = String(id); }
                 if (a3Layer && amount) {
+                    // Only reassert A3 if it wasn't overwritten by a saved pair's A3 value
                     const pair = id ? loadSavedDataPairs()[id] : null;
                     const pairA3 = pair && pair.a3 !== undefined && pair.a3 !== null ? String(pair.a3) : null;
                     if (pairA3 === null || pairA3 === '') {
-                        const el = document.getElementById(a3Layer.id); if (el) el.innerText = String(amount);
+                        const el = document.getElementById(a3Layer.id);
+                        if (el) el.innerText = String(amount);
                     }
                 }
-                if (a10Layer && name) { const el = document.getElementById(a10Layer.id); if (el) el.innerText = name; }
+                if (a10Layer && name)   { const el = document.getElementById(a10Layer.id); if (el) el.innerText = name; }
             };
             reassert();
             setTimeout(reassert, 1600);
@@ -3782,8 +3651,12 @@
 
             if (id) {
                 const saved = loadSavedDataPairs();
-                if (saved[id]) { applySavedDataPair(id); setClipboardStatus('✓ Loaded saved data for A8 ' + id, 'ok'); }
+                if (saved[id]) {
+                    applySavedDataPair(id);
+                    setClipboardStatus('✓ Loaded saved data for A8 ' + id, 'ok');
+                }
             }
+
             return true;
         }
 
@@ -3791,29 +3664,59 @@
             setClipboardStatus('Reading clipboard...', '');
             if (navigator.clipboard && navigator.clipboard.readText) {
                 navigator.clipboard.readText()
-                    .then(text => { if (!text || !text.trim()) setClipboardStatus('⚠ Clipboard empty. Paste manually below.', 'err'); else applyClipboardData(text); })
-                    .catch(err => { console.warn('Clipboard API failed:', err); setClipboardStatus('⚠ Clipboard blocked. Paste manually below and press "Parse Below".', 'err'); });
-            } else setClipboardStatus('⚠ Clipboard not supported. Paste manually below.', 'err');
+                    .then(text => {
+                        if (!text || !text.trim()) {
+                            setClipboardStatus('⚠ Clipboard empty. Paste manually below.', 'err');
+                            return;
+                        }
+                        applyClipboardData(text);
+                    })
+                    .catch(err => {
+                        console.warn('Clipboard API failed:', err);
+                        setClipboardStatus('⚠ Clipboard blocked. Paste manually below and press "Parse Below".', 'err');
+                    });
+            } else {
+                setClipboardStatus('⚠ Clipboard not supported. Paste manually below.', 'err');
+            }
         }
 
         function pasteSelectIntoTextarea() {
             const ta = document.getElementById('manualPasteArea');
             if (!ta) return;
+
             const selectAllInBox = (msg, type) => {
-                if (!ta.value || !ta.value.trim()) { setClipboardStatus('⚠ Paste area is empty.', 'err'); ta.focus(); return; }
-                ta.focus(); ta.setSelectionRange(0, ta.value.length); ta.scrollTop = ta.scrollHeight;
+                if (!ta.value || !ta.value.trim()) {
+                    setClipboardStatus('⚠ Paste area is empty.', 'err');
+                    ta.focus();
+                    return;
+                }
+                ta.focus();
+                ta.setSelectionRange(0, ta.value.length);
+                ta.scrollTop = ta.scrollHeight;
                 setClipboardStatus(msg || '✓ Selected all text in paste area.', type || 'ok');
             };
+
             if (navigator.clipboard && navigator.clipboard.readText) {
                 navigator.clipboard.readText()
                     .then(text => {
-                        if (!text || !text.trim()) { selectAllInBox('⚠ Clipboard empty — selected existing text in box.', 'err'); return; }
-                        ta.value = text; ta.focus(); ta.setSelectionRange(0, ta.value.length); ta.scrollTop = ta.scrollHeight;
+                        if (!text || !text.trim()) {
+                            selectAllInBox('⚠ Clipboard empty — selected existing text in box.', 'err');
+                            return;
+                        }
+                        ta.value = text;
+                        ta.focus();
+                        ta.setSelectionRange(0, ta.value.length);
+                        ta.scrollTop = ta.scrollHeight;
                         setClipboardStatus('✓ Clipboard inserted & selected.', 'ok');
                         autoParsePasteArea();
                     })
-                    .catch(err => { console.warn('Clipboard read failed:', err); selectAllInBox('⚠ Clipboard blocked — selected existing text in box.', 'err'); });
-            } else selectAllInBox('⚠ Clipboard not supported — selected existing text in box.', 'err');
+                    .catch(err => {
+                        console.warn('Clipboard read failed:', err);
+                        selectAllInBox('⚠ Clipboard blocked — selected existing text in box.', 'err');
+                    });
+            } else {
+                selectAllInBox('⚠ Clipboard not supported — selected existing text in box.', 'err');
+            }
         }
 
         let _autoParseTimer = null;
@@ -3830,7 +3733,9 @@
             const ta = document.getElementById('manualPasteArea');
             if (!ta) return;
             ta.addEventListener('input', autoParsePasteArea);
-            ta.addEventListener('paste', () => setTimeout(autoParsePasteArea, 10));
+            ta.addEventListener('paste', () => {
+                setTimeout(autoParsePasteArea, 10);
+            });
             ta.addEventListener('change', autoParsePasteArea);
         })();
 
@@ -3838,28 +3743,45 @@
         document.getElementById('pasteSelectBtn').addEventListener('click', pasteSelectIntoTextarea);
         document.getElementById('parseManualBtn').addEventListener('click', () => {
             const val = document.getElementById('manualPasteArea').value;
-            if (!val || !val.trim()) { setClipboardStatus('⚠ Paste area is empty.', 'err'); return; }
+            if (!val || !val.trim()) {
+                setClipboardStatus('⚠ Paste area is empty.', 'err');
+                return;
+            }
             applyClipboardData(val);
         });
 
         const A6_CYCLE_VALUES = [
-            '246146247246226','206257152650001','237668465800000',
-            '225445644400226','2132590052507544','24316001552774277'
+            '246146247246226',
+            '206257152650001',
+            '237668465800000',
+            '225445644400226',
+            '2132590052507544',
+            '24316001552774277'
         ];
+
         const A7_CYCLE_VALUES = [
-            '2562547672573572600007647','267574267627862660007287',
-            '255627627772782890000022','276772876700000627277272',
+            '2562547672573572600007647',
+            '267574267627862660007287',
+            '255627627772782890000022',
+            '276772876700000627277272',
             '287730000377837773836660'
         ];
-        let a6CycleIndex = 0, a7CycleIndex = 0;
+
+        let a6CycleIndex = 0;
+        let a7CycleIndex = 0;
 
         function cycleA6Values() {
             if (!project.layers || project.layers.length < 6) return;
             const a6Layer = project.layers[5];
-            if (!a6Layer || a6Layer.hiddenOnly) return;
-            if (selectedLayerId === a6Layer.id) { a6CycleIndex = (a6CycleIndex + 1) % A6_CYCLE_VALUES.length; return; }
+            if (!a6Layer) return;
+            if (a6Layer.hiddenOnly) return;
+            if (selectedLayerId === a6Layer.id) {
+                a6CycleIndex = (a6CycleIndex + 1) % A6_CYCLE_VALUES.length;
+                return;
+            }
             const newA6 = A6_CYCLE_VALUES[a6CycleIndex];
-            a6Layer.text = newA6; a6Layer.isInput = true;
+            a6Layer.text = newA6;
+            a6Layer.isInput = true;
             const a6El = document.getElementById(a6Layer.id);
             if (a6El) a6El.innerText = newA6;
             a6CycleIndex = (a6CycleIndex + 1) % A6_CYCLE_VALUES.length;
@@ -3869,10 +3791,15 @@
         function cycleA7Values() {
             if (!project.layers || project.layers.length < 7) return;
             const a7Layer = project.layers[6];
-            if (!a7Layer || a7Layer.hiddenOnly) return;
-            if (selectedLayerId === a7Layer.id) { a7CycleIndex = (a7CycleIndex + 1) % A7_CYCLE_VALUES.length; return; }
+            if (!a7Layer) return;
+            if (a7Layer.hiddenOnly) return;
+            if (selectedLayerId === a7Layer.id) {
+                a7CycleIndex = (a7CycleIndex + 1) % A7_CYCLE_VALUES.length;
+                return;
+            }
             const newA7 = A7_CYCLE_VALUES[a7CycleIndex];
-            a7Layer.text = newA7; a7Layer.isInput = true;
+            a7Layer.text = newA7;
+            a7Layer.isInput = true;
             const a7El = document.getElementById(a7Layer.id);
             if (a7El) a7El.innerText = newA7;
             a7CycleIndex = (a7CycleIndex + 1) % A7_CYCLE_VALUES.length;
@@ -3886,7 +3813,7 @@
             const saved = localStorage.getItem('bee72342368/formula_photo_studio_v4');
             if (saved) loadProjectFromData(saved);
             else renderCanvas();
-
+            
             ensureMaskRulerExists();
             ensureTotalLabelExists();
             applyAppBorderAndShine();
@@ -3904,20 +3831,28 @@
             if (impBtn) impBtn.addEventListener('click', triggerImportPairs);
             if (bakeBtn) bakeBtn.addEventListener('click', bakeIntoHtml);
 
-            setupNotificationBanner();
-
             setInterval(cycleA6Values, 1000);
             setInterval(cycleA7Values, 3000);
 
             setInterval(() => {
-                if (document.hidden) return;
+                if (document.hidden) return; 
+                
                 [5, 6].forEach(idx => {
                     const layer = project.layers[idx];
-                    if (!layer || layer.hiddenOnly || layer.isInput) return;
+                    if (!layer) return;
+                    if (layer.hiddenOnly) return;
+                    if (layer.isInput) return;
                     if (layer.text && layer.text.startsWith('=')) return;
+                    if (layer.text && /^=/.test(layer.text.trim())) return;
+                    
                     const str = layer.text;
-                    if (/\d+/.test(str)) layer.text = str.replace(/\d+/g, m => Math.round(parseInt(m, 10) + 30));
-                    else { const parsed = parseFloat(str); if (!isNaN(parsed)) layer.text = Math.round(parsed + 30).toString(); }
+                    const hasNumbers = /\d+/.test(str);
+                    if (hasNumbers) {
+                        layer.text = str.replace(/\d+/g, m => Math.round(parseInt(m, 10) + 30));
+                    } else {
+                        const parsed = parseFloat(str);
+                        if (!isNaN(parsed)) layer.text = Math.round(parsed + 30).toString();
+                    }
                 });
                 updateAllFormulas();
                 const activeIdx = project.layers.findIndex(l => l.id === selectedLayerId);
@@ -3926,9 +3861,18 @@
                 }
             }, 1000);
 
-            document.getElementById('multiSelectToggleBtn').addEventListener('click', (e) => { e.preventDefault(); toggleMultiSelectMode(); });
-            document.getElementById('multiSelectAllBtn').addEventListener('click', (e) => { e.preventDefault(); selectAllLayersForMulti(); });
-            document.getElementById('multiSelectClearBtn').addEventListener('click', (e) => { e.preventDefault(); clearMultiSelect(); });
+            document.getElementById('multiSelectToggleBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleMultiSelectMode();
+            });
+            document.getElementById('multiSelectAllBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                selectAllLayersForMulti();
+            });
+            document.getElementById('multiSelectClearBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                clearMultiSelect();
+            });
 
             attachDpadButton('dpadUp', 'up');
             attachDpadButton('dpadDown', 'down');
@@ -3938,7 +3882,8 @@
             const closeBtn = document.getElementById('dpadClose');
             if (closeBtn) {
                 closeBtn.addEventListener('click', (e) => {
-                    e.preventDefault(); e.stopPropagation();
+                    e.preventDefault();
+                    e.stopPropagation();
                     dpadHiddenByUser = true;
                     updateDpadVisibility();
                 });
@@ -3957,7 +3902,8 @@
                     project.maskRulerY = maskRulerY;
                     project.maskRulerAngle = maskRulerAngle;
                     localStorage.setItem('bee72342368/formula_photo_studio_v4', JSON.stringify(project));
-                } catch(e) { console.error("Local storage sync error:", e); }
+                }
+                catch(e) { console.error("Local storage sync error:", e); }
             }, 300);
         }
 
@@ -4003,40 +3949,61 @@
         document.getElementById('saveProjectFile').addEventListener('click', async () => {
             project.maskRulerY = maskRulerY;
             project.maskRulerAngle = maskRulerAngle;
+            if (window.showOpenFilePicker && projectFileHandle) {
+                try {
+                    const options = { mode: 'readwrite' };
+                    if (await projectFileHandle.queryPermission(options) !== 'granted') {
+                        if (await projectFileHandle.requestPermission(options) !== 'granted') throw new Error("Write access rejected.");
+                    }
+                    const writable = await projectFileHandle.createWritable();
+                    await writable.write(JSON.stringify(project, null, 2));
+                    await writable.close();
+                    const statusHint = document.getElementById('fileStatusHint');
+                    statusHint.innerText = `Saved directly into: ${projectFileHandle.name}`;
+                    statusHint.style.color = 'var(--text-blue)';
+                    return;
+                } catch (err) { console.warn("Direct file write aborted.", err); }
+            }
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(project));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `studio_project_${Date.now()}.json`);
+            downloadAnchor.setAttribute("download", `bee72342368/studio_project_${Date.now()}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
         });
 
-        document.getElementById('importProjectFileBtn').addEventListener('click', () => {
+        document.getElementById('importProjectFileBtn').addEventListener('click', async () => {
+            if (window.showOpenFilePicker) {
+                try {
+                    const [handle] = await window.showOpenFilePicker({
+                        types: [{ description: 'Studio Project File (.json)', accept: { 'application/json': ['.json'] } }],
+                        multiple: false
+                    });
+                    projectFileHandle = handle;
+                    const file = await handle.getFile();
+                    const text = await file.text();
+                    loadProjectFromData(text);
+                    saveProject();
+                    const statusHint = document.getElementById('fileStatusHint');
+                    statusHint.innerText = `Linked file: ${handle.name}`;
+                    statusHint.style.color = '#5cd65c';
+                    return;
+                } catch (err) { console.warn("Modern File Picker cancelled.", err); }
+            }
             const inputFallback = document.createElement('input');
             inputFallback.type = 'file';
-            inputFallback.accept = '.json,application/json';
+            inputFallback.accept = '.json';
             inputFallback.onchange = (e) => {
-                const file = e.target.files && e.target.files[0];
+                const file = e.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    try {
-                        const text = event.target.result;
-                        JSON.parse(text);
-                        loadProjectFromData(text);
-                        saveProject();
-                        const hint = document.getElementById('fileStatusHint');
-                        hint.innerText = "Imported: " + file.name;
-                        hint.style.color = '#5cd65c';
-                        showFlashMessage('Project imported');
-                    } catch(err) {
-                        console.error('Import failed:', err);
-                        showFlashMessage('Invalid project JSON');
-                    }
+                    loadProjectFromData(event.target.result);
+                    saveProject();
+                    document.getElementById('fileStatusHint').innerText = "Imported standard data file matrix.";
                 };
                 reader.readAsText(file);
-                inputFallback.value = '';
             };
             inputFallback.click();
         });
@@ -4091,20 +4058,30 @@
                 canvas.height = baseImgObj.height;
                 ctx.drawImage(baseImgObj, 0, 0);
             } else if (backgroundVisible && !project.bgImage) {
-                canvas.width = 1080; canvas.height = 1080;
-                ctx.fillStyle = "#11110e"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.strokeStyle = "rgba(255,204,0,0.02)"; ctx.lineWidth = 2;
+                canvas.width = 1080;
+                canvas.height = 1080;
+                ctx.fillStyle = "#11110e";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = "rgba(255,204,0,0.02)";
+                ctx.lineWidth = 2;
                 for(let x=0; x<canvas.width; x+=80) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
                 for(let y=0; y<canvas.height; y+=80) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
-                ctx.fillStyle = "#FFCC00"; ctx.font = "bold 28px -apple-system, sans-serif"; ctx.textAlign = "center";
+                ctx.fillStyle = "#FFCC00";
+                ctx.font = "bold 28px -apple-system, sans-serif";
+                ctx.textAlign = "center";
                 ctx.fillText("Formula Graphic Core Active", canvas.width/2, canvas.height/2 - 20);
-                ctx.fillStyle = "#616155"; ctx.font = "18px -apple-system, sans-serif";
+                ctx.fillStyle = "#616155";
+                ctx.font = "18px -apple-system, sans-serif";
                 ctx.fillText("Upload background image to start structural configuration", canvas.width/2, canvas.height/2 + 20);
             } else {
-                const w = (baseImgObj.width || 1080), h = (baseImgObj.height || 1080);
-                canvas.width = w; canvas.height = h;
-                ctx.fillStyle = "#000000"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                const w = (baseImgObj.width || 1080);
+                const h = (baseImgObj.height || 1080);
+                canvas.width = w;
+                canvas.height = h;
+                ctx.fillStyle = "#000000";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
+
             if (maskRulerY != null && maskRulerY < canvas.height) {
                 ctx.save();
                 ctx.translate(0, maskRulerY);
@@ -4114,6 +4091,7 @@
                 ctx.fillRect(-diagonal, 0, diagonal * 2, diagonal);
                 ctx.restore();
             }
+
             applyPreviewZoom();
         }
 
@@ -4136,8 +4114,9 @@
             if (formula.startsWith('SUM(') && formula.endsWith(')')) {
                 const inside = formula.slice(4, -1).replace(/\s+/g, '');
                 if (!inside) return "0";
+                const targets = inside.split(',');
                 let totalSum = 0;
-                inside.split(',').forEach(target => {
+                targets.forEach(target => {
                     if (target.startsWith('A')) {
                         const targetIdx = parseInt(target.substring(1)) - 1;
                         if (targetIdx >= 0 && targetIdx < project.layers.length) {
@@ -4164,12 +4143,20 @@
             const selectEl = document.getElementById('layerFont');
             const newLayer = {
                 id: 'layer_' + Date.now(),
-                text: initialText,
-                x: canvas.width / 4, y: canvas.height / 3,
-                hiddenX: canvas.width / 4, hiddenY: canvas.height / 3,
-                size: 50, color: '#FFCC00', bgColor: '#000000',
-                useBg: false, isBold: false, font: selectEl.value,
-                letterSpacing: 0, lineHeight: 1.2, hiddenOnly: !!hiddenOnly
+                text: initialText, 
+                x: canvas.width / 4,
+                y: canvas.height / 3,
+                hiddenX: canvas.width / 4,
+                hiddenY: canvas.height / 3,
+                size: 50,
+                color: '#FFCC00',
+                bgColor: '#000000',
+                useBg: false,
+                isBold: false,
+                font: selectEl.value,
+                letterSpacing: 0, 
+                lineHeight: 1.2,
+                hiddenOnly: !!hiddenOnly
             };
             project.layers.push(newLayer);
             createHTMLLayer(newLayer);
@@ -4193,11 +4180,15 @@
             el.style.lineHeight = (layer.lineHeight || 1.2);
             if (layer.isBold) el.style.fontWeight = 'bold';
             el.innerText = parseFormula(layer.text);
-            positionElement(el, backgroundVisible ? layer.x : layer.hiddenX, backgroundVisible ? layer.y : layer.hiddenY);
-            if (layer === project.layers[8] && backgroundVisible) el.classList.add('a9-shine');
+            positionElement(el, backgroundVisible ? layer.x : layer.hiddenX,
+                                  backgroundVisible ? layer.y : layer.hiddenY);
+            if (layer === project.layers[8] && backgroundVisible) {
+                el.classList.add('a9-shine');
+            }
 
             const startDrag = (clientX, clientY) => {
-                isDragging = true; dragTarget = layer;
+                isDragging = true;
+                dragTarget = layer;
                 document.body.classList.add('dragging-active');
                 selectLayer(layer.id);
                 const rect = canvas.getBoundingClientRect();
@@ -4206,15 +4197,24 @@
                 const baseY = backgroundVisible ? layer.y : layer.hiddenY;
                 startX = (clientX - rect.left) / scale - baseX;
                 startY = (clientY - rect.top) / scale - baseY;
-                lastTouchX = clientX; lastTouchY = clientY;
+                lastTouchX = clientX;
+                lastTouchY = clientY;
             };
 
             el.addEventListener('mousedown', (e) => {
-                if (multiSelectMode) { e.preventDefault(); toggleMultiSelectLayer(layer.id); return; }
+                if (multiSelectMode) {
+                    e.preventDefault();
+                    toggleMultiSelectLayer(layer.id);
+                    return;
+                }
                 startDrag(e.clientX, e.clientY);
             });
             el.addEventListener('touchstart', (e) => {
-                if (multiSelectMode) { e.preventDefault(); toggleMultiSelectLayer(layer.id); return; }
+                if (multiSelectMode) {
+                    e.preventDefault();
+                    toggleMultiSelectLayer(layer.id);
+                    return;
+                }
                 if(e.touches.length === 1) startDrag(e.touches[0].clientX, e.touches[0].clientY);
             }, { passive: false });
 
@@ -4251,9 +4251,15 @@
             if (isTouch) {
                 const deltaX = ((clientX - lastTouchX) / scale) * touchSpeedMultiplier;
                 const deltaY = ((clientY - lastTouchY) / scale) * touchSpeedMultiplier;
-                if (writeToHidden) { dragTarget.hiddenX += deltaX; dragTarget.hiddenY += deltaY; }
-                else { dragTarget.x += deltaX; dragTarget.y += deltaY; }
-                lastTouchX = clientX; lastTouchY = clientY;
+                if (writeToHidden) {
+                    dragTarget.hiddenX += deltaX;
+                    dragTarget.hiddenY += deltaY;
+                } else {
+                    dragTarget.x += deltaX;
+                    dragTarget.y += deltaY;
+                }
+                lastTouchX = clientX;
+                lastTouchY = clientY;
             } else {
                 if (writeToHidden) {
                     dragTarget.hiddenX = (clientX - rect.left) / scale - startX;
@@ -4267,7 +4273,11 @@
                 rafPending = true;
                 requestAnimationFrame(() => {
                     const el = document.getElementById(dragTarget.id);
-                    if(el) positionElement(el, backgroundVisible ? dragTarget.x : dragTarget.hiddenX, backgroundVisible ? dragTarget.y : dragTarget.hiddenY);
+                    if(el) {
+                        const px = backgroundVisible ? dragTarget.x : dragTarget.hiddenX;
+                        const py = backgroundVisible ? dragTarget.y : dragTarget.hiddenY;
+                        positionElement(el, px, py);
+                    }
                     applyA9Shine();
                     updateTotalLabel();
                     positionMultiMoveDpad();
@@ -4277,7 +4287,9 @@
         };
 
         window.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY, false));
-        window.addEventListener('touchmove', (e) => { if(isDragging && e.touches.length === 1) handleMove(e.touches[0].clientX, e.touches[0].clientY, true); }, { passive: true });
+        window.addEventListener('touchmove', (e) => {
+            if(isDragging && e.touches.length === 1) handleMove(e.touches[0].clientX, e.touches[0].clientY, true);
+        }, { passive: true });
 
         const endDrag = () => {
             if(isDragging) {
@@ -4295,7 +4307,10 @@
         window.addEventListener('resize', () => {
             if (_resizeRafPending) return;
             _resizeRafPending = true;
-            requestAnimationFrame(() => { applyPreviewZoom(); _resizeRafPending = false; });
+            requestAnimationFrame(() => {
+                applyPreviewZoom();
+                _resizeRafPending = false;
+            });
         });
 
         function selectLayer(id) {
@@ -4325,7 +4340,10 @@
                     textInput.select();
                 }, 50);
             }
-            if (multiSelectMode) { multiSelectedIds.add(id); updateMultiSelectVisuals(); }
+            if (multiSelectMode) {
+                multiSelectedIds.add(id);
+                updateMultiSelectVisuals();
+            }
             updateLayersList();
             updateTotalLabel();
         }
@@ -4334,6 +4352,7 @@
             document.getElementById('layerSize').value = e.target.value;
             triggerInspectorInput();
         });
+
         document.getElementById('layerSize').addEventListener('input', (e) => {
             document.getElementById('layerSizeSlider').value = e.target.value;
             triggerInspectorInput();
@@ -4351,9 +4370,12 @@
             if (layer && el) {
                 const newText = textInput.value;
                 const oldText = layer.text;
+
                 const inputIndices = [2, 7, 9];
                 const idx = project.layers.findIndex(l => l.id === selectedLayerId);
-                if (inputIndices.includes(idx)) layer.isInput = true;
+                if (inputIndices.includes(idx)) {
+                    layer.isInput = true;
+                }
 
                 layer.text = newText;
                 layer.size = parseInt(document.getElementById('layerSize').value) || 20;
@@ -4371,7 +4393,7 @@
                 el.style.backgroundColor = layer.useBg ? layer.bgColor : 'transparent';
                 el.style.fontWeight = layer.isBold ? 'bold' : 'normal';
                 el.style.letterSpacing = getScaledSize(layer.letterSpacing || 0) + 'px';
-                updateAllFormulas();
+                updateAllFormulas(); 
                 saveProject();
                 const activeIdx = project.layers.findIndex(l => l.id === selectedLayerId);
                 if (activeIdx === 7 && oldText !== newText) {
@@ -4379,7 +4401,10 @@
                     window._a8LookupTimeout = setTimeout(() => {
                         const trimmed = (newText || '').trim();
                         const saved = loadSavedDataPairs();
-                        if (trimmed && saved[trimmed]) { applySavedDataPair(trimmed); return; }
+                        if (trimmed && saved[trimmed]) {
+                            applySavedDataPair(trimmed);
+                            return;
+                        }
                         lookupAndFillName(newText);
                     }, 400);
                 }
@@ -4388,7 +4413,9 @@
                     applyA9Shine();
                     updateLayersList();
                 }
-                if (activeIdx === A5_INDEX) updateTotalLabel();
+                if (activeIdx === A5_INDEX) {
+                    updateTotalLabel();
+                }
             }
         };
 
@@ -4398,30 +4425,55 @@
             targetEl.addEventListener('change', updateActiveLayerProps);
         });
 
-        const NUDGE_DIRS = { up: {dx:0,dy:-1}, down: {dx:0,dy:1}, left: {dx:-1,dy:0}, right: {dx:1,dy:0} };
-        const NUDGE_INITIAL_DELAY = 320, NUDGE_REPEAT_INTERVAL = 55;
-        const nudgeHoldState = { timer: null, interval: null, btn: null, dir: null, active: false };
+        const NUDGE_DIRS = {
+            up:    { dx: 0,  dy: -1 },
+            down:  { dx: 0,  dy:  1 },
+            left:  { dx: -1, dy:  0 },
+            right: { dx: 1,  dy:  0 }
+        };
+
+        const NUDGE_INITIAL_DELAY = 320;
+        const NUDGE_REPEAT_INTERVAL = 55;
+
+        const nudgeHoldState = {
+            timer: null,
+            interval: null,
+            btn: null,
+            dir: null,
+            active: false
+        };
 
         function doNudgeStep(dir) {
             const d = NUDGE_DIRS[dir];
             if (!d) return;
-            if (multiSelectMode && multiSelectedIds.size > 0) moveSelectedBy(d.dx, d.dy);
-            else nudgeActiveLayer(d.dx, d.dy);
+            if (multiSelectMode && multiSelectedIds.size > 0) {
+                moveSelectedBy(d.dx, d.dy);
+            } else {
+                nudgeActiveLayer(d.dx, d.dy);
+            }
         }
 
         function stopNudgeHold() {
             if (nudgeHoldState.timer) { clearTimeout(nudgeHoldState.timer); nudgeHoldState.timer = null; }
             if (nudgeHoldState.interval) { clearInterval(nudgeHoldState.interval); nudgeHoldState.interval = null; }
-            if (nudgeHoldState.btn) nudgeHoldState.btn.classList.remove('holding');
-            nudgeHoldState.btn = null; nudgeHoldState.dir = null; nudgeHoldState.active = false;
+            if (nudgeHoldState.btn) {
+                nudgeHoldState.btn.classList.remove('holding');
+            }
+            nudgeHoldState.btn = null;
+            nudgeHoldState.dir = null;
+            nudgeHoldState.active = false;
         }
 
         function beginNudgeHold(btn, dir) {
             stopNudgeHold();
             if (!selectedLayerId && !(multiSelectMode && multiSelectedIds.size > 0)) return;
-            nudgeHoldState.btn = btn; nudgeHoldState.dir = dir; nudgeHoldState.active = true;
+            nudgeHoldState.btn = btn;
+            nudgeHoldState.dir = dir;
+            nudgeHoldState.active = true;
             btn.classList.add('holding');
+
             doNudgeStep(dir);
+
             nudgeHoldState.timer = setTimeout(() => {
                 if (!nudgeHoldState.active) return;
                 nudgeHoldState.interval = setInterval(() => {
@@ -4434,9 +4486,21 @@
         document.querySelectorAll('.nudge-btn').forEach(btn => {
             const dir = btn.getAttribute('data-dir');
             if (!dir) return;
-            btn.addEventListener('mousedown', (e) => { e.preventDefault(); beginNudgeHold(btn, dir); });
-            btn.addEventListener('touchstart', (e) => { e.preventDefault(); beginNudgeHold(btn, dir); }, { passive: false });
-            btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
+
+            btn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                beginNudgeHold(btn, dir);
+            });
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                beginNudgeHold(btn, dir);
+            }, { passive: false });
+
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
             btn.addEventListener('contextmenu', (e) => e.preventDefault());
         });
 
@@ -4451,8 +4515,15 @@
             const el = document.getElementById(selectedLayerId);
             if(layer && el) {
                 const stepMultiplier = isAndroid ? 5 : 1;
-                if (backgroundVisible) { layer.x += dx * stepMultiplier; layer.y += dy * stepMultiplier; positionElement(el, layer.x, layer.y); }
-                else { layer.hiddenX += dx * stepMultiplier; layer.hiddenY += dy * stepMultiplier; positionElement(el, layer.hiddenX, layer.hiddenY); }
+                if (backgroundVisible) {
+                    layer.x += dx * stepMultiplier;
+                    layer.y += dy * stepMultiplier;
+                    positionElement(el, layer.x, layer.y);
+                } else {
+                    layer.hiddenX += dx * stepMultiplier;
+                    layer.hiddenY += dy * stepMultiplier;
+                    positionElement(el, layer.hiddenX, layer.hiddenY);
+                }
                 if (selectedLayerId === project.layers[8]?.id) applyA9Shine();
                 saveProject();
                 updateTotalLabel();
@@ -4495,7 +4566,10 @@
             project.layers = project.layers.filter(l => l.id !== id);
             const el = document.getElementById(id);
             if(el) el.remove();
-            if(selectedLayerId === id) { document.getElementById('inspector').style.display = 'none'; selectedLayerId = null; }
+            if(selectedLayerId === id) {
+                document.getElementById('inspector').style.display = 'none';
+                selectedLayerId = null;
+            }
             multiSelectedIds.delete(id);
             updateAllFormulas();
             updateLayersList();
@@ -4513,8 +4587,12 @@
                 item.className = `layer-item ${layer.id === selectedLayerId ? 'active' : ''}${layer.hiddenOnly ? ' bg-hidden-only' : ''}${multiSelectedIds.has(layer.id) ? ' multi-selected' : ''}`;
                 item.dataset.layerId = layer.id;
                 item.onclick = (e) => {
-                    if (multiSelectMode) { e.preventDefault(); toggleMultiSelectLayer(layer.id); }
-                    else selectLayer(layer.id);
+                    if (multiSelectMode) {
+                        e.preventDefault();
+                        toggleMultiSelectLayer(layer.id);
+                    } else {
+                        selectLayer(layer.id);
+                    }
                 };
                 const displayTitle = layer.text.length > 12 ? layer.text.slice(0, 12) + '...' : layer.text;
                 const tagClass = layer.hiddenOnly ? 'layer-ref hidden-only-tag' : 'layer-ref';
@@ -4532,24 +4610,37 @@
         }
 
         function flattenAndDownload(format) {
-            if (format === 'jpg') saveCurrentDataPair();
+            if (format === 'jpg') {
+                const savedPair = saveCurrentDataPair();
+                if (savedPair) {
+                    console.log('JPEG download → saved data pair');
+                }
+            }
+
             saveCurrentPair();
 
             if (project.bgImage && baseImgObj.width) {
-                canvas.width = baseImgObj.width; canvas.height = baseImgObj.height;
+                canvas.width = baseImgObj.width;
+                canvas.height = baseImgObj.height;
                 ctx.drawImage(baseImgObj, 0, 0);
             } else {
-                canvas.width = 1080; canvas.height = 1080;
-                ctx.fillStyle = "#11110e"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                canvas.width = 1080;
+                canvas.height = 1080;
+                ctx.fillStyle = "#11110e";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
+
             project.layers.forEach(layer => {
                 if (layer.hiddenOnly) return;
                 const finalStr = parseFormula(layer.text).toString();
-                const px = layer.x, py = layer.y;
+                const px = layer.x;
+                const py = layer.y;
                 ctx.font = `${layer.isBold ? 'bold' : 'normal'} ${layer.size}px ${layer.font}`;
-                ctx.textBaseline = "top"; ctx.textAlign = "left";
+                ctx.textBaseline = "top";
+                ctx.textAlign = "left";
                 const textMetrics = ctx.measureText(finalStr);
-                if(layer.useBg) { ctx.fillStyle = layer.bgColor; ctx.fillRect(px, py, textMetrics.width, layer.size); }
+                const textWidth = textMetrics.width;
+                if(layer.useBg) { ctx.fillStyle = layer.bgColor; ctx.fillRect(px, py, textWidth, layer.size); }
                 ctx.fillStyle = layer.color;
                 if(layer.letterSpacing && layer.letterSpacing !== 0) {
                     let currentX = px;
@@ -4558,11 +4649,13 @@
                         ctx.fillText(char, currentX, py);
                         currentX += ctx.measureText(char).width + layer.letterSpacing;
                     }
-                } else ctx.fillText(finalStr, px, py);
+                } else {
+                    ctx.fillText(finalStr, px, py);
+                }
             });
             const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
             const link = document.createElement('a');
-            link.download = `studio_render_${Date.now()}.${format}`;
+            link.download = `bee72342368/studio_render_${Date.now()}.${format}`;
             link.href = canvas.toDataURL(mime, 0.95);
             link.click();
             renderCanvas();
@@ -4573,27 +4666,35 @@
             showFlashMessage('Completed Operation');
             playNotificationSound();
             vibrateOnDownload();
+
             const result = bumpDownloadCountForA8();
             if (result) showDownloadCountToast(result.count);
         }
 
         async function shareImage() {
             saveCurrentPair();
+
             if (project.bgImage && baseImgObj.width) {
-                canvas.width = baseImgObj.width; canvas.height = baseImgObj.height;
+                canvas.width = baseImgObj.width;
+                canvas.height = baseImgObj.height;
                 ctx.drawImage(baseImgObj, 0, 0);
             } else {
-                canvas.width = 1080; canvas.height = 1080;
-                ctx.fillStyle = "#11110e"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                canvas.width = 1080;
+                canvas.height = 1080;
+                ctx.fillStyle = "#11110e";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
             project.layers.forEach(layer => {
                 if (layer.hiddenOnly) return;
                 const finalStr = parseFormula(layer.text).toString();
-                const px = layer.x, py = layer.y;
+                const px = layer.x;
+                const py = layer.y;
                 ctx.font = `${layer.isBold ? 'bold' : 'normal'} ${layer.size}px ${layer.font}`;
-                ctx.textBaseline = "top"; ctx.textAlign = "left";
+                ctx.textBaseline = "top";
+                ctx.textAlign = "left";
                 const textMetrics = ctx.measureText(finalStr);
-                if(layer.useBg) { ctx.fillStyle = layer.bgColor; ctx.fillRect(px, py, textMetrics.width, layer.size); }
+                const textWidth = textMetrics.width;
+                if(layer.useBg) { ctx.fillStyle = layer.bgColor; ctx.fillRect(px, py, textWidth, layer.size); }
                 ctx.fillStyle = layer.color;
                 if(layer.letterSpacing && layer.letterSpacing !== 0) {
                     let currentX = px;
@@ -4602,7 +4703,9 @@
                         ctx.fillText(char, currentX, py);
                         currentX += ctx.measureText(char).width + layer.letterSpacing;
                     }
-                } else ctx.fillText(finalStr, px, py);
+                } else {
+                    ctx.fillText(finalStr, px, py);
+                }
             });
             canvas.toBlob(async (blob) => {
                 renderCanvas();
@@ -4639,6 +4742,12 @@
         document.getElementById('exportPng').addEventListener('click', () => flattenAndDownload('png'));
         document.getElementById('exportJpg').addEventListener('click', () => flattenAndDownload('jpg'));
         document.getElementById('shareImageBtn').addEventListener('click', shareImage);
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('bee72342368/sw.js').catch(err => console.log(err));
+            });
+        }
 
         const handleSelectAll = function(e) {
             if (e) e.preventDefault();
@@ -4742,7 +4851,10 @@
 
         document.getElementById('heartSaveA8Btn').addEventListener('click', () => {
             const a8 = getCurrentA8Value();
-            if (!a8) { showFlashMessage('No A8 value to save'); return; }
+            if (!a8) {
+                showFlashMessage('No A8 value to save');
+                return;
+            }
             const a3 = getCurrentA3Value();
             addSavedA8Value(a8, a3);
             const btn = document.getElementById('heartSaveA8Btn');
@@ -4750,9 +4862,19 @@
             setTimeout(() => btn.classList.remove('saved'), 800);
         });
 
-        document.getElementById('previewZoomIn').addEventListener('click', () => { previewZoom = Math.min(3.0, previewZoom + 0.1); applyPreviewZoom(); });
-        document.getElementById('previewZoomOut').addEventListener('click', () => { previewZoom = Math.max(0.3, previewZoom - 0.1); applyPreviewZoom(); });
-        document.getElementById('previewZoomReset').addEventListener('click', () => { previewZoom = 1.0; applyPreviewZoom(); });
+        // ========== PREVIEW ZOOM CONTROLS ==========
+        document.getElementById('previewZoomIn').addEventListener('click', () => {
+            previewZoom = Math.min(3.0, previewZoom + 0.1);
+            applyPreviewZoom();
+        });
+        document.getElementById('previewZoomOut').addEventListener('click', () => {
+            previewZoom = Math.max(0.3, previewZoom - 0.1);
+            applyPreviewZoom();
+        });
+        document.getElementById('previewZoomReset').addEventListener('click', () => {
+            previewZoom = 1.0;
+            applyPreviewZoom();
+        });
     </script>
 </body>
 </html>
