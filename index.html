@@ -923,7 +923,7 @@
             justify-content: center;
             font-size: 24px;
             line-height: 1;
-            cursor: pointer;
+            cursor: grab;
             box-shadow: 0 4px 14px rgba(0,0,0,0.9), 0 0 12px rgba(255,204,0,0.45);
             z-index: 10000;
             transition: transform 0.15s, background 0.15s;
@@ -932,10 +932,17 @@
             -webkit-user-select: none;
             padding: 0;
             min-height: auto;
+            touch-action: none;
         }
         .heart-btn:active {
             transform: scale(0.85);
             background: #2a2a2a;
+        }
+        .heart-btn.dragging {
+            cursor: grabbing;
+            transform: scale(1.05);
+            transition: none;
+            box-shadow: 0 6px 22px rgba(0,0,0,0.9), 0 0 22px rgba(255,204,0,0.75);
         }
         .heart-btn.saved {
             color: #ff4d6d;
@@ -1910,6 +1917,165 @@
             return str
                 .replace(/[\u0660-\u0669]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x0660 + 48))
                 .replace(/[\u06F0-\u06F9]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x06F0 + 48));
+        }
+
+        // ========== DRAGGABLE HEART BUTTON (Save A8) ==========
+        const HEART_POS_STORAGE_KEY = 'bee72342368/heart_btn_pos';
+
+        function clampHeartPosition(left, top, w, h) {
+            const vw = window.innerWidth || 0;
+            const vh = window.innerHeight || 0;
+            const btnW = w || 46;
+            const btnH = h || 46;
+            const maxLeft = Math.max(0, vw - btnW);
+            const maxTop = Math.max(0, vh - btnH);
+            return {
+                left: Math.min(Math.max(0, left), maxLeft),
+                top: Math.min(Math.max(0, top), maxTop)
+            };
+        }
+
+        function applyHeartButtonPosition(left, top) {
+            const btn = document.getElementById('heartSaveA8Btn');
+            if (!btn) return;
+            const clamped = clampHeartPosition(left, top, btn.offsetWidth, btn.offsetHeight);
+            btn.style.left = clamped.left + 'px';
+            btn.style.top = clamped.top + 'px';
+            btn.style.right = 'auto';
+            btn.style.bottom = 'auto';
+        }
+
+        function loadHeartButtonPosition() {
+            try {
+                const raw = localStorage.getItem(HEART_POS_STORAGE_KEY);
+                if (!raw) return;
+                const pos = JSON.parse(raw);
+                if (pos && typeof pos.left === 'number' && typeof pos.top === 'number') {
+                    applyHeartButtonPosition(pos.left, pos.top);
+                }
+            } catch(e) {}
+        }
+
+        function saveHeartButtonPosition(left, top) {
+            try {
+                localStorage.setItem(HEART_POS_STORAGE_KEY, JSON.stringify({ left, top }));
+            } catch(e) {}
+        }
+
+        (function initDraggableHeart() {
+            const btn = document.getElementById('heartSaveA8Btn');
+            if (!btn) return;
+
+            let dragging = false;
+            let moved = false;
+            let startPointerX = 0;
+            let startPointerY = 0;
+            let startLeft = 0;
+            let startTop = 0;
+            let activePointerId = null;
+
+            const DRAG_THRESHOLD = 6; // px of movement before it counts as drag (not a tap)
+
+            function onPointerDown(e) {
+                if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
+                const rect = btn.getBoundingClientRect();
+                startLeft = rect.left;
+                startTop = rect.top;
+                // Ensure the button is positioned with left/top from here on
+                btn.style.left = startLeft + 'px';
+                btn.style.top = startTop + 'px';
+                btn.style.right = 'auto';
+                btn.style.bottom = 'auto';
+
+                dragging = true;
+                moved = false;
+                startPointerX = e.clientX;
+                startPointerY = e.clientY;
+                activePointerId = e.pointerId;
+                try { btn.setPointerCapture(e.pointerId); } catch(err) {}
+            }
+
+            function onPointerMove(e) {
+                if (!dragging) return;
+                if (activePointerId !== null && e.pointerId !== activePointerId) return;
+                const dx = e.clientX - startPointerX;
+                const dy = e.clientY - startPointerY;
+                if (!moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+                if (!moved) {
+                    moved = true;
+                    btn.classList.add('dragging');
+                }
+                e.preventDefault();
+                const newLeft = startLeft + dx;
+                const newTop = startTop + dy;
+                const clamped = clampHeartPosition(newLeft, newTop, btn.offsetWidth, btn.offsetHeight);
+                btn.style.left = clamped.left + 'px';
+                btn.style.top = clamped.top + 'px';
+            }
+
+            function onPointerUp(e) {
+                if (!dragging) return;
+                if (activePointerId !== null && e.pointerId !== undefined && e.pointerId !== activePointerId) return;
+                dragging = false;
+                btn.classList.remove('dragging');
+                try { if (activePointerId !== null) btn.releasePointerCapture(activePointerId); } catch(err) {}
+                activePointerId = null;
+
+                if (moved) {
+                    const rect = btn.getBoundingClientRect();
+                    saveHeartButtonPosition(rect.left, rect.top);
+                } else {
+                    // Treat as a tap/click → perform save
+                    handleHeartSave();
+                }
+            }
+
+            function onPointerCancel() {
+                if (!dragging) return;
+                dragging = false;
+                moved = false;
+                btn.classList.remove('dragging');
+                activePointerId = null;
+            }
+
+            btn.addEventListener('pointerdown', onPointerDown);
+            btn.addEventListener('pointermove', onPointerMove);
+            btn.addEventListener('pointerup', onPointerUp);
+            btn.addEventListener('pointercancel', onPointerCancel);
+
+            // Prevent old click handler from double-firing on browsers where pointer events are supported
+            btn.addEventListener('click', (e) => {
+                // If pointer events were used, we already handled the tap in onPointerUp.
+                // Only run legacy fallback if pointer events are unsupported.
+                if (window.PointerEvent) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+
+            // Keep the button within the viewport on resize
+            window.addEventListener('resize', () => {
+                const rect = btn.getBoundingClientRect();
+                const clamped = clampHeartPosition(rect.left, rect.top, btn.offsetWidth, btn.offsetHeight);
+                btn.style.left = clamped.left + 'px';
+                btn.style.top = clamped.top + 'px';
+                saveHeartButtonPosition(clamped.left, clamped.top);
+            });
+        })();
+
+        function handleHeartSave() {
+            const btn = document.getElementById('heartSaveA8Btn');
+            const a8 = getCurrentA8Value();
+            if (!a8) {
+                showFlashMessage('No A8 value to save');
+                return;
+            }
+            const a3 = getCurrentA3Value();
+            addSavedA8Value(a8, a3);
+            if (btn) {
+                btn.classList.add('saved');
+                setTimeout(() => btn.classList.remove('saved'), 800);
+            }
         }
 
         // ========== SAVED DATA PAIRS (A8 -> {A10, A9, A3, A4}) ==========
@@ -3797,6 +3963,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            loadHeartButtonPosition();
             loadBgVisibility();
             updateBgToggleButtonUI();
 
@@ -4839,18 +5006,8 @@
         window.addEventListener('click', () => { if (a9MenuDropdown.classList.contains('show')) a9MenuDropdown.classList.remove('show'); });
         window.deleteLayer = deleteLayer;
 
-        document.getElementById('heartSaveA8Btn').addEventListener('click', () => {
-            const a8 = getCurrentA8Value();
-            if (!a8) {
-                showFlashMessage('No A8 value to save');
-                return;
-            }
-            const a3 = getCurrentA3Value();
-            addSavedA8Value(a8, a3);
-            const btn = document.getElementById('heartSaveA8Btn');
-            btn.classList.add('saved');
-            setTimeout(() => btn.classList.remove('saved'), 800);
-        });
+        // Note: heart save handler is now bound to the draggable pointer logic above.
+        // It calls handleHeartSave() on a genuine tap (no drag movement).
 
         // ========== PREVIEW ZOOM CONTROLS ==========
         document.getElementById('previewZoomIn').addEventListener('click', () => {
