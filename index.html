@@ -51,9 +51,6 @@
             --radius-md: 12px;
             --multi-select: #4da6ff;
             --multi-select-glow: rgba(77, 166, 255, 0.4);
-            --notif-bg: #0b2a4a;
-            --notif-accent: #4da6ff;
-            --notif-glow: rgba(77, 166, 255, 0.45);
         }
         body {
             margin: 0;
@@ -1569,241 +1566,9 @@
         .clipboard-panel.clipboard-collapsed {
             display: none;
         }
-
-        /* ===== NOTIFICATION BANNER ===== */
-        .notif-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(135deg, #0b2a4a 0%, #0d1f33 100%);
-            border-bottom: 2px solid var(--notif-accent);
-            box-shadow: 0 6px 28px rgba(11, 42, 74, 0.75), 0 0 22px rgba(77, 166, 255, 0.3);
-            z-index: 100000;
-            display: flex;
-            flex-direction: column;
-            transform: translateY(-120%);
-            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-            -webkit-tap-highlight-color: transparent;
-            pointer-events: none;
-        }
-        .notif-banner.visible {
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-        .notif-banner-inner {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            max-width: 100%;
-        }
-        .notif-icon {
-            width: 40px;
-            height: 40px;
-            flex: 0 0 auto;
-            border-radius: 10px;
-            background: rgba(77, 166, 255, 0.18);
-            border: 1.5px solid var(--notif-accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: var(--notif-accent);
-            box-shadow: 0 0 14px rgba(77, 166, 255, 0.35);
-        }
-        .notif-content {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .notif-title {
-            font-size: 0.82rem;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: 0.02em;
-            line-height: 1.2;
-        }
-        .notif-subtitle {
-            font-size: 0.68rem;
-            color: rgba(255, 255, 255, 0.55);
-            font-weight: 500;
-            letter-spacing: 0.01em;
-            line-height: 1.2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .notif-close {
-            width: 30px;
-            height: 30px;
-            flex: 0 0 auto;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 0;
-            min-height: auto;
-            -webkit-tap-highlight-color: transparent;
-            transition: background 0.15s, transform 0.12s;
-            line-height: 1;
-        }
-        .notif-close:active {
-            background: rgba(239, 68, 68, 0.25);
-            border-color: #ef4444;
-            color: #ef4444;
-            transform: scale(0.9);
-        }
-        .notif-input-row {
-            display: flex;
-            gap: 8px;
-            padding: 0 16px 12px 16px;
-            align-items: stretch;
-        }
-        .notif-input-row input {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(77, 166, 255, 0.4);
-            border-radius: 8px;
-            color: #ffffff;
-            padding: 10px 12px;
-            font-size: 0.82rem;
-            outline: none;
-            min-height: 38px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            -webkit-tap-highlight-color: transparent;
-            font-family: inherit;
-        }
-        .notif-input-row input:focus {
-            border-color: var(--notif-accent);
-            box-shadow: 0 0 0 3px rgba(77, 166, 255, 0.2);
-        }
-        .notif-input-row input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-        .notif-send-btn {
-            flex: 0 0 auto;
-            min-width: 70px;
-            height: 38px;
-            min-height: 38px;
-            background: var(--notif-accent);
-            border: none;
-            border-radius: 8px;
-            color: #0b2a4a;
-            font-size: 0.72rem;
-            font-weight: 900;
-            letter-spacing: 0.04em;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 0 14px;
-            -webkit-tap-highlight-color: transparent;
-            transition: background 0.15s, transform 0.12s;
-            line-height: 1;
-        }
-        .notif-send-btn:active {
-            background: #6db8ff;
-            transform: scale(0.94);
-        }
-        .notif-send-btn:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        .notif-text-display {
-            padding: 0 16px 12px 16px;
-            display: none;
-        }
-        .notif-text-display.visible {
-            display: block;
-        }
-        .notif-text-display-inner {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(77, 166, 255, 0.25);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.4;
-            max-height: 80px;
-            overflow-y: auto;
-            word-break: break-word;
-            direction: auto;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 0.3px;
-        }
-        .notif-text-display-inner .notif-empty-hint {
-            color: rgba(255, 255, 255, 0.3);
-            font-style: italic;
-            font-family: -apple-system, sans-serif;
-        }
-        .notif-permission-badge {
-            font-size: 0.55rem;
-            font-weight: 700;
-            padding: 1px 6px;
-            border-radius: 6px;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            flex: 0 0 auto;
-            margin-left: 4px;
-        }
-        .notif-permission-badge.granted {
-            background: rgba(92, 214, 92, 0.15);
-            color: #5cd65c;
-            border: 1px solid rgba(92, 214, 92, 0.35);
-        }
-        .notif-permission-badge.denied {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.35);
-        }
-        .notif-permission-badge.default {
-            background: rgba(255, 204, 0, 0.15);
-            color: var(--accent);
-            border: 1px solid rgba(255, 204, 0, 0.35);
-        }
-        @media (max-width: 380px) {
-            .notif-title { font-size: 0.72rem; }
-            .notif-subtitle { font-size: 0.62rem; }
-            .notif-input-row input { font-size: 0.75rem; padding: 8px 10px; }
-            .notif-send-btn { min-width: 58px; font-size: 0.65rem; padding: 0 10px; }
-        }
     </style>
 </head>
 <body>
-
-    <!-- NOTIFICATION BANNER (slides down from top) -->
-    <div class="notif-banner" id="notifBanner">
-        <div class="notif-banner-inner">
-            <div class="notif-icon">🔔</div>
-            <div class="notif-content">
-                <div class="notif-title">
-                    Bee Project
-                    <span class="notif-permission-badge default" id="notifPermBadge">…</span>
-                </div>
-                <div class="notif-subtitle" id="notifSubtitle">Type or paste text below — it will appear in A10 (Name)</div>
-            </div>
-            <button class="notif-close" id="notifCloseBtn" title="Dismiss banner">✕</button>
-        </div>
-        <div class="notif-input-row" id="notifInputRow">
-            <input type="text" id="notifTextInput" placeholder="Type or paste text for A10…" autocomplete="off" dir="auto">
-            <button class="notif-send-btn" id="notifSendBtn" title="Send to A10 Name layer">SEND →</button>
-        </div>
-        <div class="notif-text-display" id="notifTextDisplay">
-            <div class="notif-text-display-inner" id="notifTextDisplayInner">
-                <span class="notif-empty-hint">No text sent yet. Type above and press SEND.</span>
-            </div>
-        </div>
-    </div>
 
     <div id="workspace">
         <div class="preview-controls">
@@ -1964,7 +1729,11 @@
                                 <div class="a9-option-item" data-value="بدايتي للتمويل متناهي الصغر">بدايتي للتمويل متناهي الصغر</div>
                                 <div class="a9-option-item" data-value="تمويلي للتمويل متناهي الصغر">تمويلي للتمويل متناهي الصغر</div>
                                 <div class="a9-option-item" data-value="سنده للتمويل متناهي الصغر">سنده للتمويل متناهي الصغر</div>
-                                <div class="a9-option-item" data-value="تنمية للتمويل متناهي الصغر">تنمية للتمويل متناهي الصغر</div>
+                                <div class="a9-option-item" data-value="تنميه للتمويل متناهي الصغر">تنميه للتمويل متناهي الصغر</div>
+                                <div class="a9-option-item" data-value="كاش للتمويل متناهي الصغر">كاش للتمويل متناهي الصغر</div>
+                                <div class="a9-option-item" data-value="ارادة للتمويل متناهي الصغر">ارادة للتمويل متناهي الصغر</div>
+                                <div class="a9-option-item" data-value="الأهلي تمكين للتمويل متناهي الصغر">الأهلي تمكين للتمويل متناهي الصغر</div>
+                                <div class="a9-option-item" data-value="معاك للتمويل متناهي الصغر">معاك للتمويل متناهي الصغر</div>
                             </div>
                         </div>
                         <button id="nextLayerBtn" class="select-all-btn" style="flex: 0 0 auto;">Next</button>
@@ -2131,268 +1900,9 @@
     </div>
 
     <script>
-        // ===== NOTIFICATION BANNER SYSTEM =====
-        const notifBanner = document.getElementById('notifBanner');
-        const notifCloseBtn = document.getElementById('notifCloseBtn');
-        const notifTextInput = document.getElementById('notifTextInput');
-        const notifSendBtn = document.getElementById('notifSendBtn');
-        const notifTextDisplay = document.getElementById('notifTextDisplay');
-        const notifTextDisplayInner = document.getElementById('notifTextDisplayInner');
-        const notifSubtitle = document.getElementById('notifSubtitle');
-        const notifPermBadge = document.getElementById('notifPermBadge');
-        const notifInputRow = document.getElementById('notifInputRow');
-
-        let notifBannerVisible = false;
-        let notifAutoHideTimer = null;
-        let lastSentNotifText = '';
-
-        const NOTIF_STORAGE_KEY = 'bee72342368/notif_last_text';
-
-        function loadNotifLastText() {
-            try {
-                return localStorage.getItem(NOTIF_STORAGE_KEY) || '';
-            } catch(e) { return ''; }
-        }
-
-        function saveNotifLastText(text) {
-            try { localStorage.setItem(NOTIF_STORAGE_KEY, text); } catch(e) {}
-        }
-
-        function updateNotifPermissionBadge() {
-            if (!notifPermBadge) return;
-            if (!('Notification' in window)) {
-                notifPermBadge.textContent = 'N/A';
-                notifPermBadge.className = 'notif-permission-badge denied';
-                return;
-            }
-            const p = Notification.permission;
-            notifPermBadge.textContent = p;
-            notifPermBadge.className = 'notif-permission-badge ' + (p === 'granted' ? 'granted' : p === 'denied' ? 'denied' : 'default');
-        }
-
-        function showNotifBanner(autoHide = true) {
-            if (!notifBanner) return;
-            notifBanner.classList.add('visible');
-            notifBannerVisible = true;
-            notifTextInput.focus();
-            clearTimeout(notifAutoHideTimer);
-            if (autoHide) {
-                notifAutoHideTimer = setTimeout(() => {
-                    hideNotifBanner();
-                }, 12000);
-            }
-            updateNotifPermissionBadge();
-            renderNotifTextDisplay();
-        }
-
-        function hideNotifBanner() {
-            if (!notifBanner) return;
-            notifBanner.classList.remove('visible');
-            notifBannerVisible = false;
-            clearTimeout(notifAutoHideTimer);
-        }
-
-        function renderNotifTextDisplay() {
-            if (!notifTextDisplayInner) return;
-            const txt = lastSentNotifText || loadNotifLastText();
-            if (!txt || !txt.trim()) {
-                notifTextDisplayInner.innerHTML = '<span class="notif-empty-hint">No text sent yet. Type above and press SEND.</span>';
-                return;
-            }
-            notifTextDisplayInner.textContent = txt;
-        }
-
-        async function requestNotificationPermission() {
-            if (!('Notification' in window)) return false;
-            if (Notification.permission === 'granted') return true;
-            if (Notification.permission === 'denied') return false;
-            try {
-                const result = await Notification.requestPermission();
-                updateNotifPermissionBadge();
-                return result === 'granted';
-            } catch(e) {
-                updateNotifPermissionBadge();
-                return false;
-            }
-        }
-
-        function sendNativeNotification(title, body) {
-            if (!('Notification' in window)) return;
-            if (Notification.permission !== 'granted') return;
-            try {
-                const n = new Notification(title, {
-                    body: body,
-                    icon: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect x="6" y="12" width="36" height="26" rx="5" ry="5" fill="#FFCC00" stroke="#111" stroke-width="2"/><path d="M6 18 L42 18" stroke="#111" stroke-width="2"/><rect x="30" y="22" width="12" height="8" rx="2" ry="2" fill="#111"/><circle cx="36" cy="26" r="2" fill="#FFCC00"/></svg>'),
-                    badge: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect x="6" y="12" width="36" height="26" rx="5" ry="5" fill="#FFCC00" stroke="#111" stroke-width="2"/><path d="M6 18 L42 18" stroke="#111" stroke-width="2"/><rect x="30" y="22" width="12" height="8" rx="2" ry="2" fill="#111"/><circle cx="36" cy="26" r="2" fill="#FFCC00"/></svg>'),
-                    tag: 'bee-project-notif',
-                    renotify: true,
-                    silent: false,
-                    requireInteraction: false
-                });
-                n.onclick = () => {
-                    window.focus();
-                    showNotifBanner(true);
-                    n.close();
-                };
-                setTimeout(() => { try { n.close(); } catch(e) {} }, 8000);
-            } catch(e) {
-                console.warn('Native notification failed:', e);
-            }
-        }
-
-        function handleNotifSend() {
-            const val = (notifTextInput.value || '').trim();
-            if (!val) {
-                notifSubtitle.textContent = '⚠ Type something first!';
-                notifTextInput.focus();
-                setTimeout(() => {
-                    notifSubtitle.textContent = 'Type or paste text below — it will appear in A10 (Name)';
-                }, 2000);
-                return;
-            }
-
-            lastSentNotifText = val;
-            saveNotifLastText(val);
-            renderNotifTextDisplay();
-            notifTextDisplay.classList.add('visible');
-
-            notifSubtitle.textContent = '✓ Sending to A10 (Name)…';
-            notifSendBtn.disabled = true;
-
-            // Apply to A10 layer
-            setTimeout(() => {
-                try {
-                    const a10Layer = project.layers[9];
-                    if (a10Layer) {
-                        a10Layer.text = val;
-                        a10Layer.isInput = true;
-                        delete a10Layer.formula;
-                        delete a10Layer.isFormula;
-                        const a10El = document.getElementById(a10Layer.id);
-                        if (a10El) {
-                            a10El.innerText = val;
-                            a10El.style.transition = 'box-shadow 0.3s';
-                            a10El.style.boxShadow = '0 0 22px rgba(77,166,255,0.9)';
-                            setTimeout(() => { a10El.style.boxShadow = ''; }, 1000);
-                        }
-                        if (selectedLayerId === a10Layer.id) {
-                            const inp = document.getElementById('layerText');
-                            if (inp) inp.value = val;
-                        }
-                        addNameToMemory(val);
-                        updateAllFormulas();
-                        updateLayersList();
-                        saveProject();
-                        notifSubtitle.textContent = '✓ Sent to A10: ' + (val.length > 30 ? val.slice(0, 30) + '…' : val);
-                        showFlashMessage('Notification text → A10');
-                        vibrateStrong();
-
-                        // Also fire native notification with the sent text
-                        sendNativeNotification('Bee Project — Text Sent', val.length > 120 ? val.slice(0, 120) + '…' : val);
-                    } else {
-                        notifSubtitle.textContent = '⚠ A10 layer not found';
-                    }
-                } catch(err) {
-                    console.error('Notif send error:', err);
-                    notifSubtitle.textContent = '⚠ Error sending text';
-                } finally {
-                    notifSendBtn.disabled = false;
-                }
-            }, 150);
-
-            notifTextInput.value = '';
-            clearTimeout(notifAutoHideTimer);
-            notifAutoHideTimer = setTimeout(() => hideNotifBanner(), 6000);
-        }
-
-        function setupNotificationBanner() {
-            // Update permission badge
-            updateNotifPermissionBadge();
-
-            // Request permission on first interaction
-            const requestPermOnce = async () => {
-                if (!('Notification' in window)) return;
-                if (Notification.permission === 'default') {
-                    await requestNotificationPermission();
-                }
-            };
-
-            // Visibility change: show banner when app becomes visible again
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) {
-                    // App became visible — show banner
-                    showNotifBanner(true);
-                    // Try to request notification permission if default
-                    requestPermOnce();
-                } else {
-                    // App went hidden — optionally fire a native notification
-                    if ('Notification' in window && Notification.permission === 'granted') {
-                        const lastTxt = lastSentNotifText || loadNotifLastText();
-                        sendNativeNotification(
-                            'Bee Project — Still running',
-                            lastTxt ? 'Last text: ' + (lastTxt.length > 80 ? lastTxt.slice(0, 80) + '…' : lastTxt) : 'Tap to return to Bee Project.'
-                        );
-                    }
-                }
-            });
-
-            // Also show on first load
-            setTimeout(() => {
-                showNotifBanner(true);
-                requestPermOnce();
-            }, 1200);
-
-            // Close button
-            notifCloseBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                hideNotifBanner();
-            });
-
-            // Send button
-            notifSendBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                handleNotifSend();
-            });
-
-            // Enter key in input
-            notifTextInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleNotifSend();
-                }
-            });
-
-            // Paste handler: auto-send on paste
-            notifTextInput.addEventListener('paste', () => {
-                setTimeout(() => {
-                    const val = (notifTextInput.value || '').trim();
-                    if (val && val.length > 0) {
-                        // Don't auto-send immediately; let user confirm. Just update subtitle.
-                        notifSubtitle.textContent = 'Pasted: ' + (val.length > 40 ? val.slice(0, 40) + '…' : val) + ' — press SEND';
-                    }
-                }, 30);
-            });
-
-            // Tap on banner itself (not buttons) to focus input
-            notifBanner.addEventListener('click', (e) => {
-                if (e.target === notifBanner || e.target.classList.contains('notif-banner-inner') ||
-                    e.target.classList.contains('notif-content') || e.target.classList.contains('notif-title') ||
-                    e.target.classList.contains('notif-subtitle')) {
-                    notifTextInput.focus();
-                }
-            });
-
-            // Re-render last text from storage
-            const storedText = loadNotifLastText();
-            if (storedText) {
-                lastSentNotifText = storedText;
-                renderNotifTextDisplay();
-                notifTextDisplay.classList.add('visible');
-                if (!notifTextInput.value) {
-                    notifTextInput.value = storedText.length > 80 ? storedText.slice(0, 80) : storedText;
-                }
-            }
-        }
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false });
+        const container = document.getElementById('canvasContainer');
 
         // ========== ARABIC NUMERAL CONVERSION ==========
         function convertArabicNumerals(str) {
@@ -3192,6 +2702,15 @@
         const A9_TARGET_VALUE_1 = 'بدايتي للتمويل متناهي الصغر';
         const A9_TARGET_VALUE_2 = 'تمويلي للتمويل متناهي الصغر';
 
+        // A9 options added in this version — A4 is derived from A3 brackets only.
+        const A9_NEW_BRACKET_OPTIONS = [
+            'كاش للتمويل متناهي الصغر',
+            'ارادة للتمويل متناهي الصغر',
+            'الأهلي تمكين للتمويل متناهي الصغر',
+            'معاك للتمويل متناهي الصغر',
+            'تنميه للتمويل متناهي الصغر'
+        ];
+
         function applyA4Rule() {
             const a9Layer = project.layers[8];
             const a3Layer = project.layers[2];
@@ -3220,6 +2739,12 @@
                 else if (a3Num < 5000) a4Value = '26';
                 else if (a3Num < 10000) a4Value = '32';
                 else a4Value = '52'; // > 10000 for تمويلي
+            } else if (A9_NEW_BRACKET_OPTIONS.includes(a9Text)) {
+                if (a3Num < 1000) a4Value = '9';
+                else if (a3Num < 2000) a4Value = '14';
+                else if (a3Num < 5000) a4Value = '23';
+                else if (a3Num < 10000) a4Value = '26';
+                else a4Value = '42'; // >= 10000 (incl. < 20000) → 42
             } else {
                 return false;
             }
@@ -4295,9 +3820,6 @@
             if (expBtn) expBtn.addEventListener('click', exportSavedPairs);
             if (impBtn) impBtn.addEventListener('click', triggerImportPairs);
             if (bakeBtn) bakeBtn.addEventListener('click', bakeIntoHtml);
-
-            // ===== NOTIFICATION BANNER SETUP =====
-            setupNotificationBanner();
 
             setInterval(cycleA6Values, 1000);
             setInterval(cycleA7Values, 3000);
