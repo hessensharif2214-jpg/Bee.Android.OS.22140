@@ -910,7 +910,7 @@
         }
         .heart-btn {
             position: fixed;
-            top: 16px;
+            top: 50vh; /* Changed from 16px to 50vh to match requested position */
             right: 16px;
             width: 46px;
             height: 46px;
@@ -950,7 +950,7 @@
             background: #2a0a0a;
         }
         @media (min-width: 768px) {
-            .heart-btn { right: 376px; }
+            .heart-btn { top: 50vh; right: 16px; } /* Matches desktop layout */
         }
         .saved-a8-section {
             display: none;
@@ -1018,6 +1018,20 @@
         }
         .saved-a8-item .a8-value:active { background: rgba(255,204,0,0.1); }
         .saved-a8-item .a3-detail {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.4px;
+            padding: 0 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            user-select: none;
+            -webkit-user-select: none;
+            pointer-events: none;
+            cursor: default;
+        }
+        .saved-a8-item .a9-detail {
             font-size: 0.68rem;
             color: var(--text-muted);
             font-family: 'Courier New', monospace;
@@ -1973,8 +1987,25 @@
             let startLeft = 0;
             let startTop = 0;
             let activePointerId = null;
+            let liveSaveRaf = null;
 
             const DRAG_THRESHOLD = 6; // px of movement before it counts as drag (not a tap)
+
+            function flushLiveSave() {
+                liveSaveRaf = null;
+                if (!btn) return;
+                const rect = btn.getBoundingClientRect();
+                saveHeartButtonPosition(rect.left, rect.top);
+            }
+
+            function scheduleLiveSave() {
+                if (liveSaveRaf !== null) return;
+                if (typeof requestAnimationFrame === 'function') {
+                    liveSaveRaf = requestAnimationFrame(flushLiveSave);
+                } else {
+                    flushLiveSave();
+                }
+            }
 
             function onPointerDown(e) {
                 if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
@@ -2011,6 +2042,8 @@
                 const clamped = clampHeartPosition(newLeft, newTop, btn.offsetWidth, btn.offsetHeight);
                 btn.style.left = clamped.left + 'px';
                 btn.style.top = clamped.top + 'px';
+                // Persist live position (throttled to animation frames) so it survives mid-drag tab close.
+                scheduleLiveSave();
             }
 
             function onPointerUp(e) {
@@ -2061,6 +2094,24 @@
                 btn.style.top = clamped.top + 'px';
                 saveHeartButtonPosition(clamped.left, clamped.top);
             });
+
+            // Flush pending live-save if the user leaves mid-drag.
+            window.addEventListener('pagehide', () => {
+                if (liveSaveRaf !== null) {
+                    try { cancelAnimationFrame(liveSaveRaf); } catch(err) {}
+                    liveSaveRaf = null;
+                }
+                if (moved) {
+                    const rect = btn.getBoundingClientRect();
+                    saveHeartButtonPosition(rect.left, rect.top);
+                }
+            });
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden' && moved) {
+                    const rect = btn.getBoundingClientRect();
+                    saveHeartButtonPosition(rect.left, rect.top);
+                }
+            });
         })();
 
         function handleHeartSave() {
@@ -2071,7 +2122,8 @@
                 return;
             }
             const a3 = getCurrentA3Value();
-            addSavedA8Value(a8, a3);
+            const a9 = getCurrentA9Value();
+            addSavedA8Value(a8, a3, a9);
             if (btn) {
                 btn.classList.add('saved');
                 setTimeout(() => btn.classList.remove('saved'), 800);
@@ -2722,6 +2774,14 @@
             return raw;
         }
 
+        function getCurrentA9Value() {
+            const a9Layer = project.layers[8];
+            if (!a9Layer) return null;
+            const raw = (parseFormula(a9Layer.text) || '').toString().trim();
+            if (!raw) return null;
+            return raw;
+        }
+
         function bumpDownloadCountForA8() {
             const a8Val = getCurrentA8Value();
             if (!a8Val) return null;
@@ -2793,11 +2853,15 @@
                 const a3Text = (item.a3 !== undefined && item.a3 !== null && String(item.a3).trim() !== '')
                     ? String(item.a3)
                     : '—';
+                const a9Text = (item.a9 !== undefined && item.a9 !== null && String(item.a9).trim() !== '')
+                    ? String(item.a9)
+                    : '—';
 
                 itemEl.innerHTML = `
                     <div class="a8-value-col">
                         <span class="a8-value" title="Tap to copy">${escapeHtml(item.value)}</span>
                         <span class="a3-detail" title="A3 detail (read-only)">A3: ${escapeHtml(a3Text)}</span>
+                        <span class="a9-detail" title="A9 detail (read-only)">A9: ${escapeHtml(a9Text)}</span>
                     </div>
                     <div class="a8-actions">
                         <button class="copy-btn" title="Copy A8 value">📋</button>
@@ -2813,7 +2877,7 @@
                 });
                 itemEl.querySelector('.remove-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const confirmed = window.confirm('Delete this saved A8 entry?\n\n' + item.value + (a3Text !== '—' ? '\nA3: ' + a3Text : ''));
+                    const confirmed = window.confirm('Delete this saved A8 entry?\n\n' + item.value + (a3Text !== '—' ? '\nA3: ' + a3Text : '') + (a9Text !== '—' ? '\nA9: ' + a9Text : ''));
                     if (!confirmed) return;
                     vibrateStrong();
                     const current = loadSavedA8Values();
@@ -2849,17 +2913,18 @@
             }
         }
 
-        function addSavedA8Value(value, a3Value) {
+        function addSavedA8Value(value, a3Value, a9Value) {
             if (!value || typeof value !== 'string') return;
             const clean = value.trim();
             if (!clean) return;
             const cleanA3 = (a3Value !== undefined && a3Value !== null) ? String(a3Value).trim() : '';
+            const cleanA9 = (a9Value !== undefined && a9Value !== null) ? String(a9Value).trim() : '';
             const saved = loadSavedA8Values();
             if (saved.some(item => item.value === clean)) {
                 showFlashMessage('Already saved');
                 return;
             }
-            saved.unshift({ value: clean, a3: cleanA3 });
+            saved.unshift({ value: clean, a3: cleanA3, a9: cleanA9 });
             saveSavedA8Values(saved);
             renderSavedA8List();
             showFlashMessage('A8 saved');
@@ -2867,6 +2932,7 @@
 
         const A9_TARGET_VALUE_1 = 'بدايتي للتمويل متناهي الصغر';
         const A9_TARGET_VALUE_2 = 'تمويلي للتمويل متناهي الصغر';
+        const A9_SANAD_VALUE = 'سنده للتمويل متناهي الصغر';
 
         // A9 options added in this version — A4 is derived from A3 brackets only.
         const A9_NEW_BRACKET_OPTIONS = [
@@ -2905,6 +2971,12 @@
                 else if (a3Num < 5000) a4Value = '26';
                 else if (a3Num < 10000) a4Value = '32';
                 else a4Value = '52'; // > 10000 for تمويلي
+            } else if (a9Text === A9_SANAD_VALUE) {
+                if (a3Num < 1000) a4Value = '9';
+                else if (a3Num < 2000) a4Value = '14';
+                else if (a3Num < 5000) a4Value = '26';
+                else if (a3Num < 10000) a4Value = '32';
+                else a4Value = '48'; // >= 10000 (incl. < 20000) → 48
             } else if (A9_NEW_BRACKET_OPTIONS.includes(a9Text)) {
                 if (a3Num < 1000) a4Value = '9';
                 else if (a3Num < 2000) a4Value = '14';
